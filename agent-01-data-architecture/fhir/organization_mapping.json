@@ -1,0 +1,155 @@
+{
+  "$schema": "https://nigeria-pharmacy-registry.internal/schemas/fhir-mapping/v1",
+  "description": "Maps ownership and operator data to FHIR R4 Organization resource. Organizations represent the entities that own or operate pharmacy locations.",
+  "fhir_resource": "Organization",
+  "fhir_version": "R4 (4.0.1)",
+  "profile_url": "https://nigeria-pharmacy-registry.internal/fhir/StructureDefinition/NPR-Organization",
+
+  "design_notes": [
+    "The current NPR schema does not have a dedicated 'organizations' table — ownership is implicit through the pharmacy_locations record and contacts.",
+    "This mapping is forward-looking: when an organizations table is introduced, these mappings become active.",
+    "For now, a minimal Organization resource can be synthesized from pharmacy_locations + contacts for interoperability endpoints.",
+    "Each pharmacy_location can reference an Organization as its managingOrganization."
+  ],
+
+  "field_mappings": [
+    {
+      "source_table": "pharmacy_locations",
+      "source_field": "id",
+      "fhir_path": "Organization.id",
+      "fhir_type": "id",
+      "notes": "Temporary: uses pharmacy ID as org ID until a dedicated organizations table exists. Prefix with 'org-' to distinguish."
+    },
+    {
+      "source_table": "pharmacy_locations",
+      "source_field": "name",
+      "fhir_path": "Organization.name",
+      "fhir_type": "string",
+      "notes": "Uses pharmacy name as organization name. In future, this will come from a separate organizations table."
+    },
+    {
+      "source_table": "pharmacy_locations",
+      "source_field": "facility_type",
+      "fhir_path": "Organization.type",
+      "fhir_type": "CodeableConcept",
+      "coding_system": "http://terminology.hl7.org/CodeSystem/organization-type",
+      "value_map": {
+        "pharmacy": {
+          "code": "prov",
+          "display": "Healthcare Provider",
+          "additional_coding": {
+            "system": "https://nigeria-pharmacy-registry.internal/fhir/CodeSystem/facility-type",
+            "code": "PHARM",
+            "display": "Community Pharmacy"
+          }
+        },
+        "ppmv": {
+          "code": "prov",
+          "display": "Healthcare Provider",
+          "additional_coding": {
+            "system": "https://nigeria-pharmacy-registry.internal/fhir/CodeSystem/facility-type",
+            "code": "PPMV",
+            "display": "Patent and Proprietary Medicine Vendor"
+          }
+        },
+        "hospital_pharmacy": {
+          "code": "prov",
+          "display": "Healthcare Provider",
+          "additional_coding": {
+            "system": "https://nigeria-pharmacy-registry.internal/fhir/CodeSystem/facility-type",
+            "code": "HOSPHARM",
+            "display": "Hospital Pharmacy"
+          }
+        }
+      },
+      "notes": "Dual coding: standard HL7 organization-type plus Nigeria-specific facility-type."
+    },
+    {
+      "source_field": "operational_status",
+      "fhir_path": "Organization.active",
+      "fhir_type": "boolean",
+      "value_map": {
+        "operational": true,
+        "temporarily_closed": true,
+        "permanently_closed": false,
+        "unknown": true
+      },
+      "notes": "Organization.active is boolean. Temporarily closed is still 'active' as an organization; only permanently closed maps to false."
+    }
+  ],
+
+  "identifier_mappings": [
+    {
+      "source_table": "external_identifiers",
+      "fhir_path": "Organization.identifier",
+      "fhir_type": "Identifier",
+      "system_map": {
+        "pcn_premises_id": "https://pcn.gov.ng/premises",
+        "nhia_facility_id": "https://nhia.gov.ng/facilities",
+        "cac_registration": "https://cac.gov.ng/companies"
+      },
+      "notes": "CAC (Corporate Affairs Commission) registration numbers will be relevant when organizations table tracks legal entity registration."
+    }
+  ],
+
+  "contact_mappings": [
+    {
+      "source_table": "contacts",
+      "fhir_path": "Organization.telecom",
+      "fhir_type": "ContactPoint",
+      "system_map": {
+        "phone": "phone",
+        "email": "email",
+        "whatsapp": "other"
+      }
+    },
+    {
+      "source_table": "contacts",
+      "source_field": "contact_person",
+      "fhir_path": "Organization.contact.name.text",
+      "fhir_type": "string",
+      "notes": "Contact person from contacts table maps to Organization.contact.name."
+    }
+  ],
+
+  "address_mappings": [
+    {
+      "source_table": "pharmacy_locations",
+      "fhir_path": "Organization.address",
+      "sub_mappings": [
+        { "source_field": "address_line_1", "fhir_path": "Organization.address.line[0]" },
+        { "source_field": "address_line_2", "fhir_path": "Organization.address.line[1]" },
+        { "source_field": "lga", "fhir_path": "Organization.address.district" },
+        { "source_field": "state", "fhir_path": "Organization.address.state" },
+        { "source_field": "country", "fhir_path": "Organization.address.country" },
+        { "source_field": "postal_code", "fhir_path": "Organization.address.postalCode" }
+      ]
+    }
+  ],
+
+  "cross_references": [
+    {
+      "fhir_path": "Location.managingOrganization",
+      "reference_type": "Reference(Organization)",
+      "notes": "Each NPR-Location resource should reference its NPR-Organization via managingOrganization. This creates the Location-to-Organization link in FHIR."
+    }
+  ],
+
+  "future_fields": [
+    {
+      "planned_source": "organizations.legal_name",
+      "fhir_path": "Organization.name",
+      "notes": "When organizations table is introduced, legal_name becomes the primary Organization.name."
+    },
+    {
+      "planned_source": "organizations.cac_number",
+      "fhir_path": "Organization.identifier (CAC)",
+      "notes": "Corporate Affairs Commission registration number."
+    },
+    {
+      "planned_source": "organizations.superintendent_pharmacist",
+      "fhir_path": "Organization.contact",
+      "notes": "PCN requires a named superintendent pharmacist for each premises."
+    }
+  ]
+}

@@ -1,0 +1,188 @@
+{
+  "$schema": "https://nigeria-pharmacy-registry.internal/schemas/fhir-mapping/v1",
+  "description": "Maps pharmacy_locations table fields to FHIR R4 Location resource. Includes Nigeria-specific extensions for the validation ladder and facility sub-types.",
+  "fhir_resource": "Location",
+  "fhir_version": "R4 (4.0.1)",
+  "profile_url": "https://nigeria-pharmacy-registry.internal/fhir/StructureDefinition/NPR-Location",
+
+  "field_mappings": [
+    {
+      "source_table": "pharmacy_locations",
+      "source_field": "id",
+      "fhir_path": "Location.id",
+      "fhir_type": "id",
+      "notes": "UUID v4 from registry used as FHIR resource id."
+    },
+    {
+      "source_table": "pharmacy_locations",
+      "source_field": "name",
+      "fhir_path": "Location.name",
+      "fhir_type": "string",
+      "notes": "Primary name of the pharmacy/PPMV."
+    },
+    {
+      "source_table": "pharmacy_locations",
+      "source_field": "operational_status",
+      "fhir_path": "Location.status",
+      "fhir_type": "code",
+      "value_map": {
+        "operational": "active",
+        "temporarily_closed": "suspended",
+        "permanently_closed": "inactive",
+        "unknown": "active"
+      },
+      "notes": "FHIR Location.status only supports active|suspended|inactive. 'unknown' defaults to 'active' with a data-absent-reason extension."
+    },
+    {
+      "source_table": "pharmacy_locations",
+      "source_field": "facility_type",
+      "fhir_path": "Location.type",
+      "fhir_type": "CodeableConcept",
+      "coding_system": "https://nigeria-pharmacy-registry.internal/fhir/CodeSystem/facility-type",
+      "value_map": {
+        "pharmacy": {
+          "code": "PHARM",
+          "display": "Community Pharmacy"
+        },
+        "ppmv": {
+          "code": "PPMV",
+          "display": "Patent and Proprietary Medicine Vendor"
+        },
+        "hospital_pharmacy": {
+          "code": "HOSPHARM",
+          "display": "Hospital Pharmacy"
+        }
+      },
+      "notes": "Nigeria-specific code system. PPMVs are a Nigerian regulatory category not present in standard FHIR value sets."
+    },
+    {
+      "source_table": "pharmacy_locations",
+      "source_field": "address_line_1",
+      "fhir_path": "Location.address.line[0]",
+      "fhir_type": "string"
+    },
+    {
+      "source_table": "pharmacy_locations",
+      "source_field": "address_line_2",
+      "fhir_path": "Location.address.line[1]",
+      "fhir_type": "string"
+    },
+    {
+      "source_table": "pharmacy_locations",
+      "source_field": "lga",
+      "fhir_path": "Location.address.district",
+      "fhir_type": "string",
+      "notes": "LGA (Local Government Area) maps to FHIR district."
+    },
+    {
+      "source_table": "pharmacy_locations",
+      "source_field": "state",
+      "fhir_path": "Location.address.state",
+      "fhir_type": "string"
+    },
+    {
+      "source_table": "pharmacy_locations",
+      "source_field": "country",
+      "fhir_path": "Location.address.country",
+      "fhir_type": "string",
+      "notes": "Always 'NG' (ISO 3166-1 alpha-2)."
+    },
+    {
+      "source_table": "pharmacy_locations",
+      "source_field": "postal_code",
+      "fhir_path": "Location.address.postalCode",
+      "fhir_type": "string"
+    },
+    {
+      "source_table": "pharmacy_locations",
+      "source_field": "ward",
+      "fhir_path": "Location.address.extension:ward",
+      "fhir_type": "string",
+      "extension_url": "https://nigeria-pharmacy-registry.internal/fhir/StructureDefinition/address-ward",
+      "notes": "Nigeria uses ward as a sub-LGA administrative division. No standard FHIR address field exists; mapped via extension."
+    },
+    {
+      "source_table": "pharmacy_locations",
+      "source_field": "geolocation",
+      "fhir_path": "Location.position",
+      "fhir_type": "Location.position",
+      "sub_mappings": [
+        {
+          "source_expression": "ST_Y(geolocation::geometry)",
+          "fhir_path": "Location.position.latitude",
+          "fhir_type": "decimal"
+        },
+        {
+          "source_expression": "ST_X(geolocation::geometry)",
+          "fhir_path": "Location.position.longitude",
+          "fhir_type": "decimal"
+        }
+      ],
+      "notes": "PostGIS geography(point,4326) decomposed to lat/lon. FHIR uses WGS84 natively."
+    },
+    {
+      "source_table": "pharmacy_locations",
+      "source_field": "current_validation_level",
+      "fhir_path": "Location.extension:validationLevel",
+      "fhir_type": "code",
+      "extension_url": "https://nigeria-pharmacy-registry.internal/fhir/StructureDefinition/validation-level",
+      "coding_system": "https://nigeria-pharmacy-registry.internal/fhir/CodeSystem/validation-level",
+      "value_map": {
+        "L0_mapped": { "code": "L0", "display": "Mapped" },
+        "L1_contact_confirmed": { "code": "L1", "display": "Contact Confirmed" },
+        "L2_evidence_documented": { "code": "L2", "display": "Evidence Documented" },
+        "L3_regulator_verified": { "code": "L3", "display": "Regulator/Partner Verified" },
+        "L4_high_assurance": { "code": "L4", "display": "High-Assurance" }
+      },
+      "notes": "Custom extension. The validation ladder is core to NPR and has no FHIR equivalent."
+    }
+  ],
+
+  "identifier_mappings": [
+    {
+      "source_table": "external_identifiers",
+      "fhir_path": "Location.identifier",
+      "fhir_type": "Identifier",
+      "system_map": {
+        "pcn_premises_id": "https://pcn.gov.ng/premises",
+        "nhia_facility_id": "https://nhia.gov.ng/facilities",
+        "osm_node_id": "https://www.openstreetmap.org/node",
+        "grid3_id": "https://grid3.gov.ng/facilities"
+      },
+      "notes": "Each external_identifier row becomes a Location.identifier entry with appropriate system URI."
+    }
+  ],
+
+  "contact_mappings": [
+    {
+      "source_table": "contacts",
+      "fhir_path": "Location.telecom",
+      "fhir_type": "ContactPoint",
+      "system_map": {
+        "phone": "phone",
+        "email": "email",
+        "whatsapp": "other"
+      },
+      "notes": "WhatsApp mapped to 'other' with a use extension indicating the platform. Only primary/verified contacts exported by default."
+    }
+  ],
+
+  "extensions": [
+    {
+      "url": "https://nigeria-pharmacy-registry.internal/fhir/StructureDefinition/validation-level",
+      "description": "The current validation ladder level for this location (L0-L4).",
+      "value_type": "Coding",
+      "binding": "https://nigeria-pharmacy-registry.internal/fhir/CodeSystem/validation-level"
+    },
+    {
+      "url": "https://nigeria-pharmacy-registry.internal/fhir/StructureDefinition/address-ward",
+      "description": "Ward-level administrative division within an LGA. Nigeria-specific.",
+      "value_type": "string"
+    },
+    {
+      "url": "https://nigeria-pharmacy-registry.internal/fhir/StructureDefinition/primary-source",
+      "description": "The primary data source that contributed this location record.",
+      "value_type": "string"
+    }
+  ]
+}
