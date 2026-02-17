@@ -1,0 +1,108 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "PCN Registered Premises Import Template",
+  "description": "Validation schema for ingesting Pharmacists Council of Nigeria (PCN) premises registration data. PCN is the primary regulatory source for pharmacy and PPMV registration in Nigeria. Records ingested from PCN start at L0 but carry regulator provenance that can accelerate validation to L3.",
+  "version": "1.0.0",
+  "type": "object",
+  "required": ["source_id", "records"],
+  "properties": {
+    "source_id": {
+      "type": "string",
+      "const": "src-pcn-premises",
+      "description": "Must reference the PCN source entry in source_registry.json."
+    },
+    "ingestion_batch_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "ingestion_timestamp": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "pcn_extract_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Date when the PCN data extract was generated. Critical for determining data freshness."
+    },
+    "records": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["premises_name", "registration_number", "state", "facility_category"],
+        "properties": {
+          "registration_number": {
+            "type": "string",
+            "minLength": 3,
+            "description": "PCN premises registration number. Primary external identifier."
+          },
+          "premises_name": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 500,
+            "description": "Name of premises as registered with PCN."
+          },
+          "facility_category": {
+            "type": "string",
+            "enum": ["community_pharmacy", "hospital_pharmacy", "ppmv", "wholesale", "distribution"],
+            "description": "PCN facility category code. 'wholesale' and 'distribution' are tracked but not primary registry targets."
+          },
+          "registration_date": {
+            "type": ["string", "null"],
+            "format": "date",
+            "description": "Date of initial PCN registration."
+          },
+          "expiry_date": {
+            "type": ["string", "null"],
+            "format": "date",
+            "description": "Registration expiry date. Used to flag potentially lapsed registrations."
+          },
+          "registration_status": {
+            "type": ["string", "null"],
+            "enum": ["active", "expired", "suspended", "revoked", "unknown", null],
+            "default": "unknown"
+          },
+          "superintendent_pharmacist": {
+            "type": ["string", "null"],
+            "description": "Name of the superintendent pharmacist (for community/hospital pharmacies)."
+          },
+          "superintendent_pcn_number": {
+            "type": ["string", "null"],
+            "description": "PCN registration number of the superintendent pharmacist."
+          },
+          "address_line": {
+            "type": ["string", "null"],
+            "maxLength": 1000
+          },
+          "lga": {
+            "type": ["string", "null"]
+          },
+          "state": {
+            "type": "string",
+            "description": "Nigerian state. Must match a valid state or 'FCT'."
+          },
+          "phone": {
+            "type": ["string", "null"],
+            "pattern": "^(\\+?234|0)[0-9]{10,13}$"
+          },
+          "email": {
+            "type": ["string", "null"],
+            "format": "email"
+          },
+          "latitude": {
+            "type": ["number", "null"],
+            "minimum": 3.0,
+            "maximum": 14.0,
+            "description": "WGS84 latitude, if geocoded. PCN data typically lacks coordinates."
+          },
+          "longitude": {
+            "type": ["number", "null"],
+            "minimum": 2.0,
+            "maximum": 15.0,
+            "description": "WGS84 longitude, if geocoded."
+          }
+        }
+      }
+    }
+  }
+}

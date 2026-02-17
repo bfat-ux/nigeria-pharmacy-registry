@@ -1,0 +1,175 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Nigeria Pharmacy Registry — Data Source Catalog",
+  "description": "Catalog of potential and active data sources for pharmacy/PPMV location ingestion. Each entry tracks provenance, licensing, and ingestion status.",
+  "version": "1.0.0",
+  "last_updated": "2026-02-16",
+  "sources": [
+    {
+      "source_id": "src-grid3-health",
+      "source_name": "GRID3 Nigeria Health Facilities",
+      "source_type": "open_data",
+      "url": "https://data.grid3.org/datasets/nigeria-health-care-facilities",
+      "license": "CC-BY-4.0",
+      "coverage_scope": "National — all 36 states + FCT",
+      "estimated_record_count": 34000,
+      "facility_types_included": ["pharmacy", "ppmv", "hospital_pharmacy", "health_center"],
+      "format": "GeoJSON / Shapefile / CSV",
+      "coordinate_system": "EPSG:4326",
+      "fields_available": [
+        "facility_name", "facility_type", "state", "lga", "ward",
+        "latitude", "longitude", "ownership", "operational_status"
+      ],
+      "ingestion_status": "pending",
+      "ingestion_priority": "high",
+      "quality_notes": "Most comprehensive open spatial dataset for Nigeria health facilities. Pharmacy/PPMV subset must be filtered from broader health facility data. Coordinates generally reliable but some records lack precise geocoding.",
+      "notes": "GRID3 is a collaboration between the Bill & Melinda Gates Foundation, WorldPop, and the Nigerian government. The dataset is periodically updated. Filter by facility_type to extract pharmacy-relevant records."
+    },
+    {
+      "source_id": "src-osm-pharmacy",
+      "source_name": "OpenStreetMap Pharmacy POIs",
+      "source_type": "open_data",
+      "url": "https://overpass-turbo.eu/",
+      "license": "ODbL-1.0",
+      "coverage_scope": "National — coverage uneven, stronger in urban areas (Lagos, Abuja, Port Harcourt)",
+      "estimated_record_count": 5000,
+      "facility_types_included": ["pharmacy", "ppmv"],
+      "format": "GeoJSON (via Overpass API)",
+      "coordinate_system": "EPSG:4326",
+      "fields_available": [
+        "name", "amenity", "healthcare", "addr:street", "addr:city",
+        "addr:state", "phone", "opening_hours", "latitude", "longitude"
+      ],
+      "overpass_query": "[out:json];area['name'='Nigeria']->.ng;(node['amenity'='pharmacy'](area.ng);way['amenity'='pharmacy'](area.ng);node['healthcare'='pharmacy'](area.ng););out center;",
+      "ingestion_status": "pending",
+      "ingestion_priority": "high",
+      "quality_notes": "Community-contributed data. Names may be inconsistent. Urban areas have much better coverage than rural. Some duplicate entries possible. Coordinates are generally accurate where present.",
+      "notes": "Extract via Overpass API. Use both amenity=pharmacy and healthcare=pharmacy tags. PPMVs are rarely tagged distinctly in OSM — most will appear under generic pharmacy tags."
+    },
+    {
+      "source_id": "src-nhia-facility",
+      "source_name": "NHIA Accredited Facility List",
+      "source_type": "regulator",
+      "url": "https://nhia.gov.ng/",
+      "license": "Government of Nigeria — public registry (no explicit open license)",
+      "coverage_scope": "National — accredited facilities only",
+      "estimated_record_count": 8000,
+      "facility_types_included": ["pharmacy", "hospital_pharmacy"],
+      "format": "PDF / Excel (periodic export)",
+      "coordinate_system": null,
+      "fields_available": [
+        "facility_name", "facility_code", "state", "lga",
+        "address", "accreditation_status", "accreditation_date"
+      ],
+      "ingestion_status": "not_started",
+      "ingestion_priority": "high",
+      "quality_notes": "Authoritative for accredited facilities but list may lag behind actual accreditation status. No geocoordinates — geocoding required. Facility names may differ from signage. PPMVs are generally not included.",
+      "notes": "NHIA facility codes are critical external identifiers for interoperability. Data is not openly downloadable — requires partnership or scraping of published lists. Coordinate with Agent 8 (Regulatory Integration) for formal data-sharing agreement."
+    },
+    {
+      "source_id": "src-pcn-premises",
+      "source_name": "PCN Registered Premises",
+      "source_type": "regulator",
+      "url": "https://www.pcn.gov.ng/",
+      "license": "Government of Nigeria — regulatory register (restricted access)",
+      "coverage_scope": "National — registered pharmacies and PPMVs",
+      "estimated_record_count": 25000,
+      "facility_types_included": ["pharmacy", "ppmv"],
+      "format": "Unknown — likely Excel/CSV periodic dump or API",
+      "coordinate_system": null,
+      "fields_available": [
+        "premises_name", "registration_number", "registration_date",
+        "expiry_date", "superintendent_pharmacist", "state", "lga", "address",
+        "facility_category"
+      ],
+      "ingestion_status": "not_started",
+      "ingestion_priority": "critical",
+      "quality_notes": "Gold-standard regulatory source for pharmacy registration status. No geocoordinates. Registration status may lag (expired licenses still listed). Includes both pharmacies and PPMVs with distinct category codes.",
+      "notes": "PCN premises registration number is the most important external identifier. Data access requires formal partnership — see Agent 8. PCN distinguishes between Community Pharmacy, Hospital Pharmacy, and PPMV categories."
+    },
+    {
+      "source_id": "src-nafdac-retail",
+      "source_name": "NAFDAC Licensed Drug Retailers",
+      "source_type": "regulator",
+      "url": "https://www.nafdac.gov.ng/",
+      "license": "Government of Nigeria — regulatory (restricted access)",
+      "coverage_scope": "National — licensed drug retail outlets",
+      "estimated_record_count": 15000,
+      "facility_types_included": ["pharmacy", "ppmv"],
+      "format": "Unknown",
+      "coordinate_system": null,
+      "fields_available": [
+        "outlet_name", "license_number", "license_type",
+        "state", "address", "license_status"
+      ],
+      "ingestion_status": "not_started",
+      "ingestion_priority": "medium",
+      "quality_notes": "NAFDAC licensing data complements PCN registration. Some overlap with PCN dataset expected. Geocoding required.",
+      "notes": "NAFDAC license number is a valuable external identifier for cross-referencing. Data access requires partnership. Lower priority than PCN since PCN is the primary pharmacy regulator."
+    },
+    {
+      "source_id": "src-flutterwave-agent",
+      "source_name": "Fintech/MNO Agent Network Pharmacy Data",
+      "source_type": "partner",
+      "url": null,
+      "license": "Commercial partnership — NDA required",
+      "coverage_scope": "Varies by partner — typically urban and peri-urban",
+      "estimated_record_count": null,
+      "facility_types_included": ["pharmacy", "ppmv"],
+      "format": "API / CSV",
+      "coordinate_system": "EPSG:4326",
+      "fields_available": [
+        "business_name", "business_type", "address", "state", "lga",
+        "latitude", "longitude", "phone", "active_status"
+      ],
+      "ingestion_status": "not_started",
+      "ingestion_priority": "low",
+      "quality_notes": "Fintech agent networks (Flutterwave, OPay, PalmPay) and MNOs (MTN MoMo) maintain pharmacy/PPMV location data for their agent networks. Quality varies. May include pharmacies that double as mobile money agents.",
+      "notes": "Exploratory source. Requires commercial partnership. Useful for filling coverage gaps, especially for PPMVs in underserved areas. Coordinate with Agent 8 for partnership approach."
+    },
+    {
+      "source_id": "src-state-moh",
+      "source_name": "State Ministry of Health Facility Lists",
+      "source_type": "regulator",
+      "url": null,
+      "license": "State government — varies by state",
+      "coverage_scope": "Per-state (start with Lagos, FCT, Kano)",
+      "estimated_record_count": null,
+      "facility_types_included": ["pharmacy", "ppmv", "hospital_pharmacy", "health_center"],
+      "format": "Excel / PDF",
+      "coordinate_system": null,
+      "fields_available": [
+        "facility_name", "facility_type", "lga", "ward", "address",
+        "ownership", "operational_status"
+      ],
+      "ingestion_status": "not_started",
+      "ingestion_priority": "medium",
+      "quality_notes": "State-level datasets vary significantly in quality and completeness. Some states maintain digital records, others have paper-only registers. Geocoding required.",
+      "notes": "Incremental ingestion strategy: start with pilot states (Lagos, FCT, Kano) then expand. Coordinate with state pharmacists' councils where possible."
+    },
+    {
+      "source_id": "src-crowdsource-field",
+      "source_name": "Field Crowdsource / Community Mapping",
+      "source_type": "crowdsource",
+      "url": null,
+      "license": "Project-owned — CC-BY-4.0",
+      "coverage_scope": "Targeted — pilot LGAs first",
+      "estimated_record_count": null,
+      "facility_types_included": ["pharmacy", "ppmv"],
+      "format": "JSON (mobile app / ODK / KoboToolbox submission)",
+      "coordinate_system": "EPSG:4326",
+      "fields_available": [
+        "facility_name", "facility_type", "address", "lga", "state",
+        "latitude", "longitude", "phone", "photo_url", "collector_id",
+        "collection_timestamp"
+      ],
+      "ingestion_status": "not_started",
+      "ingestion_priority": "medium",
+      "quality_notes": "Quality depends on collector training. GPS accuracy varies by device. Photos provide evidence for L2 verification. Duplicate submissions likely — feed into deduplication pipeline.",
+      "notes": "Future data source. Requires mobile data collection tool setup (KoboToolbox or custom app). Each submission creates an L0 record with photo evidence that can fast-track to L2. Collector ID enables accountability."
+    }
+  ],
+  "source_type_enum": ["open_data", "partner", "regulator", "crowdsource"],
+  "ingestion_status_enum": ["not_started", "pending", "in_progress", "completed", "paused", "failed"],
+  "ingestion_priority_enum": ["critical", "high", "medium", "low"]
+}
