@@ -1,0 +1,270 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://nigeria-pharmacy-registry.example/schemas/evidence_record.json",
+  "title": "Evidence Record",
+  "description": "Schema for evidence records that support pharmacy/PPMV validation ladder transitions. Every status change in the registry must be backed by one or more evidence records conforming to this schema.",
+  "type": "object",
+  "required": [
+    "evidence_id",
+    "facility_id",
+    "evidence_type",
+    "capture_method",
+    "captured_by",
+    "captured_at",
+    "target_level"
+  ],
+  "properties": {
+    "evidence_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Unique identifier for this evidence record (UUID v4)."
+    },
+    "facility_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Reference to the pharmacy_locations record this evidence applies to."
+    },
+    "evidence_type": {
+      "type": "string",
+      "enum": [
+        "contact_confirmation",
+        "location_confirmation",
+        "regulator_crossref",
+        "storefront_photo",
+        "document_upload",
+        "field_observation",
+        "dispute_evidence",
+        "reverification"
+      ],
+      "description": "Category of evidence being captured."
+    },
+    "capture_method": {
+      "type": "string",
+      "enum": [
+        "phone_call",
+        "email_reply",
+        "sms_reply",
+        "field_visit",
+        "batch_crossref",
+        "manual_crossref",
+        "web_portal_submission",
+        "paper_form_entry"
+      ],
+      "description": "How the evidence was obtained."
+    },
+    "captured_by": {
+      "type": "string",
+      "description": "Actor ID (UUID) of the person or 'system' for automated processes."
+    },
+    "captured_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp (UTC) when the evidence was captured."
+    },
+    "target_level": {
+      "type": "string",
+      "enum": ["L1", "L2", "L3", "L4"],
+      "description": "The validation level this evidence supports transitioning to."
+    },
+    "storage_reference": {
+      "type": ["string", "null"],
+      "format": "uri",
+      "description": "URI pointing to stored evidence artifacts (photos, documents) in the evidence storage bucket. Null if no artifact applies.",
+      "default": null
+    },
+    "verification_notes": {
+      "type": ["string", "null"],
+      "maxLength": 2000,
+      "description": "Free-text notes recorded by the verifier. Must not contain patient data.",
+      "default": null
+    },
+    "outcome": {
+      "type": "string",
+      "enum": ["confirmed", "denied", "inconclusive", "escalated"],
+      "description": "Result of the verification attempt."
+    },
+    "contact_details": {
+      "type": ["object", "null"],
+      "description": "Details captured during contact confirmation (L0→L1). Null for non-contact evidence types.",
+      "properties": {
+        "respondent_name": {
+          "type": "string",
+          "description": "Name of the person who responded."
+        },
+        "respondent_role": {
+          "type": "string",
+          "description": "Role at the facility (e.g., pharmacist, attendant, owner)."
+        },
+        "facility_name_confirmed": {
+          "type": "string",
+          "description": "Facility name as stated by the respondent."
+        },
+        "operating_status_confirmed": {
+          "type": "string",
+          "enum": ["operating", "closed", "relocated", "unknown"],
+          "description": "Operating status as confirmed by the respondent."
+        },
+        "phone_number_used": {
+          "type": ["string", "null"],
+          "description": "Phone number used for the contact attempt."
+        },
+        "call_duration_seconds": {
+          "type": ["integer", "null"],
+          "minimum": 0,
+          "description": "Duration of the phone call in seconds."
+        }
+      },
+      "required": [
+        "respondent_name",
+        "respondent_role",
+        "facility_name_confirmed",
+        "operating_status_confirmed"
+      ],
+      "additionalProperties": false,
+      "default": null
+    },
+    "location_details": {
+      "type": ["object", "null"],
+      "description": "Details captured during field visit (L1→L2). Null for non-location evidence types.",
+      "properties": {
+        "gps_latitude": {
+          "type": "number",
+          "minimum": 4.0,
+          "maximum": 14.0,
+          "description": "Latitude captured on-site (WGS84, SRID 4326). Constrained to Nigeria's latitude range."
+        },
+        "gps_longitude": {
+          "type": "number",
+          "minimum": 2.5,
+          "maximum": 15.0,
+          "description": "Longitude captured on-site (WGS84, SRID 4326). Constrained to Nigeria's longitude range."
+        },
+        "gps_accuracy_meters": {
+          "type": "number",
+          "minimum": 0,
+          "description": "GPS accuracy reported by the capture device in meters."
+        },
+        "facility_operational": {
+          "type": "boolean",
+          "description": "Was the facility open and operating at time of visit?"
+        },
+        "signage_visible": {
+          "type": "boolean",
+          "description": "Was facility signage visible on the storefront?"
+        },
+        "photo_count": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Number of photographs captured."
+        },
+        "photo_references": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "uri"
+          },
+          "description": "URIs to individual photo artifacts in the evidence storage bucket."
+        }
+      },
+      "required": [
+        "gps_latitude",
+        "gps_longitude",
+        "gps_accuracy_meters",
+        "facility_operational",
+        "signage_visible"
+      ],
+      "additionalProperties": false,
+      "default": null
+    },
+    "regulator_details": {
+      "type": ["object", "null"],
+      "description": "Details captured during regulator/partner cross-reference (L2→L3). Null for non-regulator evidence types.",
+      "properties": {
+        "regulator_source": {
+          "type": "string",
+          "description": "Name and version of the regulatory dataset (e.g., 'pcn_2025_q4')."
+        },
+        "regulator_record_id": {
+          "type": "string",
+          "description": "Unique ID of the matching record in the regulator dataset."
+        },
+        "match_score": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "description": "Composite match score from the deduplication/matching algorithm."
+        },
+        "match_type": {
+          "type": "string",
+          "enum": ["exact_match", "probable_match"],
+          "description": "Classification of the match."
+        },
+        "license_number": {
+          "type": ["string", "null"],
+          "description": "PCN or NAFDAC license number if available."
+        },
+        "license_expiry": {
+          "type": ["string", "null"],
+          "format": "date",
+          "description": "License expiry date if available."
+        }
+      },
+      "required": [
+        "regulator_source",
+        "regulator_record_id",
+        "match_score",
+        "match_type"
+      ],
+      "additionalProperties": false,
+      "default": null
+    },
+    "superseded_by": {
+      "type": ["string", "null"],
+      "format": "uuid",
+      "description": "If this evidence record has been superseded (e.g., due to rollback), the UUID of the replacement evidence record.",
+      "default": null
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Timestamp when this evidence record was inserted into the system (UTC)."
+    },
+    "created_by": {
+      "type": "string",
+      "description": "Actor ID (UUID) who inserted this record into the system."
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "evidence_type": { "const": "contact_confirmation" }
+        }
+      },
+      "then": {
+        "required": ["contact_details"]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "evidence_type": { "const": "location_confirmation" }
+        }
+      },
+      "then": {
+        "required": ["location_details", "storage_reference"]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "evidence_type": { "const": "regulator_crossref" }
+        }
+      },
+      "then": {
+        "required": ["regulator_details"]
+      }
+    }
+  ],
+  "additionalProperties": false
+}
