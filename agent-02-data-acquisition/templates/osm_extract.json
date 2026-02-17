@@ -1,0 +1,102 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "OpenStreetMap Pharmacy Extract Template",
+  "description": "Validation schema for ingesting pharmacy POI data extracted from OpenStreetMap via the Overpass API. OSM data uses ODbL licensing and provides geocoded community-contributed facility locations.",
+  "version": "1.0.0",
+  "type": "object",
+  "required": ["source_id", "records"],
+  "properties": {
+    "source_id": {
+      "type": "string",
+      "const": "src-osm-pharmacy",
+      "description": "Must reference the OSM source entry in source_registry.json."
+    },
+    "ingestion_batch_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "ingestion_timestamp": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "overpass_query_timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Timestamp when the Overpass API query was executed."
+    },
+    "records": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["osm_id", "osm_type", "latitude", "longitude"],
+        "properties": {
+          "osm_id": {
+            "type": "integer",
+            "description": "OpenStreetMap element ID. Unique within element type."
+          },
+          "osm_type": {
+            "type": "string",
+            "enum": ["node", "way", "relation"],
+            "description": "OSM element type."
+          },
+          "name": {
+            "type": ["string", "null"],
+            "description": "Facility name from OSM 'name' tag. May be null for unnamed nodes."
+          },
+          "amenity": {
+            "type": ["string", "null"],
+            "description": "OSM amenity tag value (typically 'pharmacy')."
+          },
+          "healthcare": {
+            "type": ["string", "null"],
+            "description": "OSM healthcare tag value (e.g., 'pharmacy')."
+          },
+          "latitude": {
+            "type": "number",
+            "minimum": 3.0,
+            "maximum": 14.0,
+            "description": "WGS84 latitude. For ways/relations, use centroid."
+          },
+          "longitude": {
+            "type": "number",
+            "minimum": 2.0,
+            "maximum": 15.0,
+            "description": "WGS84 longitude. For ways/relations, use centroid."
+          },
+          "addr_street": {
+            "type": ["string", "null"],
+            "description": "OSM addr:street tag."
+          },
+          "addr_city": {
+            "type": ["string", "null"],
+            "description": "OSM addr:city tag."
+          },
+          "addr_state": {
+            "type": ["string", "null"],
+            "description": "OSM addr:state tag. May not match canonical state names."
+          },
+          "phone": {
+            "type": ["string", "null"],
+            "description": "OSM phone tag. Format varies widely."
+          },
+          "opening_hours": {
+            "type": ["string", "null"],
+            "description": "OSM opening_hours tag in OSM format."
+          },
+          "operator": {
+            "type": ["string", "null"],
+            "description": "OSM operator tag — chain or franchise name, if tagged."
+          },
+          "osm_tags_raw": {
+            "type": ["object", "null"],
+            "description": "Complete raw OSM tags object for reference. Preserved for fields not explicitly mapped.",
+            "additionalProperties": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    }
+  }
+}

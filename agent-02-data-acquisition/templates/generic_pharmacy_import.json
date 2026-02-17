@@ -1,0 +1,120 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Generic Pharmacy/PPMV Import Template",
+  "description": "Validation schema for importing pharmacy and PPMV location data from arbitrary sources. All ingested records enter at validation level L0 (Mapped).",
+  "version": "1.0.0",
+  "type": "object",
+  "required": ["source_id", "records"],
+  "properties": {
+    "source_id": {
+      "type": "string",
+      "description": "References source_registry.json source_id. Used for provenance tracking.",
+      "pattern": "^src-[a-z0-9-]+$"
+    },
+    "ingestion_batch_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "UUID v4 assigned to this import batch for traceability."
+    },
+    "ingestion_timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 UTC timestamp when this batch was ingested."
+    },
+    "records": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["facility_name", "state"],
+        "properties": {
+          "source_record_id": {
+            "type": "string",
+            "description": "Original record identifier from the source system, if available."
+          },
+          "facility_name": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 500,
+            "description": "Name of the pharmacy or PPMV outlet as recorded in the source."
+          },
+          "facility_type": {
+            "type": "string",
+            "enum": ["pharmacy", "ppmv", "hospital_pharmacy", "unknown"],
+            "default": "unknown",
+            "description": "Type of dispensing facility. Use 'unknown' when source does not distinguish."
+          },
+          "address_line": {
+            "type": ["string", "null"],
+            "maxLength": 1000,
+            "description": "Street address as provided by source."
+          },
+          "ward": {
+            "type": ["string", "null"],
+            "description": "Ward name, if available."
+          },
+          "lga": {
+            "type": ["string", "null"],
+            "description": "Local Government Area name."
+          },
+          "state": {
+            "type": "string",
+            "description": "Nigerian state name. Must match a valid Nigerian state or 'FCT'."
+          },
+          "latitude": {
+            "type": ["number", "null"],
+            "minimum": 3.0,
+            "maximum": 14.0,
+            "description": "WGS84 latitude. Nigeria range: ~4.3N to ~13.9N."
+          },
+          "longitude": {
+            "type": ["number", "null"],
+            "minimum": 2.0,
+            "maximum": 15.0,
+            "description": "WGS84 longitude. Nigeria range: ~2.7E to ~14.7E."
+          },
+          "phone": {
+            "type": ["string", "null"],
+            "pattern": "^(\\+?234|0)[0-9]{10,13}$",
+            "description": "Phone number in Nigerian format (+234 or 0 prefix)."
+          },
+          "email": {
+            "type": ["string", "null"],
+            "format": "email"
+          },
+          "contact_person": {
+            "type": ["string", "null"],
+            "description": "Name of superintendent pharmacist or contact person."
+          },
+          "registration_number": {
+            "type": ["string", "null"],
+            "description": "PCN premises registration number, if known."
+          },
+          "nhia_code": {
+            "type": ["string", "null"],
+            "description": "NHIA facility code, if known."
+          },
+          "nafdac_license": {
+            "type": ["string", "null"],
+            "description": "NAFDAC license number, if known."
+          },
+          "operational_status": {
+            "type": ["string", "null"],
+            "enum": ["operational", "closed", "temporarily_closed", "unknown", null],
+            "default": "unknown",
+            "description": "Whether the facility is currently operating."
+          },
+          "ownership": {
+            "type": ["string", "null"],
+            "enum": ["private", "government", "ngo", "faith_based", "unknown", null],
+            "default": "unknown"
+          },
+          "source_notes": {
+            "type": ["string", "null"],
+            "description": "Free-text notes from the source or during ingestion."
+          }
+        }
+      }
+    }
+  }
+}
