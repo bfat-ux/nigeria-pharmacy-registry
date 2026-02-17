@@ -1,0 +1,1220 @@
+openapi: 3.1.0
+info:
+  title: Nigeria Pharmacy Registry API
+  version: 1.0.0
+  description: |
+    Public API for the Nigeria Pharmacy Registry (NPR) — a national
+    dispensing-endpoint infrastructure layer that tracks pharmacy and PPMV
+    locations across Nigeria.
+
+    **Key principles:**
+    - This registry tracks dispensing LOCATIONS, not patients or transactions.
+    - Every record carries provenance (source, timestamp, actor).
+    - Validation levels (L0–L3) reflect progressively verified trust; no
+      record is labelled "Verified" without logged evidence.
+    - Contact data (phone, email) is rate-limited and requires elevated
+      access tiers.
+
+    **Validation Ladder:**
+    | Level | Label | Meaning |
+    |-------|-------|---------|
+    | L0 | Mapped | Record exists from an ingested data source |
+    | L1 | Contact Confirmed | Phone/email verified via outbound call/message |
+    | L2 | Evidence Documented | Location confirmation + optional storefront photo |
+    | L3 | Regulator/Partner Verified | Cross-referenced with PCN, NAFDAC, or NHIA |
+  contact:
+    name: NPR Platform Team
+    email: platform@npr.ng
+  license:
+    name: MIT
+    identifier: MIT
+
+servers:
+  - url: https://api.npr.ng/v1
+    description: Production
+  - url: https://staging-api.npr.ng/v1
+    description: Staging
+  - url: http://localhost:3000/v1
+    description: Local development
+
+tags:
+  - name: Pharmacies
+    description: Core pharmacy registry lookup and search
+  - name: Validation
+    description: Validation history and evidence
+  - name: Changes
+    description: Change-feed for data consumers
+  - name: FHIR
+    description: FHIR R4 interoperability endpoints
+  - name: Health
+    description: Service health and readiness
+
+paths:
+  # ---------------------------------------------------------------------------
+  # Pharmacy search
+  # ---------------------------------------------------------------------------
+  /pharmacies/search:
+    get:
+      operationId: searchPharmacies
+      summary: Search pharmacies by name, state, LGA, or facility type
+      description: |
+        Full-text and filter-based search across the canonical pharmacy
+        registry. Results are paginated and ordered by relevance when a
+        `name` query is supplied, otherwise by `updated_at` descending.
+
+        Contact fields (phone, email) are **redacted** for the `public`
+        access tier. Authenticated consumers with the `registry_read` scope
+        receive unmasked contact data, subject to rate limits.
+      tags: [Pharmacies]
+      security:
+        - ApiKeyAuth: []
+        - {}
+      parameters:
+        - $ref: '#/components/parameters/QueryName'
+        - $ref: '#/components/parameters/QueryState'
+        - $ref: '#/components/parameters/QueryLga'
+        - $ref: '#/components/parameters/QueryFacilityType'
+        - $ref: '#/components/parameters/QueryOperationalStatus'
+        - $ref: '#/components/parameters/QueryMinValidationLevel'
+        - $ref: '#/components/parameters/PageLimit'
+        - $ref: '#/components/parameters/PageOffset'
+        - $ref: '#/components/parameters/FieldsParam'
+      responses:
+        '200':
+          description: Paginated list of matching pharmacies
+          headers:
+            X-Total-Count:
+              $ref: '#/components/headers/X-Total-Count'
+            X-RateLimit-Limit:
+              $ref: '#/components/headers/X-RateLimit-Limit'
+            X-RateLimit-Remaining:
+              $ref: '#/components/headers/X-RateLimit-Remaining'
+            X-RateLimit-Reset:
+              $ref: '#/components/headers/X-RateLimit-Reset'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PharmacySearchResponse'
+              example:
+                meta:
+                  total: 342
+                  limit: 20
+                  offset: 0
+                data:
+                  - id: "b7e2c9f4-1a3d-4e5f-8b6c-9d0e1f2a3b4c"
+                    name: "HealthPlus Pharmacy"
+                    facility_type: "community_pharmacy"
+                    operational_status: "operational"
+                    validation_level: "L2"
+                    validation_label: "Evidence Documented"
+                    address:
+                      address_line: "12 Admiralty Way"
+                      ward: "Lekki Phase 1"
+                      lga: "Eti-Osa"
+                      state: "Lagos"
+                    geolocation:
+                      latitude: 6.4281
+                      longitude: 3.4219
+                    contacts: []
+                    external_identifiers:
+                      - type: "pcn_premises_id"
+                        value: "PCN/LAG/2024/00142"
+                    primary_source: "grid3_health_facilities"
+                    updated_at: "2025-03-15T09:12:00Z"
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  # ---------------------------------------------------------------------------
+  # Pharmacy lookup by ID
+  # ---------------------------------------------------------------------------
+  /pharmacies/{pharmacy_id}:
+    get:
+      operationId: getPharmacy
+      summary: Get a pharmacy by its registry ID
+      description: |
+        Returns the canonical record for a single pharmacy, including its
+        current validation level, operational status, external identifiers,
+        and (for authenticated callers) contact information.
+
+        Use the `include` parameter to embed related resources such as
+        `validation_history` in a single request.
+      tags: [Pharmacies]
+      security:
+        - ApiKeyAuth: []
+        - {}
+      parameters:
+        - $ref: '#/components/parameters/PharmacyId'
+        - name: include
+          in: query
+          description: |
+            Comma-separated list of related resources to embed.
+            Supported values: `validation_history`, `operational_history`.
+          schema:
+            type: string
+            example: "validation_history"
+        - $ref: '#/components/parameters/FieldsParam'
+      responses:
+        '200':
+          description: Pharmacy record
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PharmacyDetail'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  # ---------------------------------------------------------------------------
+  # Nearest pharmacies (geospatial)
+  # ---------------------------------------------------------------------------
+  /pharmacies/nearest:
+    get:
+      operationId: findNearestPharmacies
+      summary: Find pharmacies nearest to a geographic point
+      description: |
+        Returns pharmacies within a given radius of a lat/lon coordinate,
+        ordered by distance (ascending). Powered by PostGIS spatial index.
+
+        Maximum radius is 50 km. Default is 5 km.
+      tags: [Pharmacies]
+      security:
+        - ApiKeyAuth: []
+        - {}
+      parameters:
+        - name: latitude
+          in: query
+          required: true
+          description: Latitude in decimal degrees (WGS84 / SRID 4326)
+          schema:
+            type: number
+            format: double
+            minimum: 4.0
+            maximum: 14.0
+            example: 6.5244
+        - name: longitude
+          in: query
+          required: true
+          description: Longitude in decimal degrees (WGS84 / SRID 4326)
+          schema:
+            type: number
+            format: double
+            minimum: 2.5
+            maximum: 15.0
+            example: 3.3792
+        - name: radius_km
+          in: query
+          description: Search radius in kilometres (default 5, max 50)
+          schema:
+            type: number
+            format: double
+            default: 5.0
+            minimum: 0.1
+            maximum: 50.0
+        - $ref: '#/components/parameters/QueryFacilityType'
+        - $ref: '#/components/parameters/QueryMinValidationLevel'
+        - $ref: '#/components/parameters/PageLimit'
+        - $ref: '#/components/parameters/FieldsParam'
+      responses:
+        '200':
+          description: List of nearby pharmacies with distance
+          headers:
+            X-RateLimit-Limit:
+              $ref: '#/components/headers/X-RateLimit-Limit'
+            X-RateLimit-Remaining:
+              $ref: '#/components/headers/X-RateLimit-Remaining'
+            X-RateLimit-Reset:
+              $ref: '#/components/headers/X-RateLimit-Reset'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NearestPharmacyResponse'
+              example:
+                meta:
+                  latitude: 6.5244
+                  longitude: 3.3792
+                  radius_km: 5.0
+                  total: 8
+                data:
+                  - id: "b7e2c9f4-1a3d-4e5f-8b6c-9d0e1f2a3b4c"
+                    name: "HealthPlus Pharmacy"
+                    facility_type: "community_pharmacy"
+                    validation_level: "L2"
+                    distance_km: 0.42
+                    geolocation:
+                      latitude: 6.5281
+                      longitude: 3.3819
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  # ---------------------------------------------------------------------------
+  # Validation history
+  # ---------------------------------------------------------------------------
+  /pharmacies/{pharmacy_id}/validation-history:
+    get:
+      operationId: getValidationHistory
+      summary: Get the full validation history for a pharmacy
+      description: |
+        Returns the append-only validation status history for a pharmacy,
+        ordered by `changed_at` descending (newest first). Each entry
+        records the level transition, actor, evidence reference, and source.
+      tags: [Validation]
+      security:
+        - ApiKeyAuth: []
+      parameters:
+        - $ref: '#/components/parameters/PharmacyId'
+        - $ref: '#/components/parameters/PageLimit'
+        - $ref: '#/components/parameters/PageOffset'
+      responses:
+        '200':
+          description: Validation history entries
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationHistoryResponse'
+              example:
+                meta:
+                  pharmacy_id: "b7e2c9f4-1a3d-4e5f-8b6c-9d0e1f2a3b4c"
+                  total: 3
+                data:
+                  - id: "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+                    old_level: "L1"
+                    new_level: "L2"
+                    changed_at: "2025-03-15T09:12:00Z"
+                    changed_by: "field_agent:fa-00421"
+                    actor_type: "field_agent"
+                    source_description: "Field visit — GPS + storefront photo"
+                    evidence_reference: "ev-20250315-00421"
+                  - id: "f0e1d2c3-b4a5-6789-0123-456789abcdef"
+                    old_level: "L0"
+                    new_level: "L1"
+                    changed_at: "2025-02-01T14:30:00Z"
+                    changed_by: "verification_agent:va-00087"
+                    actor_type: "verification_agent"
+                    source_description: "Outbound call confirmed facility exists"
+                    evidence_reference: "ev-20250201-00087"
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  # ---------------------------------------------------------------------------
+  # Change feed
+  # ---------------------------------------------------------------------------
+  /changes:
+    get:
+      operationId: getChanges
+      summary: Stream registry changes since a given timestamp
+      description: |
+        Polling-based change-feed endpoint for downstream consumers. Returns
+        provenance records (inserts, updates, status changes) ordered by
+        `happened_at` ascending.
+
+        Consumers should persist the `next_since` cursor from each response
+        and use it in the subsequent request to avoid gaps.
+
+        **Designed for low-bandwidth environments:** default page size is 50;
+        responses are compact and support gzip.
+      tags: [Changes]
+      security:
+        - ApiKeyAuth: []
+      parameters:
+        - name: since
+          in: query
+          required: true
+          description: |
+            ISO 8601 UTC timestamp. Returns changes that occurred strictly
+            after this timestamp. Use `next_since` from the previous response.
+          schema:
+            type: string
+            format: date-time
+            example: "2025-03-01T00:00:00Z"
+        - name: entity_type
+          in: query
+          description: Filter changes to a specific entity type
+          schema:
+            type: string
+            enum:
+              - pharmacy_location
+              - contact
+              - external_identifier
+              - validation_status
+              - operational_status
+        - name: action
+          in: query
+          description: Filter by action type
+          schema:
+            type: string
+            enum:
+              - insert
+              - update
+              - status_change
+              - merge
+              - delete
+        - $ref: '#/components/parameters/PageLimit'
+      responses:
+        '200':
+          description: Change-feed page
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChangeFeedResponse'
+              example:
+                meta:
+                  since: "2025-03-01T00:00:00Z"
+                  next_since: "2025-03-15T09:12:00Z"
+                  count: 2
+                  has_more: true
+                data:
+                  - id: "c1d2e3f4-a5b6-7890-1234-567890abcdef"
+                    entity_type: "pharmacy_location"
+                    entity_id: "b7e2c9f4-1a3d-4e5f-8b6c-9d0e1f2a3b4c"
+                    action: "insert"
+                    actor: "system:ingestion-pipeline"
+                    actor_type: "system"
+                    source_system: "grid3_health_facilities"
+                    happened_at: "2025-03-02T08:00:00Z"
+                    summary: "New pharmacy ingested from GRID3 dataset"
+                  - id: "d4e5f6a7-b8c9-0123-4567-890abcdef012"
+                    entity_type: "validation_status"
+                    entity_id: "b7e2c9f4-1a3d-4e5f-8b6c-9d0e1f2a3b4c"
+                    action: "status_change"
+                    actor: "field_agent:fa-00421"
+                    actor_type: "field_agent"
+                    source_system: "verification_app"
+                    happened_at: "2025-03-15T09:12:00Z"
+                    summary: "Validation level changed from L1 to L2"
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  # ---------------------------------------------------------------------------
+  # FHIR Location
+  # ---------------------------------------------------------------------------
+  /fhir/Location/{id}:
+    get:
+      operationId: getFhirLocation
+      summary: Get a pharmacy as a FHIR R4 Location resource
+      description: |
+        Returns the pharmacy mapped to a FHIR R4 Location resource with
+        Nigeria-specific extensions for validation level, ward-level
+        addressing, and facility type.
+
+        Conforms to the mapping defined in `location_mapping.json`.
+      tags: [FHIR]
+      security:
+        - ApiKeyAuth: []
+        - {}
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Pharmacy UUID (same as the registry ID)
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: FHIR R4 Location resource
+          content:
+            application/fhir+json:
+              schema:
+                $ref: '#/components/schemas/FhirLocation'
+              example:
+                resourceType: "Location"
+                id: "b7e2c9f4-1a3d-4e5f-8b6c-9d0e1f2a3b4c"
+                meta:
+                  versionId: "3"
+                  lastUpdated: "2025-03-15T09:12:00Z"
+                  profile:
+                    - "https://npr.ng/fhir/StructureDefinition/npr-location"
+                status: "active"
+                name: "HealthPlus Pharmacy"
+                type:
+                  - coding:
+                      - system: "https://npr.ng/fhir/CodeSystem/facility-type"
+                        code: "PHARM"
+                        display: "Community Pharmacy"
+                address:
+                  line: ["12 Admiralty Way"]
+                  city: "Lekki Phase 1"
+                  district: "Eti-Osa"
+                  state: "Lagos"
+                  country: "NGA"
+                position:
+                  latitude: 6.4281
+                  longitude: 3.4219
+                extension:
+                  - url: "https://npr.ng/fhir/Extension/validation-level"
+                    valueCode: "L2"
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /fhir/Location:
+    get:
+      operationId: searchFhirLocations
+      summary: Search FHIR Location resources
+      description: |
+        FHIR-compliant search endpoint. Supports standard FHIR search
+        parameters for Location resources plus custom NPR parameters.
+      tags: [FHIR]
+      security:
+        - ApiKeyAuth: []
+        - {}
+      parameters:
+        - name: name
+          in: query
+          description: Location name (partial match supported)
+          schema:
+            type: string
+        - name: address-state
+          in: query
+          description: Nigerian state
+          schema:
+            type: string
+        - name: type
+          in: query
+          description: "Facility type code (PHARM, PPMV, HOSPHARM)"
+          schema:
+            type: string
+        - name: near
+          in: query
+          description: |
+            Latitude and longitude as `lat|lon|distance|units`.
+            Example: `6.5244|3.3792|5|km`
+          schema:
+            type: string
+        - name: status
+          in: query
+          description: FHIR Location status (active, inactive, suspended)
+          schema:
+            type: string
+            enum: [active, inactive, suspended]
+        - name: _count
+          in: query
+          description: Number of results per page (default 20, max 100)
+          schema:
+            type: integer
+            default: 20
+            maximum: 100
+      responses:
+        '200':
+          description: FHIR R4 Bundle of Location resources
+          content:
+            application/fhir+json:
+              schema:
+                $ref: '#/components/schemas/FhirBundle'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  # ---------------------------------------------------------------------------
+  # Health check
+  # ---------------------------------------------------------------------------
+  /health:
+    get:
+      operationId: healthCheck
+      summary: Service health check
+      description: Returns service health status. No authentication required.
+      tags: [Health]
+      security: []
+      responses:
+        '200':
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum: [healthy, degraded]
+                  version:
+                    type: string
+                  timestamp:
+                    type: string
+                    format: date-time
+                  checks:
+                    type: object
+                    properties:
+                      database:
+                        type: string
+                        enum: [up, down]
+                      postgis:
+                        type: string
+                        enum: [up, down]
+                required: [status, version, timestamp]
+
+# =============================================================================
+# Components
+# =============================================================================
+components:
+  # ---------------------------------------------------------------------------
+  # Security schemes
+  # ---------------------------------------------------------------------------
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+      description: |
+        API key issued by the NPR platform team. Keys are scoped to an
+        access tier (public, registry_read, admin) and carry a monthly
+        request quota.
+    OAuth2:
+      type: oauth2
+      description: |
+        OAuth 2.0 for partner systems and regulator integrations. Tokens
+        carry scopes that map to the same access tiers as API keys.
+      flows:
+        clientCredentials:
+          tokenUrl: https://auth.npr.ng/oauth/token
+          scopes:
+            public: Read-only access to non-sensitive pharmacy data
+            registry_read: Read access including contact data (rate-limited)
+            registry_write: Write access for partner ingestion pipelines
+            admin: Full access including audit logs and provenance
+
+  # ---------------------------------------------------------------------------
+  # Parameters
+  # ---------------------------------------------------------------------------
+  parameters:
+    PharmacyId:
+      name: pharmacy_id
+      in: path
+      required: true
+      description: UUID of the pharmacy in the canonical registry
+      schema:
+        type: string
+        format: uuid
+
+    QueryName:
+      name: name
+      in: query
+      description: |
+        Pharmacy name search. Supports partial match via trigram similarity
+        (pg_trgm). Minimum 2 characters.
+      schema:
+        type: string
+        minLength: 2
+        maxLength: 200
+
+    QueryState:
+      name: state
+      in: query
+      description: Nigerian state name (case-insensitive). Supports comma-separated list.
+      schema:
+        type: string
+        example: "Lagos"
+
+    QueryLga:
+      name: lga
+      in: query
+      description: Local Government Area name (case-insensitive). Requires `state` parameter.
+      schema:
+        type: string
+        example: "Eti-Osa"
+
+    QueryFacilityType:
+      name: facility_type
+      in: query
+      description: Facility type filter
+      schema:
+        type: string
+        enum:
+          - community_pharmacy
+          - hospital_pharmacy
+          - ppmv
+          - health_centre_pharmacy
+
+    QueryOperationalStatus:
+      name: operational_status
+      in: query
+      description: Operational status filter
+      schema:
+        type: string
+        enum:
+          - operational
+          - temporarily_closed
+          - permanently_closed
+          - unknown
+
+    QueryMinValidationLevel:
+      name: min_validation_level
+      in: query
+      description: |
+        Minimum validation level. Returns pharmacies at this level or above.
+        L0=Mapped, L1=Contact Confirmed, L2=Evidence Documented, L3=Regulator Verified.
+      schema:
+        type: string
+        enum: [L0, L1, L2, L3]
+
+    PageLimit:
+      name: limit
+      in: query
+      description: Number of results per page (default 20, max 100)
+      schema:
+        type: integer
+        default: 20
+        minimum: 1
+        maximum: 100
+
+    PageOffset:
+      name: offset
+      in: query
+      description: Offset for pagination (default 0)
+      schema:
+        type: integer
+        default: 0
+        minimum: 0
+
+    FieldsParam:
+      name: fields
+      in: query
+      description: |
+        Comma-separated list of fields to include in the response.
+        Reduces payload size for bandwidth-constrained clients.
+        Example: `id,name,state,validation_level,geolocation`
+      schema:
+        type: string
+
+  # ---------------------------------------------------------------------------
+  # Headers
+  # ---------------------------------------------------------------------------
+  headers:
+    X-Total-Count:
+      description: Total number of records matching the query
+      schema:
+        type: integer
+    X-RateLimit-Limit:
+      description: Maximum requests allowed in the current window
+      schema:
+        type: integer
+    X-RateLimit-Remaining:
+      description: Remaining requests in the current window
+      schema:
+        type: integer
+    X-RateLimit-Reset:
+      description: UTC epoch seconds when the rate limit window resets
+      schema:
+        type: integer
+
+  # ---------------------------------------------------------------------------
+  # Schemas
+  # ---------------------------------------------------------------------------
+  schemas:
+    # -- Pharmacy core --
+    PharmacySummary:
+      type: object
+      description: Compact pharmacy representation used in search results
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        facility_type:
+          type: string
+          enum: [community_pharmacy, hospital_pharmacy, ppmv, health_centre_pharmacy]
+        operational_status:
+          type: string
+          enum: [operational, temporarily_closed, permanently_closed, unknown]
+        validation_level:
+          type: string
+          enum: [L0, L1, L2, L3, L4]
+        validation_label:
+          type: string
+          description: Human-readable label for the validation level
+          enum:
+            - Mapped
+            - Contact Confirmed
+            - Evidence Documented
+            - Regulator Verified
+            - High Assurance
+        address:
+          $ref: '#/components/schemas/Address'
+        geolocation:
+          $ref: '#/components/schemas/GeoPoint'
+        contacts:
+          type: array
+          description: |
+            Contact entries. Redacted (empty array) for the public access
+            tier; unmasked for registry_read and above.
+          items:
+            $ref: '#/components/schemas/Contact'
+        external_identifiers:
+          type: array
+          items:
+            $ref: '#/components/schemas/ExternalIdentifier'
+        primary_source:
+          type: string
+          description: Name of the original data source
+        updated_at:
+          type: string
+          format: date-time
+      required: [id, name, facility_type, operational_status, validation_level, validation_label]
+
+    PharmacyDetail:
+      description: Full pharmacy record with optional embedded history
+      allOf:
+        - $ref: '#/components/schemas/PharmacySummary'
+        - type: object
+          properties:
+            created_at:
+              type: string
+              format: date-time
+            created_by:
+              type: string
+            validation_history:
+              type: array
+              description: Embedded when `include=validation_history` is requested
+              items:
+                $ref: '#/components/schemas/ValidationHistoryEntry'
+            operational_history:
+              type: array
+              description: Embedded when `include=operational_history` is requested
+              items:
+                $ref: '#/components/schemas/OperationalHistoryEntry'
+
+    # -- Address --
+    Address:
+      type: object
+      properties:
+        address_line:
+          type: string
+        ward:
+          type: string
+        lga:
+          type: string
+        state:
+          type: string
+      required: [state]
+
+    # -- Geolocation --
+    GeoPoint:
+      type: object
+      properties:
+        latitude:
+          type: number
+          format: double
+        longitude:
+          type: number
+          format: double
+      required: [latitude, longitude]
+
+    # -- Contact --
+    Contact:
+      type: object
+      properties:
+        contact_type:
+          type: string
+          enum: [phone, email, whatsapp]
+        contact_value:
+          type: string
+          description: |
+            The phone number or email address. Masked as `+234****1234`
+            for the public access tier.
+        is_primary:
+          type: boolean
+        is_verified:
+          type: boolean
+        verified_at:
+          type: string
+          format: date-time
+          nullable: true
+
+    # -- External identifier --
+    ExternalIdentifier:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - pcn_premises_id
+            - nhia_facility_id
+            - nafdac_license_number
+            - osm_node_id
+            - grid3_id
+            - state_ministry_id
+        value:
+          type: string
+        is_current:
+          type: boolean
+      required: [type, value]
+
+    # -- Validation history --
+    ValidationHistoryEntry:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        old_level:
+          type: string
+          enum: [L0, L1, L2, L3, L4]
+          nullable: true
+        new_level:
+          type: string
+          enum: [L0, L1, L2, L3, L4]
+        changed_at:
+          type: string
+          format: date-time
+        changed_by:
+          type: string
+        actor_type:
+          type: string
+          enum: [system, field_agent, verification_agent, partner_api, regulator_sync, admin, api_user]
+        source_description:
+          type: string
+        evidence_reference:
+          type: string
+          nullable: true
+      required: [id, new_level, changed_at, changed_by, actor_type]
+
+    # -- Operational history --
+    OperationalHistoryEntry:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        old_status:
+          type: string
+          nullable: true
+        new_status:
+          type: string
+        changed_at:
+          type: string
+          format: date-time
+        changed_by:
+          type: string
+        reason:
+          type: string
+          nullable: true
+      required: [id, new_status, changed_at, changed_by]
+
+    # -- Change feed --
+    ChangeEntry:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        entity_type:
+          type: string
+          enum:
+            - pharmacy_location
+            - contact
+            - external_identifier
+            - validation_status
+            - operational_status
+        entity_id:
+          type: string
+          format: uuid
+        action:
+          type: string
+          enum: [insert, update, status_change, merge, delete]
+        actor:
+          type: string
+        actor_type:
+          type: string
+          enum: [system, field_agent, verification_agent, partner_api, regulator_sync, admin, api_user]
+        source_system:
+          type: string
+        happened_at:
+          type: string
+          format: date-time
+        summary:
+          type: string
+          description: Human-readable one-line description of the change
+      required: [id, entity_type, entity_id, action, actor, actor_type, happened_at]
+
+    # -- Response wrappers --
+    PharmacySearchResponse:
+      type: object
+      properties:
+        meta:
+          type: object
+          properties:
+            total:
+              type: integer
+            limit:
+              type: integer
+            offset:
+              type: integer
+          required: [total, limit, offset]
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/PharmacySummary'
+      required: [meta, data]
+
+    NearestPharmacyResponse:
+      type: object
+      properties:
+        meta:
+          type: object
+          properties:
+            latitude:
+              type: number
+            longitude:
+              type: number
+            radius_km:
+              type: number
+            total:
+              type: integer
+          required: [latitude, longitude, radius_km, total]
+        data:
+          type: array
+          items:
+            allOf:
+              - $ref: '#/components/schemas/PharmacySummary'
+              - type: object
+                properties:
+                  distance_km:
+                    type: number
+                    format: double
+                    description: Distance from the query point in kilometres
+                required: [distance_km]
+      required: [meta, data]
+
+    ValidationHistoryResponse:
+      type: object
+      properties:
+        meta:
+          type: object
+          properties:
+            pharmacy_id:
+              type: string
+              format: uuid
+            total:
+              type: integer
+          required: [pharmacy_id, total]
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/ValidationHistoryEntry'
+      required: [meta, data]
+
+    ChangeFeedResponse:
+      type: object
+      properties:
+        meta:
+          type: object
+          properties:
+            since:
+              type: string
+              format: date-time
+            next_since:
+              type: string
+              format: date-time
+              description: Use as `since` in the next request to continue polling
+            count:
+              type: integer
+            has_more:
+              type: boolean
+          required: [since, next_since, count, has_more]
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/ChangeEntry'
+      required: [meta, data]
+
+    # -- FHIR --
+    FhirLocation:
+      type: object
+      description: FHIR R4 Location resource (see location_mapping.json for full spec)
+      properties:
+        resourceType:
+          type: string
+          const: "Location"
+        id:
+          type: string
+        meta:
+          type: object
+          properties:
+            versionId:
+              type: string
+            lastUpdated:
+              type: string
+              format: date-time
+            profile:
+              type: array
+              items:
+                type: string
+        status:
+          type: string
+          enum: [active, inactive, suspended]
+        name:
+          type: string
+        type:
+          type: array
+          items:
+            type: object
+            properties:
+              coding:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    system:
+                      type: string
+                    code:
+                      type: string
+                    display:
+                      type: string
+        address:
+          type: object
+          properties:
+            line:
+              type: array
+              items:
+                type: string
+            city:
+              type: string
+            district:
+              type: string
+            state:
+              type: string
+            country:
+              type: string
+        position:
+          type: object
+          properties:
+            latitude:
+              type: number
+            longitude:
+              type: number
+        extension:
+          type: array
+          items:
+            type: object
+            properties:
+              url:
+                type: string
+              valueCode:
+                type: string
+      required: [resourceType, id, name, status]
+
+    FhirBundle:
+      type: object
+      description: FHIR R4 Bundle of Location resources
+      properties:
+        resourceType:
+          type: string
+          const: "Bundle"
+        type:
+          type: string
+          const: "searchset"
+        total:
+          type: integer
+        entry:
+          type: array
+          items:
+            type: object
+            properties:
+              resource:
+                $ref: '#/components/schemas/FhirLocation'
+              search:
+                type: object
+                properties:
+                  mode:
+                    type: string
+                    enum: [match]
+
+    # -- Error --
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            code:
+              type: string
+            message:
+              type: string
+            details:
+              type: array
+              items:
+                type: object
+                properties:
+                  field:
+                    type: string
+                  issue:
+                    type: string
+          required: [code, message]
+      required: [error]
+
+  # ---------------------------------------------------------------------------
+  # Reusable responses
+  # ---------------------------------------------------------------------------
+  responses:
+    BadRequest:
+      description: Invalid request parameters
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            error:
+              code: "INVALID_PARAMETER"
+              message: "One or more request parameters are invalid"
+              details:
+                - field: "latitude"
+                  issue: "Must be between 4.0 and 14.0 (Nigeria bounding box)"
+
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            error:
+              code: "NOT_FOUND"
+              message: "Pharmacy with the given ID does not exist"
+
+    RateLimited:
+      description: Rate limit exceeded
+      headers:
+        Retry-After:
+          description: Seconds until the rate limit window resets
+          schema:
+            type: integer
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            error:
+              code: "RATE_LIMITED"
+              message: "Request rate limit exceeded. See Retry-After header."
+
+    InternalError:
+      description: Unexpected server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            error:
+              code: "INTERNAL_ERROR"
+              message: "An unexpected error occurred. The incident has been logged."
