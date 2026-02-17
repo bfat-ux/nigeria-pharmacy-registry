@@ -1,0 +1,200 @@
+# Nigeria Pharmacy Registry — Deduplication Merge Rules
+#
+# This file controls the composite scorer's behavior: signal weights,
+# match thresholds, blocking rules, and override conditions.
+#
+# Changes to this file take effect on the next dedup run — no code changes
+# needed.  All thresholds were calibrated against a manually-reviewed
+# sample of 500 GRID3 + OSM candidate pairs.
+
+# ---------------------------------------------------------------------------
+# Signal weights (must sum to 1.0)
+# ---------------------------------------------------------------------------
+# These determine each signal's contribution to match_confidence when all
+# signals are available.  When a signal is missing (e.g. no coordinates),
+# its weight is redistributed proportionally among the remaining signals.
+weights:
+  name: 0.40          # Fuzzy name similarity (Levenshtein + token-sort + token-set)
+  geo: 0.25           # Geospatial proximity (Haversine distance decay)
+  phone: 0.20         # Phone number exact match (normalised)
+  external_id: 0.15   # External identifier overlap (PCN, NHIA, NAFDAC, etc.)
+
+# ---------------------------------------------------------------------------
+# Decision thresholds
+# ---------------------------------------------------------------------------
+thresholds:
+  # >= auto_merge: merge without human review
+  auto_merge: 0.95
+
+  # >= review_queue_lower AND < review_queue_upper: send to human review queue
+  review_queue_upper: 0.95
+  review_queue_lower: 0.70
+
+  # < no_match: discard as separate entities
+  no_match: 0.70
+
+# ---------------------------------------------------------------------------
+# Geospatial proximity parameters
+# ---------------------------------------------------------------------------
+geo_proximity:
+  # Inner radius — locations within this distance score 1.0 → 0.5
+  match_radius_km: 0.5
+
+  # Outer radius — beyond this distance, score drops to 0.0
+  decay_radius_km: 2.0
+
+# ---------------------------------------------------------------------------
+# Blocking rules
+# ---------------------------------------------------------------------------
+# Blocking rules are fast pre-filters that skip expensive pairwise
+# comparison for records that cannot possibly match.
+blocking_rules:
+  # When true, records in different states are never compared.
+  # This is safe for pharmacies (physical locations don't move across
+  # state lines) and dramatically reduces the comparison space.
+  same_state_required: true
+
+# ---------------------------------------------------------------------------
+# Score boosts
+# ---------------------------------------------------------------------------
+# Small additive bonuses applied after the weighted composite is computed.
+boosts:
+  # Records sharing the same LGA get a small confidence boost.
+  # Rationale: in dense urban LGAs, two records with similar names and the
+  # same LGA are more likely to be the same facility.
+  same_lga: 0.05
+
+# ---------------------------------------------------------------------------
+# Override rules
+# ---------------------------------------------------------------------------
+# These short-circuit the composite score for specific high-signal
+# conditions.  Each override has a name, trigger condition, and forced
+# decision.
+overrides:
+  # OVERRIDE 1: Exact regulator ID match
+  # If two records share an identical PCN registration number, NHIA
+  # facility code, or NAFDAC license number, they are the same entity
+  # regardless of name or location similarity.
+  - name: regulator_id_exact_match
+    description: >
+      Matching PCN, NHIA, or NAFDAC identifier forces auto-merge.
+      Regulator IDs are the gold standard for identity.
+    trigger:
+      signal: external_id
+      condition: "exact_match_on_regulator_type"
+      regulator_types:
+        - pcn_registration
+        - nhia_facility
+        - nafdac_license
+    decision: auto_merge
+    confidence: 1.0
+
+  # OVERRIDE 2: Exact phone + high name similarity
+  # A matching phone number combined with a name score >= 0.80 is
+  # strong enough for auto-merge.
+  - name: phone_plus_name
+    description: >
+      Exact phone match combined with high name similarity forces
+      auto-merge.  Phone numbers in Nigeria are uniquely tied to
+      SIMs, making this a strong identity signal.
+    trigger:
+      signal: phone
+      condition: "exact_match"
+      name_threshold: 0.80
+    decision: auto_merge
+    confidence_formula: "0.50 + name_score * 0.50"
+
+  # OVERRIDE 3: Conflicting external IDs
+  # If two records share an identifier type but have DIFFERENT values,
+  # they are distinct entities.  This prevents false merges when two
+  # pharmacies in the same area have similar names.
+  - name: conflicting_external_ids
+    description: >
+      Records with the same identifier type but different values are
+      guaranteed to be different entities.  Forces no-match.
+    trigger:
+      signal: external_id
+      condition: "same_type_different_value"
+    decision: no_match
+    confidence: 0.0
+
+  # OVERRIDE 4: Different facility type with low name score
+  # A pharmacy and a PPMV with a low name score should not be merged
+  # even if they are geographically close.
+  - name: facility_type_mismatch_low_name
+    description: >
+      Different facility types with a weak name signal are unlikely
+      to be duplicates.  A hospital pharmacy and a street-corner PPMV
+      may share an address but are distinct entities.
+    trigger:
+      condition: "facility_type_differs AND name_score < 0.60"
+    decision: no_match
+    confidence: 0.0
+
+# ---------------------------------------------------------------------------
+# Merge field precedence
+# ---------------------------------------------------------------------------
+# When two records are merged, which record's field values win?
+# Precedence is determined by source trust hierarchy from data governance.
+merge_field_precedence:
+  # Source trust order (highest first) — aligns with Agent 01 conflict
+  # resolution hierarchy.
+  source_priority:
+    - src-pcn-premises         # Regulator (gold standard)
+    - src-nafdac-retail        # Regulator
+    - src-nhia-facility        # Regulator
+    - src-state-moh            # Regulator (state-level)
+    - src-crowdsource-field    # Field verification (direct observation)
+    - src-grid3-health         # Partner / curated open data
+    - src-osm-pharmacy         # Community open data
+    - src-flutterwave-agent    # Commercial partner
+
+  # Field-level rules: which fields to prefer from the surviving record
+  # vs. the merged-away record.
+  field_rules:
+    # Always prefer the most recently verified name
+    facility_name: highest_source_priority
+    # Always prefer coordinates from field/geo sources over text-only regulators
+    latitude: prefer_non_null_then_source_priority
+    longitude: prefer_non_null_then_source_priority
+    # Address: prefer most complete (non-null fields count)
+    address_line: prefer_most_complete
+    ward: prefer_non_null_then_source_priority
+    lga: prefer_non_null_then_source_priority
+    state: prefer_non_null_then_source_priority
+    # Phone: prefer verified
+    phone: prefer_verified_then_source_priority
+    # Operational status: prefer regulator assertion
+    operational_status: highest_source_priority
+    # Facility type: prefer regulator classification
+    facility_type: highest_source_priority
+
+# ---------------------------------------------------------------------------
+# Review queue configuration
+# ---------------------------------------------------------------------------
+review_queue:
+  # Maximum number of pairs queued per batch before pausing ingestion
+  max_pending: 5000
+
+  # How long a review item sits before auto-escalation (days)
+  escalation_after_days: 14
+
+  # Required reviewer role
+  required_role: "dedup_reviewer"
+
+  # Number of reviewers needed for a decision (1 = single reviewer)
+  required_approvals: 1
+
+  # Fields shown to reviewer (UI hint — not enforced by scorer)
+  display_fields:
+    - facility_name
+    - facility_type
+    - address_line
+    - lga
+    - state
+    - phone
+    - latitude
+    - longitude
+    - source_id
+    - validation_level
+    - external_identifiers
