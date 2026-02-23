@@ -44,7 +44,11 @@ There are conflicting definitions of core domain enums across SQL, ingestion, an
 
 Integration docs indicate Agent 08 deliverables are complete, but no `agent-08-*` directory exists in the repository.
 
+
 **Impact:** downstream assumptions in dependency tracking may be inaccurate; execution order and “satisfied dependency” claims may be premature.
+
+**Impact:** downstream assumptions in dependency tracking may be inaccurate; execution order and "satisfied dependency" claims may be premature.
+
 
 ### 4) Compliance metadata not fully operationalized in source registry
 
@@ -83,7 +87,11 @@ Source catalog has rich provenance metadata, but does not yet encode per-source 
    - Add structured fields in `source_registry.json` for lawful basis, retention class, sharing constraints, and PII handling requirements.
 
 3. **Create implementation readiness checklist**
+
    - Add a “spec-to-build readiness” gate spanning data model, API model, security middleware, and verification ops.
+
+   - Add a "spec-to-build readiness" gate spanning data model, API model, security middleware, and verification ops.
+ afa5b5f (Add Holistic Review document for Nigeria Pharmacy Registry)
 
 ## P2 (Medium-term)
 
@@ -97,7 +105,11 @@ Source catalog has rich provenance metadata, but does not yet encode per-source 
 
 - 0 enum mismatch failures across SQL/OpenAPI/ingestion compatibility tests.
 - 100% of source entries include structured lawful basis + retention profile.
+
 - Dependency tracker “complete” claims match repository contents.
+
+- Dependency tracker "complete" claims match repository contents.
+afa5b5f (Add Holistic Review document for Nigeria Pharmacy Registry)
 - Synthetic E2E run completes with full provenance chain and expected validation transitions.
 
 ## Overall Assessment
