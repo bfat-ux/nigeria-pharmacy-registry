@@ -1,0 +1,35 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+.venv/
+venv/
+
+# Environment
+.env
+*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Data & output (never commit raw data or pipeline output)
+output/
+*.csv
+*.xlsx
+!agent-02-data-acquisition/templates/*.csv
+
+# Docker persistent volumes
+db/data/
+
+# Node (future API layer)
+node_modules/

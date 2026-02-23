@@ -1,0 +1,26 @@
+# Nigeria Pharmacy Registry — Local Development Database
+# Usage: docker compose up -d
+
+services:
+  db:
+    image: postgis/postgis:16-3.4
+    container_name: npr-db
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: npr_registry
+      POSTGRES_USER: npr
+      POSTGRES_PASSWORD: npr_local_dev
+    volumes:
+      - npr_data:/var/lib/postgresql/data
+      - ./db/init:/docker-entrypoint-initdb.d:ro
+      - ./agent-01-data-architecture/sql:/sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U npr -d npr_registry"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+volumes:
+  npr_data:

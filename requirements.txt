@@ -1,0 +1,14 @@
+# Nigeria Pharmacy Registry — Python dependencies
+# Install: pip install -r requirements.txt
+
+# Entity resolution / fuzzy name matching
+rapidfuzz>=3.6,<4
+
+# Merge-rule configuration (YAML loading for deduplication config)
+PyYAML>=6.0,<7
+
+# Optional: schema validation for ingestion pipeline
+jsonschema>=4.21,<5
+
+# Testing
+pytest>=8.0,<9

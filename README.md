@@ -29,10 +29,37 @@ An open registry of pharmacy and medicine vendor dispensing locations across Nig
 
 ## Quick Start
 
+### Prerequisites
+
+- [Docker](https://docs.docker.com/get-docker/) (for the database)
+- Python 3.10+
+
+### 1. Start the database
+
 ```bash
-chmod +x setup.sh
-./setup.sh
-git init
+docker compose up -d
+```
+
+This launches PostgreSQL 16 + PostGIS 3.4 and automatically runs all schema
+migrations on first startup. The database is available at `localhost:5432`
+(user: `npr`, password: `npr_local_dev`, database: `npr_registry`).
+
+### 2. Install Python dependencies
+
+```bash
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+```
+
+### 3. Verify
+
+```bash
+# Check the database is healthy
+docker compose ps
+
+# Connect and inspect
+psql -h localhost -U npr -d npr_registry -c "\dt"
 ```
 
 ## Project Structure
