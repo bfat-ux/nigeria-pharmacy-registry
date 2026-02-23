@@ -1,0 +1,4879 @@
+{
+  "source_id": "src-google-places",
+  "google_places_query_timestamp": "2026-02-23T22:22:46.753821+00:00",
+  "scope": "Lagos",
+  "search_radius_m": 10000,
+  "total_records": 242,
+  "records": [
+    {
+      "google_place_id": "ChIJU_Hx4SyBOxAR1gBGM6m-EKc",
+      "name": "Golden Access Pharmacy & Stores",
+      "formatted_address": "1 Imude Rd, Ojo, Lagos 102104, Lagos, Nigeria",
+      "short_address": "1 Imude Rd, Lagos",
+      "latitude": 6.460316,
+      "longitude": 3.116678,
+      "phone": null,
+      "state": "Lagos",
+      "lga": "Ojo",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "store",
+        "point_of_interest",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJ_RQGgGaHOxARZgZw6H7MgNE",
+      "name": "Avant Grobel Pharmacy",
+      "formatted_address": "Plot 1901, Block XV, Phase II, Festival Town By Beacon Light Junction Abule-Ado, Trade Fair Complex, Lagos 102102, Lagos, Nigeria",
+      "short_address": "Plot 1901, Block XV, Phase II, Festival Town By Beacon Light Junction Abule-Ado, Lagos",
+      "latitude": 6.462499,
+      "longitude": 3.261156,
+      "phone": "+2348033217090",
+      "state": "Lagos",
+      "lga": "Amuwo-Odofin",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "store",
+        "point_of_interest",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJE4ySwiaGOxAR5Pj-eadidvg",
+      "name": "Grace Johnson",
+      "formatted_address": "448 Old Ojo Rd, Satellite Town, Lagos 102102, Lagos, Nigeria",
+      "short_address": "448 Old Ojo Rd, Lagos",
+      "latitude": 6.454806,
+      "longitude": 3.2551,
+      "phone": "+2347031200168",
+      "state": "Lagos",
+      "lga": "Amuwo-Odofin",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "store",
+        "point_of_interest",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJ9VafZeyGOxARoRukPtBUbtw",
+      "name": "New Concept Pharmacy",
+      "formatted_address": "Costain Rd, Ojo, Lagos 102113, Lagos, Nigeria",
+      "short_address": "Iyana Iba, Costain Rd, Lagos",
+      "latitude": 6.458378,
+      "longitude": 3.203949,
+      "phone": "+2348163394108",
+      "state": "Lagos",
+      "lga": "Ojo",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "store",
+        "point_of_interest",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJ1_a9Q36HOxARddt3AZQIqIo",
+      "name": "D2 pharmacy and sundries",
+      "formatted_address": "31 Ayinke Timson Dr, Satellite Town, Lagos 102102, Lagos, Nigeria",
+      "short_address": "31 Ayinke Timson Dr, Lagos",
+      "latitude": 6.44963,
+      "longitude": 3.251097,
+      "phone": "+2348023050812",
+      "state": "Lagos",
+      "lga": "Amuwo-Odofin",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "store",
+        "point_of_interest",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJg-hxdiiGOxARB4VozuSIBKs",
+      "name": "PharmaCare",
+      "formatted_address": "F724+6P3, Community Rd, Satellite Town, Lagos 102102, Lagos, Nigeria",
+      "short_address": "F724+6P3, Community Rd, Lagos",
+      "latitude": 6.450514,
+      "longitude": 3.256808,
+      "phone": null,
+      "state": "Lagos",
+      "lga": "Amuwo-Odofin",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "store",
+        "point_of_interest",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJD1Rc-5uHOxARsuym2lqgIVQ",
+      "name": "Zamac Pharmacy",
+      "formatted_address": "Bale St, opp. Ojo Barracks, off Lagos - Badagry Expressway, Volkswagen, Lagos 102113, Lagos, Nigeria",
+      "short_address": "Bale St, Ojo Barracks, Lagos - Badagry Expressway, Lagos",
+      "latitude": 6.459026,
+      "longitude": 3.230454,
+      "phone": "+2348066172287",
+      "state": "Lagos",
+      "lga": "Ojo",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "store",
+        "point_of_interest",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJQ_HtCZKIOxAReorGKL78qiQ",
+      "name": "Divine Seed Pharmacy",
+      "formatted_address": "By Navy Gate 1 Dupe Otegbola Way, Satellite Town, Lagos 102102, Lagos, Nigeria",
+      "short_address": "By Navy Gate 1 Dupe Otegbola Way, Lagos",
+      "latitude": 6.450607,
+      "longitude": 3.274354,
+      "phone": "+2348099543274",
+      "state": "Lagos",
+      "lga": "Amuwo-Odofin",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "store",
+        "point_of_interest",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJE8587BuHOxAR6RsKO4rTC6k",
+      "name": "Lopez Pharmacy (a mutti Pharmacy)",
+      "formatted_address": "10 Omila Onireke St, Volkswagen, Lagos 102113, Lagos, Nigeria",
+      "short_address": "10 Omila Onireke St, Lagos",
+      "latitude": 6.457352,
+      "longitude": 3.23108,
+      "phone": null,
+      "state": "Lagos",
+      "lga": "Ojo",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "store",
+        "point_of_interest",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJeWEMB92JOxARo7hUFPjI07g",
+      "name": "Medicville Pharmacy",
+      "formatted_address": "Plot 734, Road 257, Festac Phase 2, Trade Fair Complex, Lagos 100001, Lagos, Nigeria",
+      "short_address": "Plot 734, Road 257, Festac Phase 2, Lagos",
+      "latitude": 6.462478,
+      "longitude": 3.258799,
+      "phone": "+2348172076816",
+      "state": "Lagos",
+      "lga": "Amuwo-Odofin",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "store",
+        "point_of_interest",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJpRpdHn2HOxARFXF2_zEGkbc",
+      "name": "Fmc Pharmacy",
+      "formatted_address": "Old Ojo Rd, Satellite Town, Lagos 102102, Lagos, Nigeria",
+      "short_address": "Old Ojo Rd, Lagos",
+      "latitude": 6.454548,
+      "longitude": 3.256905,
+      "phone": "+2348033716370",
+      "state": "Lagos",
+      "lga": "Amuwo-Odofin",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "store",
+        "point_of_interest",
+        "wholesaler",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJywHZFHiIOxARqCzB_YogVZw",
+      "name": "Marpe Health care",
+      "formatted_address": "Satellite Town, 102102, Lagos, Nigeria",
+      "short_address": "Satellite Town",
+      "latitude": 6.43079,
+      "longitude": 3.259351,
+      "phone": "+2348080727547",
+      "state": "Lagos",
+      "lga": "Amuwo-Odofin",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "store",
+        "point_of_interest",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJbzGQk-CHOxARVUvo9R5FGPU",
+      "name": "D2 Pharmacy and Sundries",
+      "formatted_address": "22 Pharmacy and Sundries, Satellite Town, Lagos 102102, Lagos, Nigeria",
+      "short_address": "22 Pharmacy and Sundries, Lagos",
+      "latitude": 6.450035,
+      "longitude": 3.253158,
+      "phone": "+2348150836174",
+      "state": "Lagos",
+      "lga": "Amuwo-Odofin",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "store",
+        "point_of_interest",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJV4LrOSyHOxAROEImrVqeDgs",
+      "name": "Richmax Pharmacy and Stores",
+      "formatted_address": "45a Alaba Okiri Road, Ijegun Egba Rd, Satellite Town, Lagos 102102, Lagos, Nigeria",
+      "short_address": "45a Alaba Okiri Road, Ijegun Egba Rd, Lagos",
+      "latitude": 6.443351,
+      "longitude": 3.257903,
+      "phone": "+2348144836207",
+      "state": "Lagos",
+      "lga": "Amuwo-Odofin",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "store",
+        "point_of_interest",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJoyK6pd2JOxARDfZCXsm0kj8",
+      "name": "Greenline Pharmacy",
+      "formatted_address": "New Site, 24 Elumeke St, off David West Street, Satellite Town, Lagos 102102, Lagos, Nigeria",
+      "short_address": "New Site, 24 Elumeke St, David West Street, Lagos",
+      "latitude": 6.43613,
+      "longitude": 3.276605,
+      "phone": "+2348160070879",
+      "state": "Lagos",
+      "lga": "Amuwo-Odofin",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "store",
+        "point_of_interest",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJ5dg-X-OJOxAR1hokjNE1xGc",
+      "name": "University Of Calabar Teaching Hospital Accident And Emergency Ward",
+      "formatted_address": "93 Satilite Town, Oluti, Calabar 102102, Cross River, Nigeria",
+      "short_address": "93 Satilite Town, Calabar",
+      "latitude": 6.455867,
+      "longitude": 3.273452,
+      "phone": "+2347042353535",
+      "state": "Cross River",
+      "lga": "Amuwo-Odofin",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "store",
+        "point_of_interest",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJkca3w0mJOxARSoTqi0Q4LxY",
+      "name": "Pharmacare Place",
+      "formatted_address": "Satellite Town, Lagos 102102, Lagos, Nigeria",
+      "short_address": "Lagos",
+      "latitude": 6.44505,
+      "longitude": 3.261169,
+      "phone": null,
+      "state": "Lagos",
+      "lga": "Amuwo-Odofin",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "store",
+        "point_of_interest",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJzWW87CyGOxAR6UC7_-hRKbE",
+      "name": "All Saints Pharmacy",
+      "formatted_address": "8 Sanusi Adeyemo Street, Satellite Town, Lagos 102102, Lagos, Nigeria",
+      "short_address": "8 Sanusi Adeyemo Street, Lagos",
+      "latitude": 6.444166,
+      "longitude": 3.252813,
+      "phone": "+2348023533298",
+      "state": "Lagos",
+      "lga": "Amuwo-Odofin",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "store",
+        "point_of_interest",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJz5g4dzmGOxARlH6KakbJBjI",
+      "name": "Avant Grobel Pharmacy",
+      "formatted_address": "21Irede Road, Volkswagen, Lagos 102102, Lagos, Nigeria",
+      "short_address": "21Irede Road, Lagos",
+      "latitude": 6.454704,
+      "longitude": 3.242805,
+      "phone": "+2347037544222",
+      "state": "Lagos",
+      "lga": "Amuwo-Odofin",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "store",
+        "point_of_interest",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJ0SZdjBqJOxARQA93QS-3I_I",
+      "name": "Sylvagen Pharmacy",
+      "formatted_address": "4 Abija Street, by Lawanson Bus-stop, Satellite Town, Lagos 102102, Lagos, Nigeria",
+      "short_address": "4 Abija Street, by Lawanson Bus-stop, Lagos",
+      "latitude": 6.443285,
+      "longitude": 3.261403,
+      "phone": "+2349060139716",
+      "state": "Lagos",
+      "lga": "Amuwo-Odofin",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "store",
+        "point_of_interest",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJrdjNO46IOxAR9_cORmHQ2PQ",
+      "name": "Phimat Pharmacy",
+      "formatted_address": "C7XC+RMX, Holy Child Way, Satellite Town, Lagos 102102, Lagos, Nigeria",
+      "short_address": "C7XC+RMX Site J Extension, Holy Child Way, Lagos",
+      "latitude": 6.449608,
+      "longitude": 3.271742,
+      "phone": "+2348022505024",
+      "state": "Lagos",
+      "lga": "Amuwo-Odofin",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "store",
+        "point_of_interest",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJi14q6CCLOxARrekSYuwVseI",
+      "name": "Medplus - Saka Tinubu",
+      "formatted_address": "45 Saka Tinubu St, Victoria Island, Lagos 106104, Lagos, Nigeria",
+      "short_address": "45 Saka Tinubu St, Lagos",
+      "latitude": 6.427244,
+      "longitude": 3.423309,
+      "phone": "+2347013489458",
+      "state": "Lagos",
+      "lga": "Eti Osa",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "store",
+        "point_of_interest",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJGwi77tKKOxARRzNhUIFxurg",
+      "name": "Mopheth Pharmacy Victoria Island Lagos",
+      "formatted_address": "23A Adeola Odeku St, Victoria Island, Lagos 106104, Lagos, Nigeria",
+      "short_address": "23A Adeola Odeku St, Lagos",
+      "latitude": 6.430752,
+      "longitude": 3.415655,
+      "phone": "+2348081585229",
+      "state": "Lagos",
+      "lga": "Eti Osa",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "supermarket",
+        "grocery_store",
+        "food_store",
+        "manufacturer",
+        "food",
+        "health",
+        "store",
+        "point_of_interest",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJQwu2vCX1OxARk7vZ2E3eB9k",
+      "name": "Medplus Pharmacy",
+      "formatted_address": "Tantalizers Building, 58 Adetokunbo Ademola Street, Victoria Island, Lagos 106104, Lagos, Nigeria",
+      "short_address": "Tantalizers Building, 58 Adetokunbo Ademola Street, Lagos",
+      "latitude": 6.431992,
+      "longitude": 3.430342,
+      "phone": "+2349091390586",
+      "state": "Lagos",
+      "lga": "Eti Osa",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "store",
+        "point_of_interest",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJudgmCVz1OxARSAATcqOkw2w",
+      "name": "Trustee Pharmacy and Supermarket",
+      "formatted_address": "50d Glover Rd, Ikoyi, Lagos 106104, Lagos, Nigeria",
+      "short_address": "50d Glover Rd, Lagos",
+      "latitude": 6.451935,
+      "longitude": 3.441311,
+      "phone": null,
+      "state": "Lagos",
+      "lga": "Eti Osa",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "grocery_store",
+        "food_delivery",
+        "food_store",
+        "food",
+        "health",
+        "store",
+        "point_of_interest",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJeZc5ECmLOxARkfigrMQy33Q",
+      "name": "Medplus Pharmacy",
+      "formatted_address": "38 Awolowo Rd, Ikoyi, Lagos 106104, Lagos, Nigeria",
+      "short_address": "38 Awolowo Rd, Lagos",
+      "latitude": 6.442365,
+      "longitude": 3.412718,
+      "phone": "+2349152592992",
+      "state": "Lagos",
+      "lga": "Eti Osa",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "academic_department",
+        "health",
+        "store",
+        "point_of_interest",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJ52XlRM6KOxARnktmv78qHdI",
+      "name": "Iwosan Lagoon Outpatient Clinic Victoria Island",
+      "formatted_address": "13a Idejo St, Victoria Island, Lagos 106104, Lagos, Nigeria",
+      "short_address": "13a Idejo St, Lagos",
+      "latitude": 6.426521,
+      "longitude": 3.41322,
+      "phone": "+2347086393027",
+      "state": "Lagos",
+      "lga": "Eti Osa",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "wellness_center",
+        "physiotherapist",
+        "medical_clinic",
+        "hospital",
+        "health",
+        "store",
+        "point_of_interest",
+        "service",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJK7L_vA71OxAR87AKNr977XY",
+      "name": "Baykins Pharmacy",
+      "formatted_address": "Palace Rd, Victoria Island, Lagos 106104, Lagos, Nigeria",
+      "short_address": "Palace Rd, Lagos",
+      "latitude": 6.430067,
+      "longitude": 3.450991,
+      "phone": "+2349099800050",
+      "state": "Lagos",
+      "lga": "Eti Osa",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "store",
+        "point_of_interest",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJ2fvs69KKOxARbNpDVv1Pzrk",
+      "name": "Neuchem Pharmacy",
+      "formatted_address": "24 Adeola Odeku St, Victoria Island, Lagos 106104, Lagos, Nigeria",
+      "short_address": "24 Adeola Odeku St, Lagos",
+      "latitude": 6.429917,
+      "longitude": 3.418027,
+      "phone": "+2348191955079",
+      "state": "Lagos",
+      "lga": "Eti Osa",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "store",
+        "point_of_interest",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJ9bjTgyf1OxAR-lHV-zS-E6k",
+      "name": "Medplus",
+      "formatted_address": "Federal Housing Complex Rd, Victoria Island, Lagos 106104, Lagos, Nigeria",
+      "short_address": "Federal Housing Complex Rd, Lagos",
+      "latitude": 6.438502,
+      "longitude": 3.431995,
+      "phone": null,
+      "state": "Lagos",
+      "lga": "Eti Osa",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "store",
+        "point_of_interest",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJW1ZV5tSKOxARg9KjKOf86WQ",
+      "name": "Careforte Pharmacy & Health Shop",
+      "formatted_address": "299 Akin Olugbade St, Victoria Island, Lagos 106104, Lagos, Nigeria",
+      "short_address": "299 Akin Olugbade St, Lagos",
+      "latitude": 6.431161,
+      "longitude": 3.419884,
+      "phone": "+2347044743759",
+      "state": "Lagos",
+      "lga": "Eti Osa",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "store",
+        "point_of_interest",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJh1cH-c2KOxARmDNtrMOoO3w",
+      "name": "GlenEagles Medical Healthcare Services Ltd",
+      "formatted_address": "21 Molade Okoya Thomas St, Victoria Island, Lagos 106104, Lagos, Nigeria",
+      "short_address": "21 Molade Okoya Thomas St, Lagos",
+      "latitude": 6.429792,
+      "longitude": 3.432281,
+      "phone": "+2347013000052",
+      "state": "Lagos",
+      "lga": "Eti Osa",
+      "operational_status": "operational",
+      "types": [
+        "hospital",
+        "pharmacy",
+        "physiotherapist",
+        "medical_clinic",
+        "doctor",
+        "health",
+        "store",
+        "point_of_interest",
+        "service",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJMVhOIC71OxARdk3a9BijW2A",
+      "name": "Medvacc Pharmacy",
+      "formatted_address": "16 Karimu Kotun St, Victoria Island, Lagos 106104, Lagos, Nigeria",
+      "short_address": "16 Karimu Kotun St, Lagos",
+      "latitude": 6.428279,
+      "longitude": 3.425893,
+      "phone": "+2347046125337",
+      "state": "Lagos",
+      "lga": "Eti Osa",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "store",
+        "point_of_interest",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJmypp_sqLOxARWiyDthxsY1Q",
+      "name": "Alpha Pharmacy & Stores Victoria Island",
+      "formatted_address": "31 Ologun Agbaje St, off Adeola Odeku Street, Victoria Island, Lagos 106104, Lagos, Nigeria",
+      "short_address": "31 Ologun Agbaje St, Adeola Odeku Street, Lagos",
+      "latitude": 6.427982,
+      "longitude": 3.416205,
+      "phone": "+2349062440967",
+      "state": "Lagos",
+      "lga": "Eti Osa",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "supermarket",
+        "grocery_store",
+        "food_store",
+        "food",
+        "health",
+        "store",
+        "point_of_interest",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJsxdC6KqLOxAR5-dYHnoCeWw",
+      "name": "Primeah Pharmacy",
+      "formatted_address": "Awolowo Rd, Ikoyi, Lagos 106104, Lagos, Nigeria",
+      "short_address": "Awolowo Rd, Lagos",
+      "latitude": 6.442068,
+      "longitude": 3.41709,
+      "phone": "+2349085024887",
+      "state": "Lagos",
+      "lga": "Eti Osa",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "store",
+        "point_of_interest",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJ4ZzZu6j1OxARPXB7b8gd1oQ",
+      "name": "HealthPlus Pharmacy (a mutti Pharmacy)",
+      "formatted_address": "Lagos NG, Phase I, Plot 121 T. F. Kuboye Rd, Maroko, Lekki 106104, Lagos, Nigeria",
+      "short_address": "Phase I, Lagos NG, Plot 121 T. F. Kuboye Rd, Lekki",
+      "latitude": 6.428757,
+      "longitude": 3.461592,
+      "phone": "+2347074557556",
+      "state": "Lagos",
+      "lga": "Eti Osa",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "store",
+        "point_of_interest",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJX-mCAHbzOxARp1rf-OCRIzk",
+      "name": "Pharmazon Pharmacy & Supermart",
+      "formatted_address": "292e Ajose Adeogun St, Victoria Island, Lagos 106104, Lagos, Nigeria",
+      "short_address": "292e Ajose Adeogun St, Lagos",
+      "latitude": 6.430598,
+      "longitude": 3.44009,
+      "phone": "+2347061839866",
+      "state": "Lagos",
+      "lga": "Eti Osa",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "store",
+        "point_of_interest",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJo2Kp_T31OxARJKYS_SlTVo0",
+      "name": "Grover Medical's Lifestyle Clinic",
+      "formatted_address": "32-A Adetokunbo Ademola Street, Victoria Island, Lagos 106104, Lagos, Nigeria",
+      "short_address": "32-A Adetokunbo Ademola Street, Lagos",
+      "latitude": 6.429463,
+      "longitude": 3.436542,
+      "phone": "+2349022012109",
+      "state": "Lagos",
+      "lga": "Eti Osa",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "store",
+        "point_of_interest",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJH4JKT9f3OxAR6KI-UBHDexU",
+      "name": "Uba",
+      "formatted_address": "64 Lekki - Epe Expy, Victoria Island, Sangotedo 105102, Lagos, Nigeria",
+      "short_address": "64 Lekki - Epe Expy, Sangotedo",
+      "latitude": 6.440018,
+      "longitude": 3.431934,
+      "phone": "+2349044500599",
+      "state": "Lagos",
+      "lga": "Eti Osa",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "store",
+        "point_of_interest",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJbUrFZib1OxARcLRItN_zafg",
+      "name": "Pharmalife Pharmacy Ltd.",
+      "formatted_address": "7 Bishop Aboyade Cole St, V/Island, Lagos 106104, Lagos, Nigeria",
+      "short_address": "7 Bishop Aboyade Cole St, Lagos",
+      "latitude": 6.43463,
+      "longitude": 3.431935,
+      "phone": "+2347069566666",
+      "state": "Lagos",
+      "lga": "Eti Osa",
+      "operational_status": "operational",
+      "types": [
+        "medical_center",
+        "pharmacy",
+        "hospital",
+        "health",
+        "store",
+        "point_of_interest",
+        "service",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJ1bQ-VAmLOxARLm7Im31F9SE",
+      "name": "Medplus Pharmacy - Keffi Street",
+      "formatted_address": "9 Keffi St, off Awolowo Road, Ikoyi, Lagos 106104, Lagos, Nigeria",
+      "short_address": "9 Keffi St, Awolowo Road, Lagos",
+      "latitude": 6.444391,
+      "longitude": 3.415437,
+      "phone": "+2347013489460",
+      "state": "Lagos",
+      "lga": "Eti Osa",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "store",
+        "point_of_interest",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJvciBdbH1OxARSS-4AsNV1nw",
+      "name": "Vedic Lifecare Hospital",
+      "formatted_address": "Block 105, 6 Olabanji Olajide St, Lekki Phase 1, Lagos 105102, Lagos, Nigeria",
+      "short_address": "Block 105, 6 Olabanji Olajide St, Lagos",
+      "latitude": 6.432157,
+      "longitude": 3.472017,
+      "phone": "+2347084008982",
+      "state": "Lagos",
+      "lga": "Eti Osa",
+      "operational_status": "operational",
+      "types": [
+        "hospital",
+        "medical_center",
+        "pharmacy",
+        "medical_clinic",
+        "health",
+        "service",
+        "point_of_interest",
+        "store",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJyfSHAPD2OxAR-eH5DEerQSk",
+      "name": "Atlantic Mall (Atlantic Shopping & Entertainment Centre)",
+      "formatted_address": "Chevron Drive, Lekki Peninsula, Lekki, LGA, Lekki Penninsula II, Lagos 106104, Lagos, Nigeria",
+      "short_address": "Chevron Drive, Lekki Peninsula, Lekki, LGA, Lagos",
+      "latitude": 6.448107,
+      "longitude": 3.530743,
+      "phone": "+2347038169318",
+      "state": "Lagos",
+      "lga": "Eti Osa",
+      "operational_status": "operational",
+      "types": [
+        "shopping_mall",
+        "hair_salon",
+        "movie_theater",
+        "laundry",
+        "hair_care",
+        "supermarket",
+        "grocery_store",
+        "pharmacy",
+        "clothing_store",
+        "food_store",
+        "wholesaler",
+        "health",
+        "service",
+        "restaurant",
+        "food",
+        "point_of_interest",
+        "store",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJOYpFZ4f3OxARiA7EZWEeQEE",
+      "name": "Boluke Pharmacy",
+      "formatted_address": "40 Lekki - Epe Expy, Lekki Phase I, Lagos 106104, Lagos, Nigeria",
+      "short_address": "40 Lekki - Epe Expy, Lagos",
+      "latitude": 6.432423,
+      "longitude": 3.478013,
+      "phone": "+2348091422222",
+      "state": "Lagos",
+      "lga": "Eti Osa",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "point_of_interest",
+        "store",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJxUBfCkr0OxARUvuaa6dWpUo",
+      "name": "Alpha Pharmacy & Stores Lekki",
+      "formatted_address": "16B Emma Abimbola Cole, Street, Lagos 106104, Lagos, Nigeria",
+      "short_address": "16B Emma Abimbola Cole, Lagos",
+      "latitude": 6.442813,
+      "longitude": 3.480379,
+      "phone": "+2349062440937",
+      "state": "Lagos",
+      "lga": "Eti Osa",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "point_of_interest",
+        "store",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJ07w2DQD3OxARtyXpdQpoubw",
+      "name": "Orchid",
+      "formatted_address": "CHJ4+PH4, Oba Akinloye Dr, Eti-Osa, Lagos 106104, Lagos, Nigeria",
+      "short_address": "CHJ4+PH4, Oba Akinloye Dr, Lagos",
+      "latitude": 6.431773,
+      "longitude": 3.556443,
+      "phone": null,
+      "state": "Lagos",
+      "lga": "Eti Osa",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "point_of_interest",
+        "store",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJGzpXCrH1OxARm0DKFsgunrg",
+      "name": "Health Plug People's Pharmacy & Store",
+      "formatted_address": "1, REMILADE OPADOKUN STREET, OFF ALAWE ROAD, ILASAN LEKKI, Local Government, Lekki Penninsula II, Lagos 101222, Lagos, Nigeria",
+      "short_address": "Local Government, 1, REMILADE OPADOKUN STREET, OFF ALAWE ROAD, ILASAN LEKKI, Lagos",
+      "latitude": 6.427237,
+      "longitude": 3.495395,
+      "phone": "+2348064367042",
+      "state": "Lagos",
+      "lga": "Eti Osa",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "point_of_interest",
+        "store",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJuSky04v2OxAR6tTZPj-E4mc",
+      "name": "Medplus Pharmacy",
+      "formatted_address": "Shepard's Place, 11 Agungi Ajiran Rd, Lekki Penninsula II, Lagos 106104, Lagos, Nigeria",
+      "short_address": "Shepard's Place, 11 Agungi Ajiran Rd, Lagos",
+      "latitude": 6.440925,
+      "longitude": 3.51619,
+      "phone": "+2348183003665",
+      "state": "Lagos",
+      "lga": "Eti Osa",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "point_of_interest",
+        "store",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJgVI41Ov1OxARClcFEVOpFds",
+      "name": "Medplus Pharmacy - Freedom way",
+      "formatted_address": "41 Freedom Wy, Lekki Phase 1, Lekki 100001, Lagos, Nigeria",
+      "short_address": "41 Freedom Wy, Lekki",
+      "latitude": 6.438253,
+      "longitude": 3.481486,
+      "phone": "+2348054029530",
+      "state": "Lagos",
+      "lga": "Eti Osa",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "point_of_interest",
+        "store",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJqXFhcgD3OxARDmjEVyx4BxE",
+      "name": "GNT PHARMACY",
+      "formatted_address": "Jakande, 1st gate, CGJ2+FWW, Silverbird Rd, Lekki Penninsula II, Lekki 106104, Lagos, Nigeria",
+      "short_address": "Jakande, 1st gate, CGJ2+FWW, Silverbird Rd, Lekki",
+      "latitude": 6.430953,
+      "longitude": 3.501512,
+      "phone": "+2347034281375",
+      "state": "Lagos",
+      "lga": "Eti Osa",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "point_of_interest",
+        "store",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJQ-t6gCP3OxARCzut_5dHPOk",
+      "name": "Scintilla road by Chevron Alternative route",
+      "formatted_address": "CGXR+P8P, Lekki Penninsula II, Lagos 106104, Lagos, Nigeria",
+      "short_address": "CGXR+P8P, Lagos",
+      "latitude": 6.449337,
+      "longitude": 3.540817,
+      "phone": null,
+      "state": "Lagos",
+      "lga": "Eti Osa",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "point_of_interest",
+        "store",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJOzKrdk33OxARCfCPiD9MAUU",
+      "name": "Uba",
+      "formatted_address": "25 Km, Lekki - Epe Expy, Ajah, Sangotedo 106104, Lagos, Nigeria",
+      "short_address": "25 Km, Lekki - Epe Expy, Sangotedo",
+      "latitude": 6.453081,
+      "longitude": 3.554908,
+      "phone": "+2348125369748",
+      "state": "Lagos",
+      "lga": "Eti Osa",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "point_of_interest",
+        "store",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJPzIBoaL1OxARz2iNk6bemlE",
+      "name": "Medplus Pharmacy, Elegushi",
+      "formatted_address": "70 Kusenla Rd, Lekki Penninsula II, Lagos 106104, Lagos, Nigeria",
+      "short_address": "70 Kusenla Rd, Lagos",
+      "latitude": 6.445695,
+      "longitude": 3.490619,
+      "phone": "+2349055493665",
+      "state": "Lagos",
+      "lga": "Eti Osa",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "point_of_interest",
+        "store",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJQw5UAgn3OxARXkdipiqkBuU",
+      "name": "Medplus Pharmacy, Bera Estate, Chevron, Lagos.",
+      "formatted_address": "BERA Estate, Chevron Dr, Lekki Penninsula II, Lekki 106104, Lagos, Nigeria",
+      "short_address": "BERA Estate, Chevron Dr, Lekki",
+      "latitude": 6.450351,
+      "longitude": 3.530456,
+      "phone": "+2349053790050",
+      "state": "Lagos",
+      "lga": "Eti Osa",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "point_of_interest",
+        "store",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJpzwbMPv3OxARg6x5CzRyHxM",
+      "name": "Torrent Pharmacy",
+      "formatted_address": "33 Oseni Mayeigun St, Lekki Penninsula II, Lekki 106104, Lagos, Nigeria",
+      "short_address": "33 Oseni Mayeigun St, Lekki",
+      "latitude": 6.432548,
+      "longitude": 3.512828,
+      "phone": "+2348031333668",
+      "state": "Lagos",
+      "lga": "Eti Osa",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "point_of_interest",
+        "store",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJJ4K_20r1OxARMqgqLB51oDw",
+      "name": "Greenway 24/7 Supermarket & Pharmacy",
+      "formatted_address": "141 Lekki - Epe, Lekki Penninsula II, Lekki, Eti-Osa, Lagos 106104, Lagos, Nigeria",
+      "short_address": "141 Lekki - Epe, Lekki Penninsula II, Lekki, Lagos",
+      "latitude": 6.43433,
+      "longitude": 3.48861,
+      "phone": "+2348059091233",
+      "state": "Lagos",
+      "lga": "Eti Osa",
+      "operational_status": "operational",
+      "types": [
+        "supermarket",
+        "atm",
+        "food_court",
+        "grocery_store",
+        "pharmacy",
+        "finance",
+        "food_store",
+        "electronics_store",
+        "health",
+        "service",
+        "food",
+        "point_of_interest",
+        "store",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJq0U-oW_1OxARuJGdjhhZ0JI",
+      "name": "Medplus Pharmacy - Oriwu Street",
+      "formatted_address": "5 Oriwu St, Lekki Phase I, Lagos 106104, Lagos, Nigeria",
+      "short_address": "5 Oriwu St, Lagos",
+      "latitude": 6.429466,
+      "longitude": 3.474352,
+      "phone": "+2348184121607",
+      "state": "Lagos",
+      "lga": "Eti Osa",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "point_of_interest",
+        "store",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJb1H1zjX1OxAR_tVeRS2HxLg",
+      "name": "Purelife pharmacy, Elf, Lekki",
+      "formatted_address": "5, block 137, QMB Builders Mart Road, by Elf Bus-stop, Lekki Phase 1, Lekki 105102, Lagos, Nigeria",
+      "short_address": "5, block 137, QMB Builders Mart Road, by Elf Bus-stop, Lekki",
+      "latitude": 6.431231,
+      "longitude": 3.476907,
+      "phone": "+2349062829708",
+      "state": "Lagos",
+      "lga": "Eti Osa",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "point_of_interest",
+        "store",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJu9oSh3_2OxARYgLXdD17-uI",
+      "name": "Mediccy Health And Wellness",
+      "formatted_address": "1 Falilat Shomade St, beside Nicon town Estate, Lekki Penninsula II, Lekki 106104, Lagos, Nigeria",
+      "short_address": "1 Falilat Shomade St, Nicon town Estate, Lekki",
+      "latitude": 6.4362,
+      "longitude": 3.500427,
+      "phone": "+2348088889700",
+      "state": "Lagos",
+      "lga": "Eti Osa",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "point_of_interest",
+        "store",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJEUzGklH3OxAR5E92ueAdLxo",
+      "name": "Medplus Pharmacy Prime Mall, Eleganza.",
+      "formatted_address": "Prrime Mall, Oba Akinloye Dr, Lekki Penninsula II, Lagos 106104, Lagos, Nigeria",
+      "short_address": "Prrime Mall, Oba Akinloye Dr, Lagos",
+      "latitude": 6.433992,
+      "longitude": 3.542355,
+      "phone": "+2349055494172",
+      "state": "Lagos",
+      "lga": "Eti Osa",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "point_of_interest",
+        "store",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJey1SNYP5OxARH9xjZcLaysw",
+      "name": "Foye pharmacy ologolo",
+      "formatted_address": "Foye pharmacy, 39 Fubara Dublin Green St, Igbo-Efon, Lagos 106104, Lagos, Nigeria",
+      "short_address": "Foye pharmacy, 39 Fubara Dublin Green St, Lagos",
+      "latitude": 6.429844,
+      "longitude": 3.520319,
+      "phone": "+2349058529241",
+      "state": "Lagos",
+      "lga": "Eti Osa",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "point_of_interest",
+        "store",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJZxR5A47-OxARy-X4QG3kSBk",
+      "name": "UBA Pharmacy",
+      "formatted_address": "FM7V+M67, Lekki 105101, Lagos, Nigeria",
+      "short_address": "FM7V+M67, Lekki",
+      "latitude": 6.464165,
+      "longitude": 3.693044,
+      "phone": "+2349075335338",
+      "state": "Lagos",
+      "lga": "Ibeju Lekki",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "wholesaler",
+        "point_of_interest",
+        "health",
+        "store",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJ31_DTdj3OxAR747vgW2B-k8",
+      "name": "RUDAN pharmacy",
+      "formatted_address": "Ajah, Km 42 Lekki - Epe Expy, opposite rainoil filling station, Abijo GRA, Lagos 105101, Lagos, Nigeria",
+      "short_address": "Ajah, Km 42 Lekki - Epe Expy, rainoil filling station, Lagos",
+      "latitude": 6.463689,
+      "longitude": 3.673525,
+      "phone": "+2347064394877",
+      "state": "Lagos",
+      "lga": "Ibeju Lekki",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "point_of_interest",
+        "health",
+        "store",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJfXD2iAr_OxARd3-NWkz0TUE",
+      "name": "JAYCEL PHARMACY",
+      "formatted_address": "8 Watch Tower Drive Off Gbetu Iwerekun Road, New Road Bustop, Lekki - Epe Expy, Awoyaya, Lagos 105101, Lagos, Nigeria",
+      "short_address": "New Road Bustop, 8 Watch Tower Drive Off Gbetu Iwerekun Road, Lekki - Epe Expy, Lagos",
+      "latitude": 6.458877,
+      "longitude": 3.711651,
+      "phone": "+2349058072312",
+      "state": "Lagos",
+      "lga": "Ibeju Lekki",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "point_of_interest",
+        "health",
+        "store",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJ0w8xGQD_OxARlzAc87Dp5bQ",
+      "name": "Neem Pharmacy and Wellness Mart",
+      "formatted_address": "1 Grandeur Rd, Lekki 105101, Lagos, Nigeria",
+      "short_address": "1 Grandeur Rd, Lekki",
+      "latitude": 6.45455,
+      "longitude": 3.671923,
+      "phone": "+2348038739659",
+      "state": "Lagos",
+      "lga": "Ibeju Lekki",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "point_of_interest",
+        "health",
+        "store",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJP0cfgBD_OxAREt2TK7cDmTQ",
+      "name": "Panacea Mega Pharmacy&Stores(a.k.a PMS PHARMACY)",
+      "formatted_address": "opposite Sapphire Gardens Estate Fence, Awoyaya, Lekki 105101, Lagos, Nigeria",
+      "short_address": "Sapphire Gardens Estate Fence, Lekki",
+      "latitude": 6.466937,
+      "longitude": 3.698937,
+      "phone": "+2347014059330",
+      "state": "Lagos",
+      "lga": "Ibeju Lekki",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "cosmetics_store",
+        "medical_lab",
+        "point_of_interest",
+        "health",
+        "store",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJWypQBET-OxAROkOmdX5kEYg",
+      "name": "Melinks Pharmacy",
+      "formatted_address": "Gbetu Iwerekun Rd, Lekki 105101, Lagos, Nigeria",
+      "short_address": "Gbetu Iwerekun Rd, Lekki",
+      "latitude": 6.452379,
+      "longitude": 3.717679,
+      "phone": null,
+      "state": "Lagos",
+      "lga": "Ibeju Lekki",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "point_of_interest",
+        "health",
+        "store",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJJxsAgBf_OxARCytJojbmq8g",
+      "name": "OptiHealth Pharmacy, Abijo Lagos",
+      "formatted_address": "Destiny Homes Estate, 2 Best Foods Avenue, Abijo, Eti-Osa, Lagos 105101, Lagos, Nigeria",
+      "short_address": "Destiny Homes Estate, 2 Best Foods Avenue, Abijo, Lagos",
+      "latitude": 6.464119,
+      "longitude": 3.666881,
+      "phone": "+2349075372651",
+      "state": "Lagos",
+      "lga": "Ibeju Lekki",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "point_of_interest",
+        "health",
+        "store",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJtYNrhGX_OxARQ3BvyN6hcTE",
+      "name": "Healthy View Pharmacy & SuperMart",
+      "formatted_address": "KM 25 Lekki - Epe Expy, Lekki 105101, Lagos, Nigeria",
+      "short_address": "KM 25 Lekki - Epe Expy, Lekki",
+      "latitude": 6.466435,
+      "longitude": 3.708232,
+      "phone": "+2348023710194",
+      "state": "Lagos",
+      "lga": "Ibeju Lekki",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "point_of_interest",
+        "health",
+        "store",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJQ4pLFQD_OxARSwgBA-T0arQ",
+      "name": "PillsAssure Pharmacy",
+      "formatted_address": "FM9V+9FM Community, Faith and Favour Junction, Korodo Street, beside UBA supermarket, Awoyaya, Lekki 105101, Lagos, Nigeria",
+      "short_address": "FM9V+9FM Community, Faith and Favour Junction, Korodo Street, UBA supermarket, Lekki",
+      "latitude": 6.468451,
+      "longitude": 3.69366,
+      "phone": "+2347063365170",
+      "state": "Lagos",
+      "lga": "Ibeju Lekki",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "point_of_interest",
+        "health",
+        "store",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJKaWLOgD_OxAR7HD5kyqSa6c",
+      "name": "Medstrip Pharmacy",
+      "formatted_address": "5 Alh. Kamaldeen Oritola Dr, Lekki 105101, Lagos, Nigeria",
+      "short_address": "5 Alh. Kamaldeen Oritola Dr, Lekki",
+      "latitude": 6.468599,
+      "longitude": 3.702851,
+      "phone": "+2348063746996",
+      "state": "Lagos",
+      "lga": "Ibeju Lekki",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "point_of_interest",
+        "health",
+        "store",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJqSZA2rD-OxARthaW_Zn8mc8",
+      "name": "QHS Pharmacy",
+      "formatted_address": "A & M Plaza, Km 42 Lekki - Epe Expy, Lagos 101245, Lagos, Nigeria",
+      "short_address": "A & M Plaza, Km 42 Lekki - Epe Expy, Lagos",
+      "latitude": 6.459716,
+      "longitude": 3.679874,
+      "phone": "+2347044945149",
+      "state": "Lagos",
+      "lga": "Ibeju Lekki",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "point_of_interest",
+        "health",
+        "store",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJ1TZ_Fsz_OxARei1u8hME0x4",
+      "name": "Iyophacs Pharmacistical Limited",
+      "formatted_address": "Yomade Shopping Complex, Awoyaya, 105101, Lagos, Nigeria",
+      "short_address": "Yomade Shopping Complex, Awoyaya",
+      "latitude": 6.465227,
+      "longitude": 3.70512,
+      "phone": "+2348033152065",
+      "state": "Lagos",
+      "lga": "Ibeju Lekki",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "point_of_interest",
+        "health",
+        "store",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJrRewrl3_OxARVGtAmVsDBVo",
+      "name": "Fountainmed Pharmacy",
+      "formatted_address": "67 Amity Estate Rd, Eti-Osa, Lagos 105101, Lagos, Nigeria",
+      "short_address": "67 Amity Estate Rd, Lagos",
+      "latitude": 6.461376,
+      "longitude": 3.664542,
+      "phone": "+2347067779537",
+      "state": "Lagos",
+      "lga": "Ibeju Lekki",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "point_of_interest",
+        "health",
+        "store",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJrWBLcmn1OxARfG-MOyXpMI4",
+      "name": "Noble Best Pharmacy",
+      "formatted_address": "42 Lekki - Epe Expy, Lagos 105101, Lagos, Nigeria",
+      "short_address": "42 Lekki - Epe Expy, Lagos",
+      "latitude": 6.465341,
+      "longitude": 3.670613,
+      "phone": null,
+      "state": "Lagos",
+      "lga": "Ibeju Lekki",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "point_of_interest",
+        "health",
+        "store",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJp9EY9mb5OxARoED0tKZmpcE",
+      "name": "Rebecca",
+      "formatted_address": "CJGG+GXM, Okun-Ajah Rd, Eti-Osa, Lekki 106104, Lagos, Nigeria",
+      "short_address": "CJGG+GXM, Okun-Ajah Rd, Lekki",
+      "latitude": 6.426337,
+      "longitude": 3.62742,
+      "phone": "+2347010585689",
+      "state": "Lagos",
+      "lga": "Eti Osa",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "point_of_interest",
+        "health",
+        "store",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJb2eVhCT_OxARJnmEi9c0ZQs",
+      "name": "Home Nurse",
+      "formatted_address": "Block 42, Sunlight Estate, Destiny Homes, Abijo, Lagos 105208, Lagos, Nigeria",
+      "short_address": "Block 42, Sunlight Estate, Destiny Homes, Lagos",
+      "latitude": 6.46068,
+      "longitude": 3.662357,
+      "phone": "+2349036972837",
+      "state": "Lagos",
+      "lga": "Ibeju Lekki",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "wholesaler",
+        "point_of_interest",
+        "manufacturer",
+        "health",
+        "store",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJXTI2DKf5OxARI_GYsI44v1A",
+      "name": "Cyrill",
+      "formatted_address": "CJGH+G2F, Okun-Ajah Rd, Eti-Osa, Lekki 106104, Lagos, Nigeria",
+      "short_address": "CJGH+G2F, Okun-Ajah Rd, Lekki",
+      "latitude": 6.426319,
+      "longitude": 3.627543,
+      "phone": null,
+      "state": "Lagos",
+      "lga": "Eti Osa",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "point_of_interest",
+        "health",
+        "store",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJq65rrab_OxARzTA6zFfMBl8",
+      "name": "Nett Pharmacy",
+      "formatted_address": "No 17/18, Dalo Building Igbo Efon, along Lekki - Epe Expy, Eti-Osa, Lekki 101222, Lagos, Nigeria",
+      "short_address": "No 17/18, Dalo Building Igbo Efon, along Lekki - Epe Expy, Lekki",
+      "latitude": 6.468863,
+      "longitude": 3.704373,
+      "phone": "+2349169845482",
+      "state": "Lagos",
+      "lga": "Ibeju Lekki",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "point_of_interest",
+        "health",
+        "store",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJPx0YALj_OxAROY6dyO_RpVg",
+      "name": "The Will Of God Restoration Hospital",
+      "formatted_address": "36 Alesh Hotel Road, Awoyaya, Lekki 105101, Lagos, Nigeria",
+      "short_address": "36 Alesh Hotel Road, Lekki",
+      "latitude": 6.464691,
+      "longitude": 3.705267,
+      "phone": "+2348061135242",
+      "state": "Lagos",
+      "lga": "Ibeju Lekki",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "hospital",
+        "service",
+        "point_of_interest",
+        "health",
+        "store",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJI-Rd1mT-OxARrD4dMOpCgOs",
+      "name": "La-Boycert Pharmacy",
+      "formatted_address": "27 Close 6, Lekki 105101, Lagos, Nigeria",
+      "short_address": "27 Close 6, Lekki",
+      "latitude": 6.467803,
+      "longitude": 3.710692,
+      "phone": "+2348060243468",
+      "state": "Lagos",
+      "lga": "Ibeju Lekki",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "point_of_interest",
+        "health",
+        "store",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJKb4-7ISDOxARyUjf3to-_Xc",
+      "name": "Grocery Bazaar Ltd, Agbara",
+      "formatted_address": "De Sholly Bus Stop, KM 33 Lagos - Badagry Expy, Agbara 112103, Ogun State, Nigeria",
+      "short_address": "De Sholly Bus Stop, KM 33 Lagos - Badagry Expy, Agbara",
+      "latitude": 6.496271,
+      "longitude": 3.084904,
+      "phone": "+2347025225396",
+      "state": "Ogun",
+      "lga": "Ado Odo/Ota",
+      "operational_status": "operational",
+      "types": [
+        "grocery_store",
+        "pharmacy",
+        "supermarket",
+        "health",
+        "food_store",
+        "food",
+        "store",
+        "point_of_interest",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJFVrLtT-EOxARtuHdXjVGq58",
+      "name": "Newton Pharmacy",
+      "formatted_address": "Opposite Adoff Bus-Stop Along Iba-LASU Express Way, Ojo, Lagos 102101, Lagos, Nigeria",
+      "short_address": "Opposite Adoff Bus-Stop Along Iba-LASU Express Way, Lagos",
+      "latitude": 6.501538,
+      "longitude": 3.199734,
+      "phone": "+2348171115547",
+      "state": "Lagos",
+      "lga": "Ojo",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "store",
+        "point_of_interest",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJg6krjxp5OxARLb4HO2CZimY",
+      "name": "Felimat pharmacy, Agbara",
+      "formatted_address": "O'7 center, Agbara bus stop, along, Lagos - Badagry Expy, Agbara 103101, Ogun State, Nigeria",
+      "short_address": "O'7 center, Agbara bus stop, along, Lagos - Badagry Expy, Agbara",
+      "latitude": 6.501263,
+      "longitude": 3.09728,
+      "phone": "+2348031334587",
+      "state": "Ogun",
+      "lga": "Ado Odo/Ota",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "store",
+        "point_of_interest",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJPYkTS_GFOxARDuOB5byFTmE",
+      "name": "BANE Pharmacy",
+      "formatted_address": "Omoyeni St, Ijegun, Lagos 102213, Lagos, Nigeria",
+      "short_address": "Omoyeni St, Lagos",
+      "latitude": 6.534355,
+      "longitude": 3.22136,
+      "phone": "+2348098255983",
+      "state": "Lagos",
+      "lga": "Alimosho",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "store",
+        "point_of_interest",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJcTqssUaFOxARvKDr8CS79TU",
+      "name": "All In One Store.",
+      "formatted_address": "PHASE 1, 29 Lasu-Isheri Rd, opp. STANBIC IBTC BANK, IGANDO, Lagos 102213, Lagos, Nigeria",
+      "short_address": "PHASE 1, Idowu Egba bus stop, 29 Lasu-Isheri Rd, STANBIC IBTC BANK, Lagos",
+      "latitude": 6.548877,
+      "longitude": 3.237803,
+      "phone": "+2348063396582",
+      "state": "Lagos",
+      "lga": "Alimosho",
+      "operational_status": "operational",
+      "types": [
+        "supermarket",
+        "pharmacy",
+        "grocery_store",
+        "health",
+        "food_store",
+        "food",
+        "store",
+        "point_of_interest",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJgw0rjS6FOxAR_Kt8cTF6ARY",
+      "name": "Vivacare Pharmacy",
+      "formatted_address": "by O'mark Busstop, 1 Lasisi Adesanya St, Igando, Lagos 102213, Lagos, Nigeria",
+      "short_address": "by O'mark Busstop, 1 Lasisi Adesanya St, Lagos",
+      "latitude": 6.543631,
+      "longitude": 3.234174,
+      "phone": "+2347030997844",
+      "state": "Lagos",
+      "lga": "Alimosho",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "store",
+        "point_of_interest",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJ92ub6_CDOxAR8dVNklA8n4s",
+      "name": "Pharmacy",
+      "formatted_address": "Ojo, Lagos 102101, Lagos, Nigeria",
+      "short_address": "Lagos",
+      "latitude": 6.494847,
+      "longitude": 3.17259,
+      "phone": "+2349069202113",
+      "state": "Lagos",
+      "lga": "Ojo",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "store",
+        "point_of_interest",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJnSwRjU2bOxARfD4frpp8TdQ",
+      "name": "Parent Choice Street",
+      "formatted_address": "1 Parent Choice, off olorunsola ayobo, Idimu, Lagos 102213, Lagos, Nigeria",
+      "short_address": "1 Parent Choice, off olorunsola ayobo, Lagos",
+      "latitude": 6.572718,
+      "longitude": 3.224458,
+      "phone": "+2349169657618",
+      "state": "Lagos",
+      "lga": "Alimosho",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "store",
+        "point_of_interest",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJ_XZwki2FOxAR8iSMtFpkkYs",
+      "name": "Life Plus Drugs Pharmacy",
+      "formatted_address": "96 Oba Goriola Rd, Ojo, Lagos 102101, Lagos, Nigeria",
+      "short_address": "96 Oba Goriola Rd, Lagos",
+      "latitude": 6.504293,
+      "longitude": 3.190592,
+      "phone": "+2348030979132",
+      "state": "Lagos",
+      "lga": "Ojo",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "store",
+        "point_of_interest",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJkwkVxEaFOxARC6HGRJzBySs",
+      "name": "SOMED PHARMACY AND STORE",
+      "formatted_address": "NO 2 SEKONI WAY IGANDO, IGANDO, Lagos 300001, Lagos, Nigeria",
+      "short_address": "NO 2 SEKONI WAY IGANDO, Lagos",
+      "latitude": 6.55283,
+      "longitude": 3.241637,
+      "phone": "+2348027171245",
+      "state": "Lagos",
+      "lga": "Alimosho",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "store",
+        "point_of_interest",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJCREOQqWFOxAR0mB0ZsUzKF4",
+      "name": "Elbeth Community Pharma Plus",
+      "formatted_address": "Isashi, 28 Celestial Rd, Ojo, Lagos 102101, Lagos, Nigeria",
+      "short_address": "Isashi, 28 Celestial Rd, Lagos",
+      "latitude": 6.502877,
+      "longitude": 3.16501,
+      "phone": "+2348029093053",
+      "state": "Lagos",
+      "lga": "Ojo",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health_food_store",
+        "grocery_store",
+        "health",
+        "food_store",
+        "food",
+        "service",
+        "store",
+        "point_of_interest",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJy5_kQ7CGOxARvZfW-tQ8JMs",
+      "name": "Drug Plux Pharmacy & Store's Ltd.",
+      "formatted_address": "Okokomaiko B/Stop 17 Kemberi Road, Along Ajangbadi Road, Ojo, Lagos 102101, Lagos, Nigeria",
+      "short_address": "Okokomaiko B/Stop 17 Kemberi Road, Along Ajangbadi Road, Lagos",
+      "latitude": 6.470658,
+      "longitude": 3.186377,
+      "phone": "+2348036877870",
+      "state": "Lagos",
+      "lga": "Ojo",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "cosmetics_store",
+        "health",
+        "store",
+        "point_of_interest",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJpyDZpzWFOxARsslTDJGVhk4",
+      "name": "Korex Pharmacy",
+      "formatted_address": "204 Abaranje Rd, Ikotun, Lagos 100265, Lagos, Nigeria",
+      "short_address": "204 Abaranje Rd, Lagos",
+      "latitude": 6.534698,
+      "longitude": 3.247297,
+      "phone": "+2347030360148",
+      "state": "Lagos",
+      "lga": "Alimosho",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "store",
+        "point_of_interest",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJjU8WDxaDOxAR4y7BUEUyHVY",
+      "name": "Tee-Med Pharmacy Limited",
+      "formatted_address": "Plot 5, Road 411, Area 4, local government, Opic estate, Agbara 112102, Ogun State, Nigeria",
+      "short_address": "Area 4, local government, Opic estate, Plot 5, Road 411, Agbara",
+      "latitude": 6.51371,
+      "longitude": 3.114051,
+      "phone": "+2348036980920",
+      "state": "Ogun",
+      "lga": "Ado Odo/Ota",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "store",
+        "point_of_interest",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJlfw7GBmFOxAR1aJ_3riGpPk",
+      "name": "BOLAJUMOKE PHARMACY Isuti Igando",
+      "formatted_address": "276, ISUTI ROAD ODO DOWN-DOWN EGAN, IGANDO, Alimosho, Lagos 102213, Lagos, Nigeria",
+      "short_address": "276, ISUTI ROAD ODO DOWN-DOWN EGAN, IGANDO, Lagos",
+      "latitude": 6.55229,
+      "longitude": 3.206882,
+      "phone": "+2349025458875",
+      "state": "Lagos",
+      "lga": "Alimosho",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "manufacturer",
+        "store",
+        "point_of_interest",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJd788OGGFOxARt56-6b4tFxc",
+      "name": "Massey Vickers Pharmacy",
+      "formatted_address": "G6G7+R42, Obadore Rd, Ikotun, Lagos 102213, Lagos, Nigeria",
+      "short_address": "G6G7+R42, Obadore Rd, Lagos",
+      "latitude": 6.527014,
+      "longitude": 3.212768,
+      "phone": null,
+      "state": "Lagos",
+      "lga": "Alimosho",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "store",
+        "point_of_interest",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJAd4TioubOxARE3Soi6klkHE",
+      "name": "Bane Pharmacy Isuti Road",
+      "formatted_address": "213 Egan Igando Isuti Rd, Idimu, Lagos 102213, Lagos, Nigeria",
+      "short_address": "213 Egan Igando Isuti Rd, Lagos",
+      "latitude": 6.570929,
+      "longitude": 3.214464,
+      "phone": "+2348034859151",
+      "state": "Lagos",
+      "lga": "Alimosho",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "store",
+        "point_of_interest",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJfYiKX8SFOxARFIU2NyzfXao",
+      "name": "Mebina Healthcare Solutions LTD",
+      "formatted_address": "Km 10 LASU-IGANDO ROAD AKESAN Alimosho, Ikotun, Lagos 102213, Lagos, Nigeria",
+      "short_address": "Km 10 LASU-IGANDO ROAD AKESAN Alimosho, Lagos",
+      "latitude": 6.541963,
+      "longitude": 3.228314,
+      "phone": "+2348023270716",
+      "state": "Lagos",
+      "lga": "Alimosho",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "consultant",
+        "service",
+        "store",
+        "point_of_interest",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJLzevgHyBOxARmoMmNIjVgtM",
+      "name": "Jedidiah Community Pharma Plus Ltd",
+      "formatted_address": "36 Adaloko road,by Iyana era bus stop Ojo, Ojo, Lagos 102101, Lagos, Nigeria",
+      "short_address": "36 Adaloko road,by Iyana era bus stop Ojo, Lagos",
+      "latitude": 6.477285,
+      "longitude": 3.147607,
+      "phone": "+2348039648778",
+      "state": "Lagos",
+      "lga": "Ojo",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "store",
+        "point_of_interest",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJidjYyICTOxARlR1OrXNtRrk",
+      "name": "PRINCE EBEANO SUPERMARKET IKEJA",
+      "formatted_address": "14 Isaac John St, Ikeja GRA, Ikeja 100271, Lagos, Nigeria",
+      "short_address": "14 Isaac John St, Ikeja",
+      "latitude": 6.577123,
+      "longitude": 3.360704,
+      "phone": "+2348026651017",
+      "state": "Lagos",
+      "lga": "Ikeja",
+      "operational_status": "operational",
+      "types": [
+        "supermarket",
+        "grocery_store",
+        "pharmacy",
+        "health",
+        "food_store",
+        "store",
+        "food",
+        "point_of_interest",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJtf00kfmNOxARK-T7tGb4H3I",
+      "name": "The Place Restaurant, Maryland Mall",
+      "formatted_address": "350, Maryland mall, 360 Ikorodu Rd, Anthony, Ikeja 100211, Lagos, Nigeria",
+      "short_address": "350, Maryland mall, 360 Ikorodu Rd, Ikeja",
+      "latitude": 6.567606,
+      "longitude": 3.367194,
+      "phone": "+2348131867091",
+      "state": "Lagos",
+      "lga": "Kosofe",
+      "operational_status": "operational",
+      "types": [
+        "fast_food_restaurant",
+        "general_store",
+        "warehouse_store",
+        "shopping_mall",
+        "supermarket",
+        "grocery_store",
+        "pharmacy",
+        "health",
+        "restaurant",
+        "food_store",
+        "store",
+        "food",
+        "point_of_interest",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJ3cruq2qMOxARPT2rhd2VEDo",
+      "name": "Havana Specialist Hospital Limited",
+      "formatted_address": "115 Akerele Extension, 115 Akerele Road, Surulere, Lagos 100001, Lagos, Nigeria",
+      "short_address": "115 Akerele Extension, 115 Akerele Road, Lagos",
+      "latitude": 6.502924,
+      "longitude": 3.359543,
+      "phone": "+2348027272727",
+      "state": "Lagos",
+      "lga": "Surulere",
+      "operational_status": "operational",
+      "types": [
+        "hospital",
+        "medical_center",
+        "medical_lab",
+        "pharmacy",
+        "medical_clinic",
+        "health",
+        "service",
+        "store",
+        "point_of_interest",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJseAnvjuSOxAREfR5DVrOaF0",
+      "name": "Alpha Pharmacy & Stores Ltd",
+      "formatted_address": "2B Alabi St, off Toyin Street, Opebi, Ikeja 101233, Lagos, Nigeria",
+      "short_address": "2B Alabi St, Toyin Street, Ikeja",
+      "latitude": 6.595292,
+      "longitude": 3.352227,
+      "phone": "+2348134041020",
+      "state": "Lagos",
+      "lga": "Ikeja",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "supermarket",
+        "grocery_store",
+        "health",
+        "food_store",
+        "store",
+        "food",
+        "point_of_interest",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJQ65G1iaSOxAR4VlRpt7LyaA",
+      "name": "Juli Pharmacy",
+      "formatted_address": "19 Kodesoh St, Ikeja, Lagos 101233, Lagos, Nigeria",
+      "short_address": "19 Kodesoh St, Lagos",
+      "latitude": 6.594493,
+      "longitude": 3.341623,
+      "phone": "+2349090551092",
+      "state": "Lagos",
+      "lga": "Ikeja",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "store",
+        "point_of_interest",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJe4Ga7xWNOxARcBXz5Y62JLc",
+      "name": "Medserve-LUTH Cancer Centre",
+      "formatted_address": "NSIA-LUTH Cancer Centre, University Teaching Hospital, Surulere, Lagos 100254, Lagos, Nigeria",
+      "short_address": "University Teaching Hospital, NSIA-LUTH Cancer Centre, Lagos",
+      "latitude": 6.518201,
+      "longitude": 3.352961,
+      "phone": "+2347006742588",
+      "state": "Lagos",
+      "lga": "Mushin",
+      "operational_status": "operational",
+      "types": [
+        "hospital",
+        "pharmacy",
+        "medical_clinic",
+        "doctor",
+        "health",
+        "service",
+        "store",
+        "point_of_interest",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJf0KF2xONOxART5kE6L5pl-8",
+      "name": "General Hospital Gbagada",
+      "formatted_address": "1 Hospital Rd, Gbagada, Lagos 105102, Lagos, Nigeria",
+      "short_address": "1 Hospital Rd, Lagos",
+      "latitude": 6.553085,
+      "longitude": 3.387808,
+      "phone": null,
+      "state": "Lagos",
+      "lga": "Kosofe",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "store",
+        "point_of_interest",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJqfecOYaNOxAR9C8ZQ2BT4rs",
+      "name": "Edichart Shopping Mall",
+      "formatted_address": "54 Olorunlogbon St, Anthony, Lagos 105102, Lagos, Nigeria",
+      "short_address": "54 Olorunlogbon St, Lagos",
+      "latitude": 6.563543,
+      "longitude": 3.370193,
+      "phone": "+23412914235",
+      "state": "Lagos",
+      "lga": "Kosofe",
+      "operational_status": "operational",
+      "types": [
+        "supermarket",
+        "bakery",
+        "grocery_store",
+        "pharmacy",
+        "clothing_store",
+        "health",
+        "wholesaler",
+        "food_store",
+        "store",
+        "food",
+        "point_of_interest",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJe2HzaWyTOxARSr4Tvvhft1k",
+      "name": "Alpha Pharmacy & Stores Adeniyi Jones",
+      "formatted_address": "GFL, 33 Adeniyi Jones, Oba Akran, Ikeja 101233, Lagos, Nigeria",
+      "short_address": "GFL, 33 Adeniyi Jones, Ikeja",
+      "latitude": 6.608358,
+      "longitude": 3.342158,
+      "phone": "+2349060006241",
+      "state": "Lagos",
+      "lga": "Ikeja",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "store",
+        "point_of_interest",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJT6LlyxSMOxAR1qjCedrO3Pg",
+      "name": "Healthrite Pharmacy & Supermart",
+      "formatted_address": "72 Akerele Street Surulere, Lagos surulere akerele, Surulere, Lagos 101241, Lagos, Nigeria",
+      "short_address": "72 Akerele Street Surulere, Lagos surulere akerele, Lagos",
+      "latitude": 6.504793,
+      "longitude": 3.355787,
+      "phone": "+2349168675007",
+      "state": "Lagos",
+      "lga": "Surulere",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "supermarket",
+        "grocery_store",
+        "health",
+        "food_store",
+        "store",
+        "food",
+        "point_of_interest",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJOdUO7d-NOxAR4Ltj1F1bZiQ",
+      "name": "Fmc Ebute- Metta",
+      "formatted_address": "119 Cooper Street, Ebute Metta, Lagos 101245, Lagos, Nigeria",
+      "short_address": "119 Cooper Street, Lagos",
+      "latitude": 6.4882,
+      "longitude": 3.375519,
+      "phone": "+2348037202631",
+      "state": "Lagos",
+      "lga": "Lagos Mainland",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "store",
+        "point_of_interest",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJpzB44YeMOxARPaa6NA92roA",
+      "name": "Tonyson Pharmacy and Stores",
+      "formatted_address": "47A Simpson St, Adekunle St, Yaba, Lagos 101212, Lagos, Nigeria",
+      "short_address": "47A Simpson St, Adekunle St, Lagos",
+      "latitude": 6.492142,
+      "longitude": 3.38031,
+      "phone": "+2348023039766",
+      "state": "Lagos",
+      "lga": "Lagos Mainland",
+      "operational_status": "operational",
+      "types": [
+        "supermarket",
+        "grocery_store",
+        "pharmacy",
+        "health",
+        "food_store",
+        "store",
+        "food",
+        "point_of_interest",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJvY5nZz-SOxARYfaRpZnvLi8",
+      "name": "Nett Pharmacy",
+      "formatted_address": "33 Opebi Rd, Allen, Ikeja 101233, Lagos, Nigeria",
+      "short_address": "33 Opebi Rd, Ikeja",
+      "latitude": 6.592547,
+      "longitude": 3.358945,
+      "phone": "+23412955051",
+      "state": "Lagos",
+      "lga": "Ikeja",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "manufacturer",
+        "store",
+        "point_of_interest",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJZ1YQeD2MOxARJH1ggDM1Ars",
+      "name": "Vaticabells",
+      "formatted_address": "61 Ogunlana Dr, Surulere, Lagos 101241, Lagos, Nigeria",
+      "short_address": "61 Ogunlana Dr, Lagos",
+      "latitude": 6.507945,
+      "longitude": 3.352851,
+      "phone": "+2348033019432",
+      "state": "Lagos",
+      "lga": "Surulere",
+      "operational_status": "operational",
+      "types": [
+        "drugstore",
+        "pharmacy",
+        "health",
+        "store",
+        "point_of_interest",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJkZuVYTuNOxARIYSN9NxIsRk",
+      "name": "Chemist Bus Stop Pharmacy",
+      "formatted_address": "Opere St, Igbobi, Lagos 102216, Lagos, Nigeria",
+      "short_address": "Opere St, Lagos",
+      "latitude": 6.529055,
+      "longitude": 3.379856,
+      "phone": "+2348034053986",
+      "state": "Lagos",
+      "lga": "Shomolu",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "store",
+        "point_of_interest",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJWQJ9kgCROxARs7xeClV9-bM",
+      "name": "Medplus Pharmacy Egbeda",
+      "formatted_address": "santos layout, J837+MGG, 26 Oladipupo Fafore St, Akowonjo roundabout, Idi Mangoro, Ikeja 102213, Lagos, Nigeria",
+      "short_address": "J837+MGG, santos layout, 26 Oladipupo Fafore St, Akowonjo roundabout, Ikeja",
+      "latitude": 6.604188,
+      "longitude": 3.313813,
+      "phone": "+2349053835688",
+      "state": "Lagos",
+      "lga": "Alimosho",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "store",
+        "point_of_interest",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJEecqbIiMOxARz4XhngbeLoA",
+      "name": "Lifeback Pharmacy and Store Limited",
+      "formatted_address": "Old Yabaroad Adekunle, 36 Makoko Rd, Yaba, Lagos 101212, Lagos, Nigeria",
+      "short_address": "Old Yabaroad Adekunle, 36 Makoko Rd, Lagos",
+      "latitude": 6.493367,
+      "longitude": 3.381055,
+      "phone": "+2348039888848",
+      "state": "Lagos",
+      "lga": "Lagos Mainland",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "supermarket",
+        "grocery_store",
+        "health",
+        "food_store",
+        "store",
+        "food",
+        "point_of_interest",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJF962GTqSOxARcQK-YZTE1tY",
+      "name": "HealthPlus Pharmacy, Allen Avenue (a mutti Pharmacy)",
+      "formatted_address": "Centage Plaza, 14 Allen Ave, Allen, Ikeja 100271, Lagos, Nigeria",
+      "short_address": "Centage Plaza, 14 Allen Ave, Ikeja",
+      "latitude": 6.597694,
+      "longitude": 3.35436,
+      "phone": "+2347074557529",
+      "state": "Lagos",
+      "lga": "Ikeja",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "store",
+        "point_of_interest",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJNalyL1WTOxARZNk9okFTeFI",
+      "name": "Medplus - Opebi",
+      "formatted_address": "61 Opebi Rd, Opebi, Ikeja 101233, Lagos, Nigeria",
+      "short_address": "61 Opebi Rd, Ikeja",
+      "latitude": 6.590017,
+      "longitude": 3.360978,
+      "phone": "+2349082042960",
+      "state": "Lagos",
+      "lga": "Ikeja",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "store",
+        "point_of_interest",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJE64v8TCNOxARCwENg1p_D3k",
+      "name": "Medplus Pharmacy",
+      "formatted_address": "113 Ogunlana Dr, Surulere, Lagos 101241, Lagos, Nigeria",
+      "short_address": "113 Ogunlana Dr, Lagos",
+      "latitude": 6.504579,
+      "longitude": 3.352037,
+      "phone": "+23470012131415",
+      "state": "Lagos",
+      "lga": "Surulere",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "store",
+        "point_of_interest",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJ8ecP1Vr0OxARK50AwxfHuHM",
+      "name": "Daytona 24/7 Supermarket",
+      "formatted_address": "21 Admiralty Rd, Lekki Phase I, Lagos 106104, Lagos, Nigeria",
+      "short_address": "21 Admiralty Rd, Lagos",
+      "latitude": 6.451919,
+      "longitude": 3.469878,
+      "phone": "+2348180002968",
+      "state": "Lagos",
+      "lga": "Eti Osa",
+      "operational_status": "operational",
+      "types": [
+        "supermarket",
+        "pharmacy",
+        "grocery_store",
+        "food_store",
+        "food",
+        "point_of_interest",
+        "store",
+        "health",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJZWSaIv70OxARmDtE5mBIPP4",
+      "name": "Medplus Pharmacy Lekki-Admiralty",
+      "formatted_address": "7 Admiralty Wy, Lekki Phase I, Lagos 106104, Lagos, Nigeria",
+      "short_address": "7 Admiralty Wy, Lagos",
+      "latitude": 6.447617,
+      "longitude": 3.481355,
+      "phone": "+2348098509526",
+      "state": "Lagos",
+      "lga": "Eti Osa",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "point_of_interest",
+        "store",
+        "health",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJz-b0qVf0OxARBJXDI0CRVHQ",
+      "name": "Mopheth Pharmacy Lekki",
+      "formatted_address": "12E Admiralty Wy, Lekki Phase I, Lekki 106104, Lagos, Nigeria",
+      "short_address": "12E Admiralty Wy, Lekki",
+      "latitude": 6.447155,
+      "longitude": 3.462477,
+      "phone": null,
+      "state": "Lagos",
+      "lga": "Eti Osa",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "point_of_interest",
+        "store",
+        "health",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJDzEBrqyNOxARIOuykvvQ1pU",
+      "name": "Primerose Hospital",
+      "formatted_address": "4 Olusola Olude Cl, Somolu, Lagos 102216, Lagos, Nigeria",
+      "short_address": "4 Olusola Olude Cl, Lagos",
+      "latitude": 6.546164,
+      "longitude": 3.388698,
+      "phone": "+2348099910978",
+      "state": "Lagos",
+      "lga": "Shomolu",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "point_of_interest",
+        "store",
+        "health",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJFUK5oJb1OxARGxnZHrbMwlI",
+      "name": "Mopheth Pharmacy Lekki Phase 1 Lagos",
+      "formatted_address": "32a Admiralty Wy, Lekki Phase 1, Lagos 105102, Lagos, Nigeria",
+      "short_address": "32a Admiralty Wy, Lagos",
+      "latitude": 6.448019,
+      "longitude": 3.471474,
+      "phone": "+2348081585229",
+      "state": "Lagos",
+      "lga": "Eti Osa",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "supermarket",
+        "grocery_store",
+        "food_store",
+        "manufacturer",
+        "food",
+        "point_of_interest",
+        "store",
+        "health",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJExJugg-NOxARNeGXKOz_tZs",
+      "name": "Safecare Pharmacy & Stores",
+      "formatted_address": "Abule Okuta Road, Bariga, Lagos 102216, Lagos, Nigeria",
+      "short_address": "Abule Okuta Road, Lagos",
+      "latitude": 6.535421,
+      "longitude": 3.386812,
+      "phone": null,
+      "state": "Lagos",
+      "lga": "Shomolu",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "point_of_interest",
+        "store",
+        "health",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJxXmqS0CNOxARG0prpTNn6Po",
+      "name": "Naza pharmacy and store",
+      "formatted_address": "6 Adams St, Oworosoki, Lagos 105102, Lagos, Nigeria",
+      "short_address": "6 Adams St, Lagos",
+      "latitude": 6.547964,
+      "longitude": 3.400715,
+      "phone": "+2348026555000",
+      "state": "Lagos",
+      "lga": "Kosofe",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "point_of_interest",
+        "store",
+        "health",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJTZdVVE70OxARyFVebOsYNkw",
+      "name": "HealthPlus Pharmacy, Lekki1 (a mutti Pharmacy)",
+      "formatted_address": "11B Victoria Arobieke St, Lekki Phase I, Lagos 106104, Lagos, Nigeria",
+      "short_address": "11B Victoria Arobieke St, Lagos",
+      "latitude": 6.446805,
+      "longitude": 3.472459,
+      "phone": "+2348095896090",
+      "state": "Lagos",
+      "lga": "Eti Osa",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "point_of_interest",
+        "store",
+        "health",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJL3h74nSNOxARhud_p9TDzNE",
+      "name": "HealthPlus Pharmacy, Herbert Macaulay (a mutti Pharmacy)",
+      "formatted_address": "346 Herbert Macaulay Wy, Yaba, Lagos 100001, Lagos, Nigeria",
+      "short_address": "346 Herbert Macaulay Wy, Lagos",
+      "latitude": 6.511539,
+      "longitude": 3.37765,
+      "phone": "+2347074557560",
+      "state": "Lagos",
+      "lga": "Lagos Mainland",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "point_of_interest",
+        "store",
+        "health",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJU8Z3S_GMOxARmiJYxQn0t-E",
+      "name": "Pillbox Pharmacy",
+      "formatted_address": "4 Olumo St, Iwaya, Lagos 101245, Lagos, Nigeria",
+      "short_address": "4 Olumo St, Lagos",
+      "latitude": 6.509494,
+      "longitude": 3.38478,
+      "phone": "+2347061190149",
+      "state": "Lagos",
+      "lga": "Lagos Mainland",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "point_of_interest",
+        "store",
+        "health",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJl_Wmm-eTOxAR4HcGoHT8hGg",
+      "name": "CarnaMed Clinic",
+      "formatted_address": "137 Ogudu Rd, Ogudu, Lagos 105102, Lagos, Nigeria",
+      "short_address": "137 Ogudu Rd, Lagos",
+      "latitude": 6.575979,
+      "longitude": 3.390845,
+      "phone": "+2347007022762",
+      "state": "Lagos",
+      "lga": "Kosofe",
+      "operational_status": "temporarily_closed",
+      "types": [
+        "medical_clinic",
+        "pharmacy",
+        "point_of_interest",
+        "store",
+        "health",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJGTsyqsj0OxARdCumiMLi1w4",
+      "name": "HealthPlus Pharmacy, Glover Road (a mutti Pharmacy)",
+      "formatted_address": "15 Glover Rd, Ikoyi 101233, Ikoyi, Lagos 101001, Lagos, Nigeria",
+      "short_address": "15 Glover Rd, Ikoyi 101233, Lagos",
+      "latitude": 6.455095,
+      "longitude": 3.429511,
+      "phone": "+2349087766949",
+      "state": "Lagos",
+      "lga": "Eti Osa",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "point_of_interest",
+        "store",
+        "health",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJA-CTPQONOxARoprocFAFQUU",
+      "name": "Accupill Pharmacy and stores Ltd",
+      "formatted_address": "Local government, 11 Abdullahi Street, opposite Ayetoro Nursery and Primary School, Akoka, Lagos 100001, Lagos, Nigeria",
+      "short_address": "Local government, 11 Abdullahi Street, Ayetoro Nursery and Primary School, Lagos",
+      "latitude": 6.527707,
+      "longitude": 3.388284,
+      "phone": "+2347065153035",
+      "state": "Lagos",
+      "lga": "Shomolu",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "point_of_interest",
+        "store",
+        "health",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJJeDo8syNOxAR-Kx1KXyRu40",
+      "name": "Reinomed Pharmacy",
+      "formatted_address": "24 Bajulaye Rd, Igbobi, Lagos 100001, Lagos, Nigeria",
+      "short_address": "24 Bajulaye Rd, Lagos",
+      "latitude": 6.52943,
+      "longitude": 3.377498,
+      "phone": "+2348035279544",
+      "state": "Lagos",
+      "lga": "Shomolu",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "point_of_interest",
+        "store",
+        "health",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJNZqZgWn1OxARk0r6limp8rI",
+      "name": "BPS Pharmacy",
+      "formatted_address": "2 Alexander Ave, Ikoyi, Eti Osa 101233, Lagos, Nigeria",
+      "short_address": "2 Alexander Ave, Eti Osa",
+      "latitude": 6.456375,
+      "longitude": 3.445392,
+      "phone": "+2348160200003",
+      "state": "Lagos",
+      "lga": "Eti Osa",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "point_of_interest",
+        "store",
+        "health",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJ6RmDQ52NOxARLhN2_arxMwk",
+      "name": "Naza Pharmacy and Sto",
+      "formatted_address": "4, Diya street Ifako, Gbagada, Lagos 100234, Lagos, Nigeria",
+      "short_address": "4, Diya street Ifako, Lagos",
+      "latitude": 6.551862,
+      "longitude": 3.392461,
+      "phone": "+2349057555556",
+      "state": "Lagos",
+      "lga": "Kosofe",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "department_store",
+        "food_delivery",
+        "food",
+        "point_of_interest",
+        "store",
+        "health",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJ8fIyYcGNOxAR9PN7bNo92Xk",
+      "name": "Med Plus Pharmacy",
+      "formatted_address": "Odunlami St, Somolu, Lagos 102216, Lagos, Nigeria",
+      "short_address": "Odunlami St, Lagos",
+      "latitude": 6.535407,
+      "longitude": 3.375642,
+      "phone": "+2349025364978",
+      "state": "Lagos",
+      "lga": "Shomolu",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "point_of_interest",
+        "store",
+        "health",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJM9rj2zX5OxARks9wOfGyDl0",
+      "name": "Dkk Pharmacy",
+      "formatted_address": "Lekki - Epe Expy, Eti-Osa, Sangotedo 106104, Lagos, Nigeria",
+      "short_address": "Lekki - Epe Expy, Sangotedo",
+      "latitude": 6.474879,
+      "longitude": 3.617724,
+      "phone": null,
+      "state": "Lagos",
+      "lga": "Eti Osa",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "point_of_interest",
+        "store",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJQz1kxTb3OxARB8I0AOy3xaE",
+      "name": "Havilah Hospital",
+      "formatted_address": "2 Bisi Afolabi Street, Addo Rd, Ajah, Lekki 106104, Lagos, Nigeria",
+      "short_address": "2 Bisi Afolabi Street, Addo Rd",
+      "latitude": 6.474594,
+      "longitude": 3.567742,
+      "phone": "+2348034704292",
+      "state": "Lagos",
+      "lga": "Eti Osa",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "point_of_interest",
+        "store",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJ02k3EQj6OxARV0iyJFDFDUU",
+      "name": "Drug Matters Pharmacy",
+      "formatted_address": "Addo Rd, Ajah, Lagos 101245, Lagos, Nigeria",
+      "short_address": "Addo Rd, Lagos",
+      "latitude": 6.491944,
+      "longitude": 3.58211,
+      "phone": "+2347026461524",
+      "state": "Lagos",
+      "lga": "Eti Osa",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "point_of_interest",
+        "store",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJUzegaLT5OxARkjUQqiOxVVw",
+      "name": "Medplus Pharmacy - Sangotedo Mall",
+      "formatted_address": "Eti-Osa, Sangotedo 106104, Lagos, Nigeria",
+      "short_address": "Sangotedo",
+      "latitude": 6.467706,
+      "longitude": 3.638965,
+      "phone": "+2348188687911",
+      "state": "Lagos",
+      "lga": "Eti Osa",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "point_of_interest",
+        "store",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJGWOloCD5OxAR1d4WmsgR1sI",
+      "name": "Fountain Med Pharmacy",
+      "formatted_address": "Lekki - Epe Expy, Eti-Osa, Sangotedo 106104, Lagos, Nigeria",
+      "short_address": "Lekki - Epe Expy, Sangotedo",
+      "latitude": 6.470648,
+      "longitude": 3.637199,
+      "phone": "+2348130121318",
+      "state": "Lagos",
+      "lga": "Eti Osa",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "point_of_interest",
+        "store",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJjYYaXzP7OxARwQUkn1IiBOk",
+      "name": "Medplus - Blenco Mall",
+      "formatted_address": "Blenco Mall, 53 Addo Rd, Ajah, Lagos 106104, Lagos, Nigeria",
+      "short_address": "Blenco Mall, 53 Addo Rd, Lagos",
+      "latitude": 6.479604,
+      "longitude": 3.571532,
+      "phone": "+2348187316970",
+      "state": "Lagos",
+      "lga": "Eti Osa",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "point_of_interest",
+        "store",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJGwUvnFD3OxARXOBb21Qr78w",
+      "name": "Dlightsom Pharmacy",
+      "formatted_address": "Kemfat St, Ajah, Lekki 101245, Lagos, Nigeria",
+      "short_address": "Kemfat St, Lekki",
+      "latitude": 6.469567,
+      "longitude": 3.574838,
+      "phone": "+2348131368668",
+      "state": "Lagos",
+      "lga": "Eti Osa",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "point_of_interest",
+        "store",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJHZAbGFP5OxARr2BxsKVBHEU",
+      "name": "24 Hours Pharmacy",
+      "formatted_address": "Lekki - Epe Expy, opp. Wema Bank, Eti-Osa, Sangotedo 106104, Lagos, Nigeria",
+      "short_address": "Lekki - Epe Expy, Wema Bank, Sangotedo",
+      "latitude": 6.471503,
+      "longitude": 3.634898,
+      "phone": null,
+      "state": "Lagos",
+      "lga": "Eti Osa",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "point_of_interest",
+        "store",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJhSLrbnn5OxARQxrqjLLvPhk",
+      "name": "OLASURU SHOPPING COMPLEX",
+      "formatted_address": "Km47, Plot1-2 Olasuru Street, Haruna Bus-Stop, Sangotedo,Eti-Osa L.G.A,, Lagos-S, Eti-Osa, Lekki-Sangotedo 106104, Lagos, Nigeria",
+      "short_address": "Km47, Plot1-2 Olasuru Street, Haruna Bus-Stop, Sangotedo,Eti-Osa L.G.A,, Lagos-S, Lekki-Sangotedo",
+      "latitude": 6.472896,
+      "longitude": 3.625992,
+      "phone": "+2348107372308",
+      "state": "Lagos",
+      "lga": "Eti Osa",
+      "operational_status": "operational",
+      "types": [
+        "shopping_mall",
+        "pharmacy",
+        "beauty_salon",
+        "food_delivery",
+        "medical_lab",
+        "supplier",
+        "manufacturer",
+        "health",
+        "service",
+        "point_of_interest",
+        "food",
+        "store",
+        "local_government_office",
+        "government_office",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJbWOMsEH6OxARP5s6Q7H_C40",
+      "name": "Rosswell pharmacy",
+      "formatted_address": "GJ33+X77, Aina Plaza, Badore Rd, Opppsite KTM, Badore, Ajah, Lekki, a, Lambasa, Lagos 106104, Lagos, Nigeria",
+      "short_address": "GJ33+X77, Aina Plaza, Badore Rd, Opppsite KTM, Badore, Ajah, Lekki, a, Lagos",
+      "latitude": 6.504856,
+      "longitude": 3.603052,
+      "phone": "+2349033874204",
+      "state": "Lagos",
+      "lga": "Eti Osa",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "point_of_interest",
+        "store",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJbT_QLGr5OxARaT6aQWwjKfY",
+      "name": "Safco Mega Solution Pharmaceutical and Health Care",
+      "formatted_address": "Victoria Island, Lekki 106104, Lagos, Nigeria",
+      "short_address": "Lekki",
+      "latitude": 6.464942,
+      "longitude": 3.58519,
+      "phone": "+2348111811811",
+      "state": "Lagos",
+      "lga": "Eti Osa",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "point_of_interest",
+        "store",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJ91FVMEb3OxARZROjjebicZY",
+      "name": "Osamedic Diagnostics Ltd",
+      "formatted_address": "Olokonla, Olokonla Rd, Lekki - Epe Expy, Eti-Osa, Lekki 106104, Lagos, Nigeria",
+      "short_address": "Olokonla, Olokonla Rd, Lekki - Epe Expy, Lekki",
+      "latitude": 6.475073,
+      "longitude": 3.608183,
+      "phone": "+2348027894448",
+      "state": "Lagos",
+      "lga": "Eti Osa",
+      "operational_status": "operational",
+      "types": [
+        "medical_lab",
+        "pharmacy",
+        "real_estate_agency",
+        "employment_agency",
+        "health",
+        "service",
+        "point_of_interest",
+        "store",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJodxC_Xf5OxARkKIWLJOTFpU",
+      "name": "Dkk Pharmacy",
+      "formatted_address": "77, Eti-Osa, Sangotedo 106104, Lagos, Nigeria",
+      "short_address": "77, Sangotedo",
+      "latitude": 6.453508,
+      "longitude": 3.62693,
+      "phone": "+2349038300784",
+      "state": "Lagos",
+      "lga": "Eti Osa",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "point_of_interest",
+        "store",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJvzrCBBP6OxARZ15ZexFsJng",
+      "name": "Femire Pharmacy",
+      "formatted_address": "Ibeju, 70 ADDO, Badore Rd, Ajah, Lagos 106104, Lagos, Nigeria",
+      "short_address": "Ibeju, 70 ADDO, Badore Rd, Lagos",
+      "latitude": 6.499506,
+      "longitude": 3.594382,
+      "phone": "+2348144961510",
+      "state": "Lagos",
+      "lga": "Eti Osa",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "wholesaler",
+        "health",
+        "point_of_interest",
+        "store",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJy-hmjkT7OxARvPsVPxnkpd4",
+      "name": "STELLA CHARLES PHARMACY AND STORE",
+      "formatted_address": "harmony estate, No 1 Samuel Abu Street, Langbasa Rd, Aja, Lagos 106104, Lagos, Nigeria",
+      "short_address": "harmony estate, No 1 Samuel Abu Street, Langbasa Rd, Lagos",
+      "latitude": 6.507508,
+      "longitude": 3.586824,
+      "phone": null,
+      "state": "Lagos",
+      "lga": "Eti Osa",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "grocery_store",
+        "food_store",
+        "point_of_interest",
+        "food",
+        "store",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJ_2LQCVH3OxARISUHt3CzeB0",
+      "name": "Drugmatters Pharmacy",
+      "formatted_address": "Thomas estate Plaza, 47 Modupe Young St, Ajah, Lagos 101245, Lagos, Nigeria",
+      "short_address": "Thomas estate Plaza, 47 Modupe Young St, Ajah, Lagos",
+      "latitude": 6.473376,
+      "longitude": 3.573744,
+      "phone": "+2347041735638",
+      "state": "Lagos",
+      "lga": "Eti Osa",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "point_of_interest",
+        "store",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJVybXpY35OxARr72ZaDU6xPQ",
+      "name": "Honey Health Pharmacy",
+      "formatted_address": "Onishon Bus Stop, Lekki - Epe Expy, Ajah, Lekki 106104, Lagos, Nigeria",
+      "short_address": "Onishon Bus Stop, Lekki - Epe Expy",
+      "latitude": 6.469415,
+      "longitude": 3.584622,
+      "phone": "+2348032848828",
+      "state": "Lagos",
+      "lga": "Eti Osa",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "point_of_interest",
+        "store",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJkRKL-Tn3OxARsVUl-cCCg64",
+      "name": "Divine Care Pharmaceutical Ltd",
+      "formatted_address": "2 Ayodele Close, Thomas Estate, Ajah, Lagos 106104, Lagos, Nigeria",
+      "short_address": "2 Ayodele Close, Thomas Estate, Lagos",
+      "latitude": 6.471623,
+      "longitude": 3.572613,
+      "phone": null,
+      "state": "Lagos",
+      "lga": "Eti Osa",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "point_of_interest",
+        "store",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJe-lDGHv5OxAR8KivnSW1B-I",
+      "name": "Xplore Pharmacy, Sangotedo",
+      "formatted_address": "Eti-Osa, Lekki 106104, Lagos, Nigeria",
+      "short_address": "Lekki",
+      "latitude": 6.472714,
+      "longitude": 3.630558,
+      "phone": "+2348129279240",
+      "state": "Lagos",
+      "lga": "Eti Osa",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "point_of_interest",
+        "store",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJ5dXWXlj3OxARojvCkg_FjEo",
+      "name": "Ephre-kings pharmacy",
+      "formatted_address": "Thomas estate, 79B Modupe Young St, Aja, Ajah, Lagos 106104, Lagos, Nigeria",
+      "short_address": "Thomas estate, 79B Modupe Young St, Aja, Lagos",
+      "latitude": 6.474438,
+      "longitude": 3.57599,
+      "phone": "+2348169513483",
+      "state": "Lagos",
+      "lga": "Eti Osa",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "point_of_interest",
+        "store",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJZZKhr_B1OxAREU5bkNDIrxg",
+      "name": "Saatrado Int'l Patient' Stores",
+      "formatted_address": "Doctor's House, TIWADAYO COMMUNITY, Peace AVENUE, Agbara - Atan Rd, Atan 112103, Ogun State, Nigeria",
+      "short_address": "TIWADAYO COMMUNITY, Doctor's House, Peace AVENUE, Agbara - Atan Rd, Atan",
+      "latitude": 6.667537,
+      "longitude": 3.086205,
+      "phone": "+2348023939048",
+      "state": "Ogun",
+      "lga": "Ado Odo/Ota",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "point_of_interest",
+        "store",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJR4-vmtGfOxARzhNoN1oz85g",
+      "name": "SAMRON PHARMACY AND STORE",
+      "formatted_address": "Transformer ADO-ODO, Onibuku 112211, Ogun State, Nigeria",
+      "short_address": "Transformer ADO-ODO, Onibuku",
+      "latitude": 6.676153,
+      "longitude": 3.125441,
+      "phone": "+2349121678518",
+      "state": "Ogun",
+      "lga": "Ado Odo/Ota",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "point_of_interest",
+        "store",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJka1z_YqfOxARuNYIwMgrr5M",
+      "name": "Little Hills Pharmacy",
+      "formatted_address": "Km 18 Sango Idiroko Express Road, opposite Goro Market, Ota 112103, Ogun State, Nigeria",
+      "short_address": "Km 18 Sango Idiroko Express Road, Goro Market, Ota",
+      "latitude": 6.664973,
+      "longitude": 3.10161,
+      "phone": "+2348038766676",
+      "state": "Ogun",
+      "lga": "Ado Odo/Ota",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "point_of_interest",
+        "store",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJWbEByP11OxARVPgAQy7aEB0",
+      "name": "ST. Cyprian Pharmacy Atan, Ota, Ogun State",
+      "formatted_address": "Atan 112103, Ogun State, Nigeria",
+      "short_address": "Atan",
+      "latitude": 6.661384,
+      "longitude": 3.089019,
+      "phone": "+2348060982203",
+      "state": "Ogun",
+      "lga": "Ado Odo/Ota",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "wholesaler",
+        "health",
+        "point_of_interest",
+        "store",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJg46nlTt1OxARRdlBS-ECqYY",
+      "name": "Ayobami Patients medicine store along welking school onse",
+      "formatted_address": "M3H6+5HX, Unnamed Road, Owode 112103, Ogun State, Nigeria",
+      "short_address": "M3H6+5HX, Unnamed Road, Owode",
+      "latitude": 6.677984,
+      "longitude": 3.061481,
+      "phone": null,
+      "state": "Ogun",
+      "lga": "Ado Odo/Ota",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "point_of_interest",
+        "store",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJM3_2vPt1OxARGkDbauYRjOg",
+      "name": "Felmox Pharmaceutical And ALlied Products",
+      "formatted_address": "M36R+C9F, A5-1, Owode 112103, Ogun State, Nigeria",
+      "short_address": "M36R+C9F, A5-1, Owode",
+      "latitude": 6.66106,
+      "longitude": 3.090935,
+      "phone": "+2348061935588",
+      "state": "Ogun",
+      "lga": "Ado Odo/Ota",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "point_of_interest",
+        "store",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJQ48ppJlzOxARIdq2ZbVODxY",
+      "name": "ELEYO PHARMACY & STORES",
+      "formatted_address": "Owode 112106, Ogun State, Nigeria",
+      "short_address": "Owode",
+      "latitude": 6.688865,
+      "longitude": 3.00064,
+      "phone": null,
+      "state": "Ogun",
+      "lga": "Yewa South",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "point_of_interest",
+        "store",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJSQcH-mmeOxAR83ynUxubpwY",
+      "name": "Nikks Pharmacy & Stores",
+      "formatted_address": "A5-1, Iju 112104, Ogun State, Nigeria",
+      "short_address": "A5-1, Iju",
+      "latitude": 6.674717,
+      "longitude": 3.123107,
+      "phone": "+2348065193677",
+      "state": "Ogun",
+      "lga": "Ado Odo/Ota",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "point_of_interest",
+        "store",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJ32Fe0fp1OxAR2_UOYCG1FNc",
+      "name": "Gozian Rapha Pharmacy",
+      "formatted_address": "Atan b/stop, Gobeson plaza, Road, Agbara 112103, Ogun State, Nigeria",
+      "short_address": "Atan b/stop, Gobeson plaza, Road, Agbara",
+      "latitude": 6.662644,
+      "longitude": 3.088039,
+      "phone": "+2347061902075",
+      "state": "Ogun",
+      "lga": "Ado Odo/Ota",
+      "operational_status": "operational",
+      "types": [
+        "doctor",
+        "pharmacy",
+        "health",
+        "point_of_interest",
+        "store",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJMbj716Z1OxARjrNBHYHHPQ8",
+      "name": "Sowers Pharmacy&stores",
+      "formatted_address": "Opposite Atan market along idiroko road, LGA, Ota 112103, Ogun State, Nigeria",
+      "short_address": "Opposite Atan market along idiroko road, LGA, Ota",
+      "latitude": 6.662979,
+      "longitude": 3.095611,
+      "phone": "+2348131467494",
+      "state": "Ogun",
+      "lga": "Ado Odo/Ota",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "point_of_interest",
+        "store",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJoTimxOWdOxARLhrPDkwt_XI",
+      "name": "Ayomide pharmacy",
+      "formatted_address": "140 Kajola St, Ota 112103, Ogun State, Nigeria",
+      "short_address": "140 Kajola St, Ota",
+      "latitude": 6.651947,
+      "longitude": 3.100687,
+      "phone": null,
+      "state": "Ogun",
+      "lga": "Ado Odo/Ota",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "point_of_interest",
+        "store",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJ0aGUBQB3OxARKw7l_TbS1lc",
+      "name": "OWA HEALTHCARE",
+      "formatted_address": "M35M+8PP, Ajegunle road, opposite Bee Bee Magnificent Hotel, Atan 112103, Ogun State, Nigeria",
+      "short_address": "M35M+8PP, Ajegunle road, Bee Bee Magnificent Hotel, Atan",
+      "latitude": 6.658325,
+      "longitude": 3.084329,
+      "phone": "+2348053527686",
+      "state": "Ogun",
+      "lga": "Ado Odo/Ota",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "point_of_interest",
+        "store",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJrXAroxd1OxARdZteYVBhRZw",
+      "name": "St Cyprian Pharmacy Limited",
+      "formatted_address": "Shop 2,Gobeson Plaza, Ose Olose 112103, Ogun State, Nigeria",
+      "short_address": "Shop 2,Gobeson Plaza",
+      "latitude": 6.686386,
+      "longitude": 3.067637,
+      "phone": "+2348060982203",
+      "state": "Ogun",
+      "lga": "Ado Odo/Ota",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "point_of_interest",
+        "store",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJMTmFYWN1OxARR8WwIeuvbpM",
+      "name": "Pebble Pharmacy and Stores",
+      "formatted_address": "Igbele Tella, Agbedi 112103, Ogun State, Nigeria",
+      "short_address": "Igbele Tella, Agbedi",
+      "latitude": 6.692536,
+      "longitude": 3.083006,
+      "phone": "+2348160081726",
+      "state": "Ogun",
+      "lga": "Ado Odo/Ota",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "point_of_interest",
+        "store",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJ07pbHe51OxARWXoAsUaogow",
+      "name": "Hasamalsin Agro Allied Limited.",
+      "formatted_address": "House 1 Oniyide close, off Hasamalsin Crescent, off Sokoto Road, Ajana, Igbele 112102, Ogun State, Nigeria",
+      "short_address": "House 1 Oniyide close, Hasamalsin Crescent, Sokoto Road, Igbele",
+      "latitude": 6.696681,
+      "longitude": 3.080587,
+      "phone": "+2348135921986",
+      "state": "Ogun",
+      "lga": "Ado Odo/Ota",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "veterinary_care",
+        "health",
+        "point_of_interest",
+        "store",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJoV0h1-yfOxARWswjNfcv2sA",
+      "name": "Roses Enterprises",
+      "formatted_address": "Shop E13, Mesan 112104, Ogun State, Nigeria",
+      "short_address": "Shop E13, Mesan",
+      "latitude": 6.656659,
+      "longitude": 3.125278,
+      "phone": "+2348164754454",
+      "state": "Ogun",
+      "lga": "Ado Odo/Ota",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "point_of_interest",
+        "store",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJLWo2fF2fOxARvw691VKXsM4",
+      "name": "Imue global pharmacy",
+      "formatted_address": "Stream Bus-Stop, by Transformer, off Love Junction, Epete, Ota 112226, Ogun State, Nigeria",
+      "short_address": "Stream Bus-Stop, by Transformer, Love Junction, Ota",
+      "latitude": 6.672567,
+      "longitude": 3.135383,
+      "phone": "+2347038644453",
+      "state": "Ogun",
+      "lga": "Ado-Odo",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "point_of_interest",
+        "store",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJTVNzNyV3OxARHQLVxGsxd7U",
+      "name": "Remola Chemist Shop",
+      "formatted_address": "1 Idi-aba, Ishola 112102, Ìpínlẹ̀ Ògùn, Nigeria",
+      "short_address": "1 Idi-aba, Ishola",
+      "latitude": 6.611719,
+      "longitude": 3.05762,
+      "phone": "+2348053356399",
+      "state": null,
+      "lga": "Agbègbè Ìjọba Ìbílẹ̀ Ado-Odo/Ota",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "point_of_interest",
+        "store",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJo3jTagJ3OxAREcS89Szm19E",
+      "name": "Josam Pharmacy",
+      "formatted_address": "Souls Revival way, Igorokoh Road, Okanran 102272, Ogun State, Nigeria",
+      "short_address": "Souls Revival way, Igorokoh Road, Okanran",
+      "latitude": 6.611719,
+      "longitude": 3.05762,
+      "phone": "+2348020728090",
+      "state": "Ogun",
+      "lga": "Ado Odo/Ota",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "point_of_interest",
+        "store",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJX1NxXOmfOxARi7R7tHTl0n0",
+      "name": "God Gift Medicine Store And Varieties",
+      "formatted_address": "Km 9 Idiroko Rd, Agege 112104, Ogun State, Nigeria",
+      "short_address": "Km 9 Idiroko Rd, Agege",
+      "latitude": 6.681816,
+      "longitude": 3.163243,
+      "phone": "+2348033846682",
+      "state": "Ogun",
+      "lga": "Ado Odo/Ota",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "point_of_interest",
+        "store",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJK23YTw6XOxAR7K_TacnezhU",
+      "name": "Folyma Pharmacy And Stores",
+      "formatted_address": "133 Alakuko Rd, Ifako-Ijaiye, Lagos 112105, Ogun State, Nigeria",
+      "short_address": "133 Alakuko Rd, Lagos",
+      "latitude": 6.686971,
+      "longitude": 3.285545,
+      "phone": "+2348033651566",
+      "state": "Ogun",
+      "lga": "Ado Odo/Ota",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "wholesaler",
+        "health",
+        "point_of_interest",
+        "store",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJ_X0LucWQOxARj6yE7cCTOMg",
+      "name": "Drug Master Pharmarcy and stores ltd",
+      "formatted_address": "Ekoro Road, Agbelekale bus stop via ile-iwe, Abule Egba, Lagos 102213, Lagos, Nigeria",
+      "short_address": "Ekoro Road, Agbelekale bus stop via ile-iwe, Lagos",
+      "latitude": 6.640324,
+      "longitude": 3.28438,
+      "phone": "+2347031117515",
+      "state": "Lagos",
+      "lga": "Alimosho",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "point_of_interest",
+        "store",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJQwqjtLGZOxARmJ9L81XKiJI",
+      "name": "Hardej Pharmacy - Ota",
+      "formatted_address": "99 Iganmode Road, Ota 112221, Ogun State, Nigeria",
+      "short_address": "99 Iganmode Road, Ota",
+      "latitude": 6.687596,
+      "longitude": 3.233283,
+      "phone": "+2347066753055",
+      "state": "Ogun",
+      "lga": "Ado Odo/Ota",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "wholesaler",
+        "health",
+        "point_of_interest",
+        "store",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJIXE2zUCbOxARZ_QJEq96nLo",
+      "name": "5a, Moses Ayeni close Ikola odunsi ipaja Lagos",
+      "formatted_address": "4 Moses Ayeni close, Ikola Rd, Alimi Odunsi St, off Adekoya Street, Ipaja, Lagos 102213, Lagos, Nigeria",
+      "short_address": "4 Moses Ayeni close, Ikola Rd, Alimi Odunsi St, Adekoya Street, Lagos",
+      "latitude": 6.626867,
+      "longitude": 3.245738,
+      "phone": null,
+      "state": "Lagos",
+      "lga": "Alimosho",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "point_of_interest",
+        "store",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJH-NTC4CaOxARfq1_P5KXJ48",
+      "name": "Mediservices Community Hospital",
+      "formatted_address": "28 David Ogundele St, Ipaja, Lagos 102213, Lagos, Nigeria",
+      "short_address": "28 David Ogundele St, Lagos",
+      "latitude": 6.610016,
+      "longitude": 3.258152,
+      "phone": "+2348033238873",
+      "state": "Lagos",
+      "lga": "Alimosho",
+      "operational_status": "operational",
+      "types": [
+        "hospital",
+        "pharmacy",
+        "doctor",
+        "health",
+        "service",
+        "point_of_interest",
+        "store",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJN1FD8WSZOxARtDnz9zdofeY",
+      "name": "Josrite Pharmacy",
+      "formatted_address": "No 203 Idiroko Rd, Ota 112104, Ogun State, Nigeria",
+      "short_address": "No 203 Idiroko Rd, Ota",
+      "latitude": 6.684751,
+      "longitude": 3.215895,
+      "phone": "+2348037008021",
+      "state": "Ogun",
+      "lga": "Ado Odo/Ota",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "point_of_interest",
+        "store",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJCyTHuSuROxARzYM7_inNblI",
+      "name": "Price Point Pharmacy",
+      "formatted_address": "28 Ekoro Rd, Abule Egba, Lagos 102213, Lagos, Nigeria",
+      "short_address": "28 Ekoro Rd, Lagos",
+      "latitude": 6.649012,
+      "longitude": 3.30166,
+      "phone": "+2348034483036",
+      "state": "Lagos",
+      "lga": "Alimosho",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "point_of_interest",
+        "store",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJy4c9A8CROxARipDW8Ay626U",
+      "name": "Fadob Pharmacy",
+      "formatted_address": "29 Salami, 30 Kasumu St, Ipaja, Lagos 102213, Lagos, Nigeria",
+      "short_address": "29 Salami, 30 Kasumu St, Lagos",
+      "latitude": 6.613793,
+      "longitude": 3.27442,
+      "phone": "+2348154556393",
+      "state": "Lagos",
+      "lga": "Alimosho",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "point_of_interest",
+        "store",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJO9idyRuXOxARdb9ht3Zxx3M",
+      "name": "Shekinah Pharmacy, puposola",
+      "formatted_address": "9 Adebisi Amusa Cl, Ifako-Ijaiye, Lagos 101232, Lagos, Nigeria",
+      "short_address": "9 Adebisi Amusa Cl, Lagos",
+      "latitude": 6.66304,
+      "longitude": 3.312373,
+      "phone": null,
+      "state": "Lagos",
+      "lga": "Ifako/Ijaye",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "point_of_interest",
+        "store",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJNeKIRzWXOxARL8M0pXP3ZZw",
+      "name": "Deshab Pharmacy",
+      "formatted_address": "105, Baale animashaun road, off Adenekan bus_stop, Alakuko, Lagos 101232, Lagos, Nigeria",
+      "short_address": "105, Baale animashaun road, off Adenekan bus_stop, Lagos",
+      "latitude": 6.688711,
+      "longitude": 3.278126,
+      "phone": "+2348177775326",
+      "state": "Lagos",
+      "lga": "Ifako/Ijaye",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "manufacturer",
+        "health",
+        "point_of_interest",
+        "store",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJL-Vq8zmYOxAR1nuA2k_7saY",
+      "name": "Micoson Pharmacy",
+      "formatted_address": "1 Ijoko Rd, Ota 112104, Ogun State, Nigeria",
+      "short_address": "1 Ijoko Rd, Ota",
+      "latitude": 6.707647,
+      "longitude": 3.242798,
+      "phone": "+2348026150963",
+      "state": "Ogun",
+      "lga": "Ado Odo/Ota",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "drugstore",
+        "health",
+        "point_of_interest",
+        "store",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJjRN0TLCZOxARcVLVkc0BqXM",
+      "name": "Joy Veterinary",
+      "formatted_address": "37 Iganmode Road, Ota 112104, Ogun State, Nigeria",
+      "short_address": "37 Iganmode Road, Ota",
+      "latitude": 6.687778,
+      "longitude": 3.232028,
+      "phone": "+2348027634893",
+      "state": "Ogun",
+      "lga": "Ado Odo/Ota",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "veterinary_care",
+        "point_of_interest",
+        "store",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJsxo50WWZOxARrc6mOI9_8u0",
+      "name": "Medplus Pharmacy - Otta Outlet",
+      "formatted_address": "The Palms Ota- Former Gateway Hotel Premises, Ifako-Ijaiye, Ota 112104, Ogun State, Nigeria",
+      "short_address": "The Palms Ota- Former Gateway Hotel Premises, Ota",
+      "latitude": 6.697483,
+      "longitude": 3.255694,
+      "phone": "+2349096440462",
+      "state": "Ogun",
+      "lga": "Ado Odo/Ota",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "point_of_interest",
+        "store",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJvRMzqu2ROxARwskSUoSHrlw",
+      "name": "Fadob pharmacy",
+      "formatted_address": "no 2 bola dada street off victor fagbemi road, Ipaja Rd, Oke Odo, Lagos 102213, Lagos, Nigeria",
+      "short_address": "no 2 bola dada street off victor fagbemi road, Ipaja Rd, Lagos",
+      "latitude": 6.626944,
+      "longitude": 3.286962,
+      "phone": "+2348032345398",
+      "state": "Lagos",
+      "lga": "Alimosho",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "point_of_interest",
+        "store",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJz8czhzqXOxARfJB2iIGtQyE",
+      "name": "Drugrite Pharmacy",
+      "formatted_address": "12 Agbado-Ijaiye Road, Ijaiye Ojokoro,, Opposite Ojokoro LCDA, Lagos, Ojokoro, Lagos 100311, Lagos, Nigeria",
+      "short_address": "12 Agbado-Ijaiye Road, Ijaiye Ojokoro,, Opposite Ojokoro LCDA, Lagos, Lagos",
+      "latitude": 6.663978,
+      "longitude": 3.286135,
+      "phone": "+2347052692121",
+      "state": "Lagos",
+      "lga": "Ifako/Ijaye",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "point_of_interest",
+        "store",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJBXgfRp6QOxARjjvGYAbAUJ0",
+      "name": "Ajib Pharmacy And Supermarket",
+      "formatted_address": "12a Command Rd, Ipaja, Lagos 102213, Lagos, Nigeria",
+      "short_address": "12a Command Rd, Lagos",
+      "latitude": 6.628436,
+      "longitude": 3.259858,
+      "phone": "+2348032254426",
+      "state": "Lagos",
+      "lga": "Alimosho",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "supermarket",
+        "health",
+        "grocery_store",
+        "food_store",
+        "point_of_interest",
+        "food",
+        "store",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJEU7ozx6ROxARWko_BAs11KI",
+      "name": "Kallycare pharmacy and stores LTD",
+      "formatted_address": "122 Ekoro Rd Abulegba, Ishaga junction, Oke odo LCDA, 122 Ekoro Rd, Oke Odo, Lagos 102213, Lagos, Nigeria",
+      "short_address": "122 Ekoro Rd Abulegba, Ishaga junction, Oke odo LCDA, 122 Ekoro Rd, Lagos",
+      "latitude": 6.640238,
+      "longitude": 3.278139,
+      "phone": "+2348066312098",
+      "state": "Lagos",
+      "lga": "Alimosho",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "point_of_interest",
+        "store",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJexYS1CKfOxARqpTC-kbPbOc",
+      "name": "Gilbalm Pharmacy & Stores",
+      "formatted_address": "Estate bus stop, Km 6 Idiroko Rd, beside Totmak Farmers' Centre, Ota 112212, Ogun State, Nigeria",
+      "short_address": "Estate bus stop, Km 6 Idiroko Rd, Totmak Farmers' Centre, Ota",
+      "latitude": 6.681971,
+      "longitude": 3.201756,
+      "phone": "+2348034006406",
+      "state": "Ogun",
+      "lga": "Ado-Odo",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "point_of_interest",
+        "store",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJkdpXRw6ZOxARScjkPwN2rs0",
+      "name": "Ramsgate Pharmacy, Iyana Iyesi",
+      "formatted_address": "Ota 112104, Ogun State, Nigeria",
+      "short_address": "Ota",
+      "latitude": 6.682698,
+      "longitude": 3.18023,
+      "phone": "+2348055065881",
+      "state": "Ogun",
+      "lga": "Ado Odo/Ota",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "point_of_interest",
+        "store",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJjRbCG82WOxARPs9gfhr0PXM",
+      "name": "Atidam Pharmacy",
+      "formatted_address": "1 Olayiwola St, Abule Egba, Lagos 101232, Lagos, Nigeria",
+      "short_address": "1 Olayiwola St, Lagos",
+      "latitude": 6.656787,
+      "longitude": 3.310639,
+      "phone": null,
+      "state": "Lagos",
+      "lga": "Ifako/Ijaye",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "point_of_interest",
+        "store",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJLci8x56TOxARLTeaifYrXDU",
+      "name": "Westgate Lifecare Supermarket",
+      "formatted_address": "1 The Apostolic Church Cl, Isheri, Lagos 105102, Lagos, Nigeria",
+      "short_address": "1 The Apostolic Church Cl, Lagos",
+      "latitude": 6.635105,
+      "longitude": 3.374981,
+      "phone": "+2348166406200",
+      "state": "Lagos",
+      "lga": "Kosofe",
+      "operational_status": "operational",
+      "types": [
+        "supermarket",
+        "cosmetics_store",
+        "bar_and_grill",
+        "shopping_mall",
+        "lounge_bar",
+        "night_club",
+        "grocery_store",
+        "pharmacy",
+        "bar",
+        "bakery",
+        "food_store",
+        "health",
+        "restaurant",
+        "food",
+        "point_of_interest",
+        "store",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJ8_355piTOxARcjL4i_eM1fc",
+      "name": "Healthrite Pharmacy & Supermart",
+      "formatted_address": "4, Ogunnusi Rd, Ojodu 101233, Ikeja, Lagos Ojodu, Local Development Council, Omole Phase 1, Ojodu Berger 101233, Lagos, Nigeria",
+      "short_address": "Local Development Council, 4, Ogunnusi Rd, Ojodu 101233, Ikeja, Lagos Ojodu, Ojodu Berger",
+      "latitude": 6.636872,
+      "longitude": 3.355006,
+      "phone": "+2347049226764",
+      "state": "Lagos",
+      "lga": "Ikeja",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "convenience_store",
+        "supermarket",
+        "grocery_store",
+        "food_store",
+        "manufacturer",
+        "health",
+        "food",
+        "point_of_interest",
+        "store",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJrSyhpNCTOxARr4-KKCmMG_o",
+      "name": "Medplus Pharmacy - Adeniyi Jones",
+      "formatted_address": "107 Adeniyi Jones, Ogba, Ikeja 101233, Lagos, Nigeria",
+      "short_address": "107 Adeniyi Jones, Ikeja",
+      "latitude": 6.618922,
+      "longitude": 3.345612,
+      "phone": "+2348173136117",
+      "state": "Lagos",
+      "lga": "Ikeja",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "point_of_interest",
+        "store",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJu_UodsOTOxARlvbt_Nhxz-0",
+      "name": "Medplus Pharmacy -EmanuelKeshi",
+      "formatted_address": "32 Emmanuel Keshi St, Ikosi Ketu, Lagos 105102, Lagos, Nigeria",
+      "short_address": "32 Emmanuel Keshi St, Lagos",
+      "latitude": 6.619079,
+      "longitude": 3.378681,
+      "phone": "+2349055492610",
+      "state": "Lagos",
+      "lga": "Kosofe",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "point_of_interest",
+        "store",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJy8iPENCTOxARzkLwxG-46pA",
+      "name": "Medplus Pharmacy Magodo",
+      "formatted_address": "57 Adekunle Banjo Ave, Street, Magodo 105102, Lagos, Nigeria",
+      "short_address": "57 Adekunle Banjo Ave, Magodo",
+      "latitude": 6.612819,
+      "longitude": 3.37296,
+      "phone": "+2349083341953",
+      "state": "Lagos",
+      "lga": "Kosofe",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "wholesaler",
+        "health",
+        "point_of_interest",
+        "store",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJVThzE9OTOxARLYWryxBhyrs",
+      "name": "Medplus Pharmacy Ogunnusi",
+      "formatted_address": "Studio 24, 101 Isheri Rd, opp. Grammar School, Ojodu, 100001, Lagos, Nigeria",
+      "short_address": "Studio 24, 101 Isheri Rd, Grammar School, Ojodu",
+      "latitude": 6.639403,
+      "longitude": 3.358484,
+      "phone": "+2349137768145",
+      "state": "Lagos",
+      "lga": "Ikeja",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "point_of_interest",
+        "store",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJ5RfI996TOxAR9Quyj8_xXH4",
+      "name": "Medplus Pharmacy - Ikeja Mall",
+      "formatted_address": "Inside Ikeja City Mall, Obafemi Awolowo Wy, Oregun, Ikeja 101233, Lagos, Nigeria",
+      "short_address": "Inside Ikeja City Mall, Obafemi Awolowo Wy, Ikeja",
+      "latitude": 6.614219,
+      "longitude": 3.358348,
+      "phone": "+2347013489462",
+      "state": "Lagos",
+      "lga": "Ikeja",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "point_of_interest",
+        "store",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJf03Ku6GTOxARBrvuP3MUwuo",
+      "name": "Medkonsult Pharmacy",
+      "formatted_address": "5 Old Olowora Rd, Olowora, Lagos 105102, Lagos, Nigeria",
+      "short_address": "5 Old Olowora Rd, Lagos",
+      "latitude": 6.637554,
+      "longitude": 3.378541,
+      "phone": "+2348033576300",
+      "state": "Lagos",
+      "lga": "Kosofe",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "manufacturer",
+        "health",
+        "point_of_interest",
+        "store",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJCdMUJEuROxAR1t0rjdhMXoM",
+      "name": "Boluke Pharmacy & Store",
+      "formatted_address": "16, Iju Road (Pen-Cinema), Agege LA, Agege, Lagos 101232, Lagos, Nigeria",
+      "short_address": "16, Iju Road (Pen-Cinema), Agege LA, Lagos",
+      "latitude": 6.630642,
+      "longitude": 3.324197,
+      "phone": "+2348128000007",
+      "state": "Lagos",
+      "lga": "Ifako/Ijaye",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "point_of_interest",
+        "store",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJscMGn82TOxARLDnez534xO8",
+      "name": "HealthPlus Pharmacy (a mutti Pharmacy)",
+      "formatted_address": "68 Adeniyi Jones, Ogba, Ikeja 101233, Lagos, Nigeria",
+      "short_address": "68 Adeniyi Jones, Ikeja",
+      "latitude": 6.614748,
+      "longitude": 3.346379,
+      "phone": "+2347074557548",
+      "state": "Lagos",
+      "lga": "Ikeja",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "point_of_interest",
+        "store",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJ66Vq13eSOxAR15Xmf_OzyH8",
+      "name": "Asset Pharmacy",
+      "formatted_address": "1A OLUGBESAN CLOSE Allen Ikeja, Allen, Lagos 100281, Lagos, Nigeria",
+      "short_address": "1A OLUGBESAN CLOSE Allen Ikeja, Lagos",
+      "latitude": 6.605725,
+      "longitude": 3.351752,
+      "phone": "+2349034553795",
+      "state": "Lagos",
+      "lga": "Ikeja",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "point_of_interest",
+        "store",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJhX5Sr1SROxAR3GjCFN4duYU",
+      "name": "Pero Pharmacy",
+      "formatted_address": "83 Ogba Rd, Agege, Ikeja 100283, Lagos, Nigeria",
+      "short_address": "83 Ogba Rd, Ikeja",
+      "latitude": 6.618502,
+      "longitude": 3.331632,
+      "phone": "+2348088643075",
+      "state": "Lagos",
+      "lga": "Agege",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "point_of_interest",
+        "store",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJpS9N3oeTOxARwhMGEs60U0U",
+      "name": "Anchorlink Pharmacy",
+      "formatted_address": "35/37 Alhaji Kosoko St, Ojodu, Ojodu Berger 102109, Ogun State, Nigeria",
+      "short_address": "35/37 Alhaji Kosoko St, Ojodu Berger",
+      "latitude": 6.6486,
+      "longitude": 3.369017,
+      "phone": "+2348100644908",
+      "state": "Ogun",
+      "lga": "Ifo",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "point_of_interest",
+        "store",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJuzJZLzmSOxARLUdDex-g5eI",
+      "name": "NHC Pharmaceuticals Limited",
+      "formatted_address": "23 Acme Rd, Ogba, Ikeja 101233, Lagos, Nigeria",
+      "short_address": "23 Acme Rd, Ikeja",
+      "latitude": 6.623988,
+      "longitude": 3.341904,
+      "phone": "+2348139074493",
+      "state": "Lagos",
+      "lga": "Ikeja",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "point_of_interest",
+        "store",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJ2WvTRuKXOxARBBDRZl8Mvzk",
+      "name": "Crux Pharmacy Ltd",
+      "formatted_address": "7 Daddy Savage Rd, Iju Ishaga Rd, Iju, Agege 100216, Lagos, Nigeria",
+      "short_address": "7 Daddy Savage Rd, Iju Ishaga Rd, Agege",
+      "latitude": 6.657045,
+      "longitude": 3.324481,
+      "phone": "+2349164134227",
+      "state": "Lagos",
+      "lga": "Ifako/Ijaye",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "point_of_interest",
+        "store",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJyedFuqGTOxAR1FRVnNVfCvU",
+      "name": "360 Degree Pharmacy",
+      "formatted_address": "Store 1: 39 Adebowale Street Ojodu Store 2: 14 Ogunnusi Road Ojodu Ojodu, Ojodu, Lagos 101233, Lagos, Nigeria",
+      "short_address": "Store 1: 39 Adebowale Street Ojodu Store 2: 14 Ogunnusi Road Ojodu Ojodu, Lagos",
+      "latitude": 6.649477,
+      "longitude": 3.361677,
+      "phone": "+2348089804567",
+      "state": "Lagos",
+      "lga": "Ikeja",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "point_of_interest",
+        "store",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJK_T7iVKVOxARKSGvbQ-qYTo",
+      "name": "BROADLAND HOSPITAL SERVICES LTD",
+      "formatted_address": "46 Ajegunle, Makogi Rd, Magboro 110113, Ogun State, Nigeria",
+      "short_address": "46 Ajegunle, Makogi Rd, Magboro",
+      "latitude": 6.72865,
+      "longitude": 3.398045,
+      "phone": "+2349045051583",
+      "state": "Ogun",
+      "lga": "Obafemi Owode",
+      "operational_status": "operational",
+      "types": [
+        "hospital",
+        "pharmacy",
+        "health",
+        "service",
+        "point_of_interest",
+        "store",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJRzqr-d7tOxAR_KXrzJ1e2I4",
+      "name": "Giottos Pharmacy",
+      "formatted_address": "JC5C+7W6, Badejo St, ERUNKAN, Lagos 105102, Lagos, Nigeria",
+      "short_address": "JC5C+7W6, Badejo St, Lagos",
+      "latitude": 6.608163,
+      "longitude": 3.422251,
+      "phone": "+2349021530009",
+      "state": "Lagos",
+      "lga": "Kosofe",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "point_of_interest",
+        "store",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJTZOXv06SOxARvhI8ooDY6ho",
+      "name": "Pharmacy Plus Ltd",
+      "formatted_address": "28 Olanrewaju Street, Off Billings Way, Oregun, Ikeja 101233, Lagos, Nigeria",
+      "short_address": "28 Olanrewaju Street, Off Billings Way, Ikeja",
+      "latitude": 6.603157,
+      "longitude": 3.365229,
+      "phone": "+2348084818243",
+      "state": "Lagos",
+      "lga": "Ikeja",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "corporate_office",
+        "manufacturer",
+        "health",
+        "point_of_interest",
+        "store",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJ6XFKAFiVOxAR8vhTBJniIm0",
+      "name": "Nett Pharmacy",
+      "formatted_address": "Kings Ave, Ojodu, 102109, Ogun State, Nigeria",
+      "short_address": "Kings Ave, Ojodu",
+      "latitude": 6.65404,
+      "longitude": 3.368437,
+      "phone": null,
+      "state": "Ogun",
+      "lga": "Ifo",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "point_of_interest",
+        "store",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJr-YZLIjvOxARV2SfJ7LgHT8",
+      "name": "Itowolo",
+      "formatted_address": "JG96+Q58, Ikorodu, 104101, Lagos, Nigeria",
+      "short_address": "JG96+Q58, Ikorodu",
+      "latitude": 6.619411,
+      "longitude": 3.510439,
+      "phone": null,
+      "state": "Lagos",
+      "lga": "Ikorodu",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "store",
+        "point_of_interest",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJxx6csUTvOxARwLH3BbKhNX8",
+      "name": "DrugstoreNg Pharmacy",
+      "formatted_address": "4/6 Ikorodu-Epe Rd, opposite Sabo Market, Ikorodu, Lagos 104101, Lagos, Nigeria",
+      "short_address": "4/6 Ikorodu-Epe Rd, Sabo Market, Lagos",
+      "latitude": 6.628085,
+      "longitude": 3.508803,
+      "phone": "+2349079772482",
+      "state": "Lagos",
+      "lga": "Ikorodu",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "store",
+        "point_of_interest",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJEVlr_oLuOxARbLI5uiMgVYc",
+      "name": "Rommar Pharmacy, Ikorodu",
+      "formatted_address": "27 Ayangburen Rd, Ikorodu, Lagos 104101, Lagos, Nigeria",
+      "short_address": "27 Ayangburen Rd, Lagos",
+      "latitude": 6.617055,
+      "longitude": 3.502878,
+      "phone": "+2349048912845",
+      "state": "Lagos",
+      "lga": "Ikorodu",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "store",
+        "point_of_interest",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJY95dxxnvOxAR90v17gaEP8E",
+      "name": "SETZ Pharmacy And Megamart",
+      "formatted_address": "Ijede Rd, Ikorodu, 104101, Lagos, Nigeria",
+      "short_address": "Ijede Rd, Ikorodu",
+      "latitude": 6.625976,
+      "longitude": 3.54962,
+      "phone": "+2349050195394",
+      "state": "Lagos",
+      "lga": "Ikorodu",
+      "operational_status": "operational",
+      "types": [
+        "grocery_store",
+        "ice_cream_shop",
+        "atm",
+        "pharmacy",
+        "supermarket",
+        "dessert_shop",
+        "finance",
+        "confectionery",
+        "food_store",
+        "food",
+        "health",
+        "store",
+        "point_of_interest",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJmzHsLgDvOxARs38eHHkIj1U",
+      "name": "Medplus Ikorodu -Domino",
+      "formatted_address": "60 Ayangburen Rd, Ikorodu, 104101, Lagos, Nigeria",
+      "short_address": "60 Ayangburen Rd, Ikorodu",
+      "latitude": 6.615342,
+      "longitude": 3.501856,
+      "phone": "+2349154306653",
+      "state": "Lagos",
+      "lga": "Ikorodu",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "store",
+        "point_of_interest",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJSxpEgxvvOxARN5TGN2VuDOU",
+      "name": "Helix Pharmacy And Stores",
+      "formatted_address": "67 Ayangburen Rd, Ikorodu, 104101, Lagos, Nigeria",
+      "short_address": "67 Ayangburen Rd, Ikorodu",
+      "latitude": 6.613681,
+      "longitude": 3.501716,
+      "phone": "+2348167288814",
+      "state": "Lagos",
+      "lga": "Ikorodu",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "manufacturer",
+        "store",
+        "point_of_interest",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJT5-JH4PuOxARhO0_sb4XvQA",
+      "name": "Beat Pharmacy",
+      "formatted_address": "Opp Ojubode Juction, 22 Ayangburen Rd, Ikorodu, Lagos 104101, Lagos, Nigeria",
+      "short_address": "Opp Ojubode Juction, 22 Ayangburen Rd, Lagos",
+      "latitude": 6.618208,
+      "longitude": 3.502793,
+      "phone": "+2348172719040",
+      "state": "Lagos",
+      "lga": "Ikorodu",
+      "operational_status": "operational",
+      "types": [
+        "medical_center",
+        "pharmacy",
+        "hospital",
+        "health",
+        "manufacturer",
+        "store",
+        "service",
+        "point_of_interest",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJDyevf57vOxAR8aQHJa3KWTI",
+      "name": "Winlot Supermarket & Pharmacy",
+      "formatted_address": "Ikorodu 104101, Lagos, Nigeria",
+      "short_address": "Ikorodu",
+      "latitude": 6.61723,
+      "longitude": 3.563961,
+      "phone": "+2348054320943",
+      "state": "Lagos",
+      "lga": "Ikorodu",
+      "operational_status": "operational",
+      "types": [
+        "grocery_store",
+        "pharmacy",
+        "food_store",
+        "food",
+        "health",
+        "store",
+        "point_of_interest",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJzdE9h3_vOxARMTwmCISTqrs",
+      "name": "Emma-Steve Pharmacy wholesale",
+      "formatted_address": "5 Ijede Rd, Ikorodu, 104101, Lagos, Nigeria",
+      "short_address": "5 Ijede Rd, Ikorodu",
+      "latitude": 6.631976,
+      "longitude": 3.537916,
+      "phone": null,
+      "state": "Lagos",
+      "lga": "Ikorodu",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "store",
+        "point_of_interest",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJ3yPAnSfsOxARa2rZcFD62Zc",
+      "name": "Lugz Pharmacy Ikorodu",
+      "formatted_address": "Opposite Eco Bank, 35 Lagos Road, opposite Benson bus stop, Ikorodu, 104101, Lagos, Nigeria",
+      "short_address": "Opposite Eco Bank, 35 Lagos Road, Benson bus stop, Ikorodu",
+      "latitude": 6.636851,
+      "longitude": 3.499106,
+      "phone": "+2348063121270",
+      "state": "Lagos",
+      "lga": "Ikorodu",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "store",
+        "point_of_interest",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJ33sc_wPpOxARhHiGUvEDKTg",
+      "name": "Totem Pharmacy",
+      "formatted_address": "shop 29 Jaf Plaza Estate Junction Odonla Road Ikorodu, Ikorodu, Lagos 23401, Lagos, Nigeria",
+      "short_address": "shop 29 Jaf Plaza Estate Junction Odonla Road Ikorodu, Lagos",
+      "latitude": 6.670086,
+      "longitude": 3.531687,
+      "phone": "+2349169849280",
+      "state": "Lagos",
+      "lga": "Ikorodu",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "manufacturer",
+        "store",
+        "point_of_interest",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJ5QFqJrHvOxAR5auGj2um2ys",
+      "name": "Shogalu Crescent",
+      "formatted_address": "Shogalu crescent, JG6R+H6W, Eruwen Rd, Ikorodu, 104101, Lagos, Nigeria",
+      "short_address": "JG6R+H6W, Shogalu crescent, Eruwen Rd, Ikorodu",
+      "latitude": 6.611489,
+      "longitude": 3.540574,
+      "phone": null,
+      "state": "Lagos",
+      "lga": "Ikorodu",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "store",
+        "point_of_interest",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJO-wASnPsOxARnzEb4HRFqfs",
+      "name": "Ashmola Pharmacy",
+      "formatted_address": "Owutu-Isawo Rd, Ikorodu, 104101, Lagos, Nigeria",
+      "short_address": "Owutu-Isawo Rd, Ikorodu",
+      "latitude": 6.644916,
+      "longitude": 3.479824,
+      "phone": "+2348033953767",
+      "state": "Lagos",
+      "lga": "Ikorodu",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "manufacturer",
+        "store",
+        "point_of_interest",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJZ20h5CbsOxARRHXYl6AX97Q",
+      "name": "Nova Pharmacy",
+      "formatted_address": "13 Lagos Road, Ikorodu, 104101, Lagos, Nigeria",
+      "short_address": "13 Lagos Road, Ikorodu",
+      "latitude": 6.62119,
+      "longitude": 3.500776,
+      "phone": "+2349032545723",
+      "state": "Lagos",
+      "lga": "Ikorodu",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "store",
+        "point_of_interest",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJRXs4ZM7tOxARq5EJWuvUVvs",
+      "name": "Macojo Pharmacy",
+      "formatted_address": "13 TOS Benson road Ojogbe bus stop along General hospital rd, Ikorodu, Lagos 104101, Lagos, Nigeria",
+      "short_address": "13 TOS Benson road Ojogbe bus stop along General hospital rd, Lagos",
+      "latitude": 6.611961,
+      "longitude": 3.500795,
+      "phone": "+2348168786021",
+      "state": "Lagos",
+      "lga": "Ikorodu",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "store",
+        "point_of_interest",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJLXE3qYHpOxARDRj5rwQ2MKw",
+      "name": "Oko oba road",
+      "formatted_address": "PG65+QWX, Unnamed Road, Ogijo 121101, Ogun State, Nigeria",
+      "short_address": "PG65+QWX, Unnamed Road, Ogijo",
+      "latitude": 6.711982,
+      "longitude": 3.509857,
+      "phone": "+2348054946475",
+      "state": "Ogun",
+      "lga": "Shagamu",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "store",
+        "point_of_interest",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJjw83BADvOxAReFGe1did1jA",
+      "name": "Medplus Igbogbo",
+      "formatted_address": "88 Oba Molaja Ogunlewe Rd, Ikorodu, 104101, Lagos, Nigeria",
+      "short_address": "88 Oba Molaja Ogunlewe Rd, Ikorodu",
+      "latitude": 6.605702,
+      "longitude": 3.516295,
+      "phone": null,
+      "state": "Lagos",
+      "lga": "Ikorodu",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "store",
+        "point_of_interest",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJs_REZILuOxARJyOwTa77v9s",
+      "name": "Temidara Pharmacy Ltd.",
+      "formatted_address": "Garage, 2 Suberu Ogunsanya St, Ikorodu, 104101, Lagos, Nigeria",
+      "short_address": "Garage, 2 Suberu Ogunsanya St, Ikorodu",
+      "latitude": 6.61634,
+      "longitude": 3.501178,
+      "phone": "+2348035725969",
+      "state": "Lagos",
+      "lga": "Ikorodu",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "store",
+        "point_of_interest",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJOe1TkOflOxARl2Jt2wREBYU",
+      "name": "BrytHealth Pharmacy",
+      "formatted_address": "Omitoro Bust-stop, 47 Ijede Rd, Ikorodu, 104102, Lagos, Nigeria",
+      "short_address": "Omitoro Bust-stop, 47 Ijede Rd, Ikorodu",
+      "latitude": 6.620052,
+      "longitude": 3.557782,
+      "phone": "+2347025089770",
+      "state": "Lagos",
+      "lga": "Ikorodu",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "store",
+        "point_of_interest",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJ7SVi25zuOxAR4-Lf3b_sgwU",
+      "name": "Femark Pharmacy",
+      "formatted_address": "Shop No. 7, Bolfas Plaza, Ikorodu, 104101, Lagos, Nigeria",
+      "short_address": "Shop No. 7, Bolfas Plaza, Ikorodu",
+      "latitude": 6.620201,
+      "longitude": 3.503692,
+      "phone": "+2348023630153",
+      "state": "Lagos",
+      "lga": "Ikorodu",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "health",
+        "store",
+        "point_of_interest",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJtw86jUjhOxARMDHaL9Fh4GE",
+      "name": "Pharmacy",
+      "formatted_address": "Imawte 104101, Lagos, Nigeria",
+      "short_address": "Imawte",
+      "latitude": 6.668375,
+      "longitude": 3.671239,
+      "phone": null,
+      "state": "Lagos",
+      "lga": "Ikorodu",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "point_of_interest",
+        "health",
+        "store",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJs2K_wRfhOxARi-1wSv3syWU",
+      "name": "Obioma Chemist Shop",
+      "formatted_address": "MM7C+5CF, Imota 104101, Lagos, Nigeria",
+      "short_address": "MM7C+5CF, Imota",
+      "latitude": 6.662935,
+      "longitude": 3.67105,
+      "phone": null,
+      "state": "Lagos",
+      "lga": "Ikorodu",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "point_of_interest",
+        "health",
+        "store",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJK7c4yFHhOxARHhzjJdsMxcM",
+      "name": "Pharmacy",
+      "formatted_address": "Imawte 104101, Lagos, Nigeria",
+      "short_address": "Imawte",
+      "latitude": 6.65969,
+      "longitude": 3.669397,
+      "phone": null,
+      "state": "Lagos",
+      "lga": "Ikorodu",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "point_of_interest",
+        "health",
+        "store",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJ3UEoXhRZORAR51sWH-Nc6t4",
+      "name": "Toyin pharmacy",
+      "formatted_address": "4 RAFIU TELLA STREET, IGBOIGBO, BAYEKU, IKORODU Epe, Lagos 106103, Lagos, Nigeria",
+      "short_address": "4 RAFIU TELLA STREET, IGBOIGBO, BAYEKU, IKORODU Epe, Lagos",
+      "latitude": 6.647519,
+      "longitude": 3.749414,
+      "phone": "+2348105309750",
+      "state": "Lagos",
+      "lga": "Epe",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "point_of_interest",
+        "health",
+        "store",
+        "establishment"
+      ]
+    },
+    {
+      "google_place_id": "ChIJXTym3GTmOxARMaeRJY_wKkg",
+      "name": "Tt Robinson Pharmaceuticals (Nig. Ltd.)",
+      "formatted_address": "Isiu 104101, Lagos, Nigeria",
+      "short_address": "Isiwu",
+      "latitude": 6.662221,
+      "longitude": 3.614777,
+      "phone": null,
+      "state": "Lagos",
+      "lga": "Ikorodu",
+      "operational_status": "operational",
+      "types": [
+        "pharmacy",
+        "point_of_interest",
+        "health",
+        "store",
+        "establishment"
+      ]
+    }
+  ],
+  "_completed_grid_points": [
+    [
+      6.38,
+      3.08
+    ],
+    [
+      6.38,
+      3.23416
+    ],
+    [
+      6.38,
+      3.38832
+    ],
+    [
+      6.38,
+      3.54247
+    ],
+    [
+      6.38,
+      3.69663
+    ],
+    [
+      6.53315,
+      3.15708
+    ],
+    [
+      6.53315,
+      3.31124
+    ],
+    [
+      6.53315,
+      3.46539
+    ],
+    [
+      6.53315,
+      3.61955
+    ],
+    [
+      6.68631,
+      3.08
+    ],
+    [
+      6.68631,
+      3.23416
+    ],
+    [
+      6.68631,
+      3.38832
+    ],
+    [
+      6.68631,
+      3.54247
+    ],
+    [
+      6.68631,
+      3.69663
+    ]
+  ]
+}
