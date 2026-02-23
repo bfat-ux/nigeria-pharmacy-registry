@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nigeria Pharmacy Registry</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f5f5f5; color: #222; }
+
+        /* Header */
+        .header { background: #1a6b3c; color: white; padding: 12px 24px; display: flex; align-items: center; justify-content: space-between; }
+        .header h1 { font-size: 18px; font-weight: 600; }
+        .header .stats { font-size: 13px; opacity: 0.9; }
+        .header .stats span { background: rgba(255,255,255,0.2); padding: 3px 10px; border-radius: 12px; margin-left: 8px; }
+
+        /* Layout */
+        .container { display: flex; height: calc(100vh - 48px); }
+
+        /* Sidebar */
+        .sidebar { width: 420px; min-width: 420px; display: flex; flex-direction: column; background: white; border-right: 1px solid #ddd; }
+        .filters { padding: 12px; border-bottom: 1px solid #eee; display: flex; flex-direction: column; gap: 8px; }
+        .filter-row { display: flex; gap: 8px; }
+        .filter-row select, .filter-row input {
+            flex: 1; padding: 7px 10px; border: 1px solid #ccc; border-radius: 6px;
+            font-size: 13px; background: white;
+        }
+        .filter-row input { flex: 2; }
+
+        /* Table */
+        .table-wrap { flex: 1; overflow-y: auto; }
+        table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+        thead { position: sticky; top: 0; background: #f8f8f8; z-index: 1; }
+        th { text-align: left; padding: 8px 10px; font-weight: 600; border-bottom: 2px solid #ddd; color: #555; }
+        td { padding: 7px 10px; border-bottom: 1px solid #eee; }
+        tr:hover { background: #f0f7f2; cursor: pointer; }
+        .badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 500; }
+        .badge-pharmacy { background: #e3f2fd; color: #1565c0; }
+        .badge-ppmv { background: #fff3e0; color: #e65100; }
+        .badge-hospital { background: #f3e5f5; color: #7b1fa2; }
+        .badge-osm { background: #e8f5e9; color: #2e7d32; }
+        .badge-grid3 { background: #fff8e1; color: #f57f17; }
+        .row-count { padding: 8px 12px; font-size: 12px; color: #888; border-top: 1px solid #eee; }
+
+        /* Map */
+        .map-wrap { flex: 1; position: relative; }
+        #map { width: 100%; height: 100%; }
+
+        /* Popup */
+        .popup-title { font-weight: 600; font-size: 14px; margin-bottom: 6px; }
+        .popup-row { font-size: 12px; margin: 2px 0; color: #555; }
+        .popup-row strong { color: #333; }
+
+        /* Loading */
+        .loading { display: flex; align-items: center; justify-content: center; height: 100%; color: #888; font-size: 14px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Nigeria Pharmacy Registry</h1>
+        <div class="stats">
+            <span id="stat-total">Loading...</span>
+            <span id="stat-states"></span>
+            <span id="stat-sources"></span>
+        </div>
+    </div>
+    <div class="container">
+        <div class="sidebar">
+            <div class="filters">
+                <div class="filter-row">
+                    <input type="text" id="filter-search" placeholder="Search pharmacy name..." />
+                </div>
+                <div class="filter-row">
+                    <select id="filter-state"><option value="">All states</option></select>
+                    <select id="filter-type">
+                        <option value="">All types</option>
+                        <option value="pharmacy">Pharmacy</option>
+                        <option value="ppmv">PPMV</option>
+                        <option value="hospital_pharmacy">Hospital Pharmacy</option>
+                    </select>
+                    <select id="filter-source">
+                        <option value="">All sources</option>
+                        <option value="src-osm-pharmacy">OSM</option>
+                        <option value="src-grid3-health">GRID3</option>
+                    </select>
+                </div>
+            </div>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Type</th>
+                            <th>State</th>
+                            <th>Source</th>
+                        </tr>
+                    </thead>
+                    <tbody id="table-body">
+                        <tr><td colspan="4" class="loading">Loading...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="row-count" id="row-count"></div>
+        </div>
+        <div class="map-wrap">
+            <div id="map"></div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+    <script>
+    (function () {
+        // --- Map setup ---
+        const map = L.map("map").setView([9.05, 7.49], 6);  // Nigeria center
+        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+            attribution: '&copy; OpenStreetMap contributors',
+            maxZoom: 19,
+        }).addTo(map);
+
+        const markers = L.markerClusterGroup({ maxClusterRadius: 40, spiderfyOnMaxZoom: true });
+        map.addLayer(markers);
+
+        // Source colors
+        const sourceColors = {
+            "src-osm-pharmacy": "#2196f3",
+            "src-grid3-health": "#ff9800",
+        };
+
+        function makeIcon(sourceId) {
+            const color = sourceColors[sourceId] || "#666";
+            return L.divIcon({
+                className: "",
+                html: `<div style="
+                    width:10px;height:10px;border-radius:50%;
+                    background:${color};border:2px solid white;
+                    box-shadow:0 1px 3px rgba(0,0,0,0.4);
+                "></div>`,
+                iconSize: [14, 14],
+                iconAnchor: [7, 7],
+            });
+        }
+
+        // --- State ---
+        let allData = [];
+        let filteredData = [];
+        let markerMap = {};  // pharmacy_id -> marker
+
+        // --- Load stats ---
+        fetch("/api/stats").then(r => r.json()).then(stats => {
+            document.getElementById("stat-total").textContent = stats.total.toLocaleString() + " pharmacies";
+            document.getElementById("stat-states").textContent = stats.states_covered + " states";
+            const srcParts = Object.entries(stats.by_source).map(([k, v]) => {
+                const label = k.replace("src-", "").replace("-pharmacy", "").replace("-health", "").toUpperCase();
+                return label + ": " + v;
+            });
+            document.getElementById("stat-sources").textContent = srcParts.join(" | ");
+
+            // Populate state dropdown
+            const stateSelect = document.getElementById("filter-state");
+            Object.keys(stats.by_state).sort().forEach(state => {
+                const opt = document.createElement("option");
+                opt.value = state;
+                opt.textContent = state + " (" + stats.by_state[state] + ")";
+                stateSelect.appendChild(opt);
+            });
+        });
+
+        // --- Load all data ---
+        fetch("/api/pharmacies?limit=2000").then(r => r.json()).then(result => {
+            allData = result.data;
+            applyFilters();
+        });
+
+        // --- Filters ---
+        const filterSearch = document.getElementById("filter-search");
+        const filterState = document.getElementById("filter-state");
+        const filterType = document.getElementById("filter-type");
+        const filterSource = document.getElementById("filter-source");
+
+        let debounceTimer;
+        filterSearch.addEventListener("input", () => {
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(applyFilters, 200);
+        });
+        filterState.addEventListener("change", applyFilters);
+        filterType.addEventListener("change", applyFilters);
+        filterSource.addEventListener("change", applyFilters);
+
+        function applyFilters() {
+            const q = filterSearch.value.toLowerCase();
+            const state = filterState.value;
+            const type = filterType.value;
+            const source = filterSource.value;
+
+            filteredData = allData.filter(r => {
+                if (q && !(r.facility_name || "").toLowerCase().includes(q)) return false;
+                if (state && r.state !== state) return false;
+                if (type && r.facility_type !== type) return false;
+                if (source && r.source_id !== source) return false;
+                return true;
+            });
+
+            renderTable();
+            renderMarkers();
+        }
+
+        function renderTable() {
+            const tbody = document.getElementById("table-body");
+            const rows = filteredData.slice(0, 500);  // cap for DOM performance
+
+            tbody.innerHTML = rows.map(r => `
+                <tr data-id="${r.pharmacy_id}">
+                    <td>${esc(r.facility_name || "Unnamed")}</td>
+                    <td><span class="badge badge-${typeBadge(r.facility_type)}">${esc(r.facility_type || "?")}</span></td>
+                    <td>${esc(r.state || "?")}</td>
+                    <td><span class="badge badge-${sourceBadge(r.source_id)}">${sourceLabel(r.source_id)}</span></td>
+                </tr>
+            `).join("");
+
+            // Click handler
+            tbody.querySelectorAll("tr").forEach(tr => {
+                tr.addEventListener("click", () => {
+                    const id = tr.dataset.id;
+                    const m = markerMap[id];
+                    if (m) {
+                        markers.zoomToShowLayer(m, () => m.openPopup());
+                    }
+                });
+            });
+
+            document.getElementById("row-count").textContent =
+                filteredData.length.toLocaleString() + " records" +
+                (filteredData.length > 500 ? " (showing first 500 in table)" : "");
+        }
+
+        function renderMarkers() {
+            markers.clearLayers();
+            markerMap = {};
+
+            filteredData.forEach(r => {
+                if (r.latitude == null || r.longitude == null) return;
+                const m = L.marker([r.latitude, r.longitude], { icon: makeIcon(r.source_id) });
+                m.bindPopup(makePopup(r));
+                markers.addLayer(m);
+                markerMap[r.pharmacy_id] = m;
+            });
+        }
+
+        function makePopup(r) {
+            const lines = [
+                `<div class="popup-title">${esc(r.facility_name || "Unnamed")}</div>`,
+                row("Type", r.facility_type),
+                row("State", r.state),
+                row("LGA", r.lga),
+                row("Address", r.address_line),
+                row("Phone", r.phone),
+                row("Source", sourceLabel(r.source_id)),
+                row("Status", r.operational_status),
+                row("Validation", r.validation_label),
+                row("Coordinates", r.latitude?.toFixed(5) + ", " + r.longitude?.toFixed(5)),
+            ];
+            return lines.filter(Boolean).join("");
+        }
+
+        function row(label, val) {
+            if (!val || val === "unknown" || val === "null") return "";
+            return `<div class="popup-row"><strong>${label}:</strong> ${esc(String(val))}</div>`;
+        }
+
+        // --- Helpers ---
+        function esc(s) { const d = document.createElement("div"); d.textContent = s; return d.innerHTML; }
+        function typeBadge(t) { return t === "ppmv" ? "ppmv" : t === "hospital_pharmacy" ? "hospital" : "pharmacy"; }
+        function sourceBadge(s) { return s === "src-osm-pharmacy" ? "osm" : s === "src-grid3-health" ? "grid3" : "osm"; }
+        function sourceLabel(s) { return s === "src-osm-pharmacy" ? "OSM" : s === "src-grid3-health" ? "GRID3" : s || "?"; }
+    })();
+    </script>
+</body>
+</html>
