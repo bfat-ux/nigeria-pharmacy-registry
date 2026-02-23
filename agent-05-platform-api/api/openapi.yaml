@@ -103,9 +103,9 @@ paths:
                 data:
                   - id: "b7e2c9f4-1a3d-4e5f-8b6c-9d0e1f2a3b4c"
                     name: "HealthPlus Pharmacy"
-                    facility_type: "community_pharmacy"
+                    facility_type: "pharmacy"
                     operational_status: "operational"
-                    validation_level: "L2"
+                    validation_level: "L2_evidence_documented"
                     validation_label: "Evidence Documented"
                     address:
                       address_line: "12 Admiralty Way"
@@ -244,8 +244,8 @@ paths:
                 data:
                   - id: "b7e2c9f4-1a3d-4e5f-8b6c-9d0e1f2a3b4c"
                     name: "HealthPlus Pharmacy"
-                    facility_type: "community_pharmacy"
-                    validation_level: "L2"
+                    facility_type: "pharmacy"
+                    validation_level: "L2_evidence_documented"
                     distance_km: 0.42
                     geolocation:
                       latitude: 6.5281
@@ -288,16 +288,16 @@ paths:
                   total: 3
                 data:
                   - id: "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
-                    old_level: "L1"
-                    new_level: "L2"
+                    old_level: "L1_contact_confirmed"
+                    new_level: "L2_evidence_documented"
                     changed_at: "2025-03-15T09:12:00Z"
                     changed_by: "field_agent:fa-00421"
                     actor_type: "field_agent"
                     source_description: "Field visit — GPS + storefront photo"
                     evidence_reference: "ev-20250315-00421"
                   - id: "f0e1d2c3-b4a5-6789-0123-456789abcdef"
-                    old_level: "L0"
-                    new_level: "L1"
+                    old_level: "L0_mapped"
+                    new_level: "L1_contact_confirmed"
                     changed_at: "2025-02-01T14:30:00Z"
                     changed_by: "verification_agent:va-00087"
                     actor_type: "verification_agent"
@@ -461,7 +461,7 @@ paths:
                   longitude: 3.4219
                 extension:
                   - url: "https://npr.ng/fhir/Extension/validation-level"
-                    valueCode: "L2"
+                    valueCode: "L2_evidence_documented"
         '404':
           $ref: '#/components/responses/NotFound'
         '500':
@@ -640,10 +640,9 @@ components:
       schema:
         type: string
         enum:
-          - community_pharmacy
+          - pharmacy
           - hospital_pharmacy
           - ppmv
-          - health_centre_pharmacy
 
     QueryOperationalStatus:
       name: operational_status
@@ -662,10 +661,10 @@ components:
       in: query
       description: |
         Minimum validation level. Returns pharmacies at this level or above.
-        L0=Mapped, L1=Contact Confirmed, L2=Evidence Documented, L3=Regulator Verified.
+        L0_mapped, L1_contact_confirmed, L2_evidence_documented, L3_regulator_verified.
       schema:
         type: string
-        enum: [L0, L1, L2, L3]
+        enum: [L0_mapped, L1_contact_confirmed, L2_evidence_documented, L3_regulator_verified]
 
     PageLimit:
       name: limit
@@ -733,13 +732,13 @@ components:
           type: string
         facility_type:
           type: string
-          enum: [community_pharmacy, hospital_pharmacy, ppmv, health_centre_pharmacy]
+          enum: [pharmacy, hospital_pharmacy, ppmv]
         operational_status:
           type: string
           enum: [operational, temporarily_closed, permanently_closed, unknown]
         validation_level:
           type: string
-          enum: [L0, L1, L2, L3, L4]
+          enum: [L0_mapped, L1_contact_confirmed, L2_evidence_documented, L3_regulator_verified, L4_high_assurance]
         validation_label:
           type: string
           description: Human-readable label for the validation level
@@ -869,11 +868,11 @@ components:
           format: uuid
         old_level:
           type: string
-          enum: [L0, L1, L2, L3, L4]
+          enum: [L0_mapped, L1_contact_confirmed, L2_evidence_documented, L3_regulator_verified, L4_high_assurance]
           nullable: true
         new_level:
           type: string
-          enum: [L0, L1, L2, L3, L4]
+          enum: [L0_mapped, L1_contact_confirmed, L2_evidence_documented, L3_regulator_verified, L4_high_assurance]
         changed_at:
           type: string
           format: date-time

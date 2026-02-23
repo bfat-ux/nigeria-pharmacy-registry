@@ -23,6 +23,18 @@
       "ingestion_status": "pending",
       "ingestion_priority": "high",
       "quality_notes": "Most comprehensive open spatial dataset for Nigeria health facilities. Pharmacy/PPMV subset must be filtered from broader health facility data. Coordinates generally reliable but some records lack precise geocoding.",
+      "compliance_profile": {
+        "lawful_basis": "public_interest_registry_operations",
+        "retention_class": "R2_standard_source",
+        "sharing_constraints": [
+          "share_derived_registry_records_only",
+          "attribute_source_on_export"
+        ],
+        "pii_handling_requirements": [
+          "no_patient_data_allowed",
+          "redact_direct_contacts_for_public_tier"
+        ]
+      },
       "notes": "GRID3 is a collaboration between the Bill & Melinda Gates Foundation, WorldPop, and the Nigerian government. The dataset is periodically updated. Filter by facility_type to extract pharmacy-relevant records."
     },
     {
@@ -44,6 +56,18 @@
       "ingestion_status": "pending",
       "ingestion_priority": "high",
       "quality_notes": "Community-contributed data. Names may be inconsistent. Urban areas have much better coverage than rural. Some duplicate entries possible. Coordinates are generally accurate where present.",
+      "compliance_profile": {
+        "lawful_basis": "legitimate_interest_data_quality_improvement",
+        "retention_class": "R2_standard_source",
+        "sharing_constraints": [
+          "odbl_share_alike_obligation",
+          "attribute_source_on_export"
+        ],
+        "pii_handling_requirements": [
+          "no_patient_data_allowed",
+          "mask_contact_fields_when_license_unclear"
+        ]
+      },
       "notes": "Extract via Overpass API. Use both amenity=pharmacy and healthcare=pharmacy tags. PPMVs are rarely tagged distinctly in OSM — most will appear under generic pharmacy tags."
     },
     {
@@ -64,6 +88,18 @@
       "ingestion_status": "not_started",
       "ingestion_priority": "high",
       "quality_notes": "Authoritative for accredited facilities but list may lag behind actual accreditation status. No geocoordinates — geocoding required. Facility names may differ from signage. PPMVs are generally not included.",
+      "compliance_profile": {
+        "lawful_basis": "legal_obligation_regulatory_reference",
+        "retention_class": "R1_regulatory_source",
+        "sharing_constraints": [
+          "respect_regulator_terms_of_use",
+          "share_minimum_necessary_fields"
+        ],
+        "pii_handling_requirements": [
+          "no_patient_data_allowed",
+          "restrict_raw_exports_to_authorized_roles"
+        ]
+      },
       "notes": "NHIA facility codes are critical external identifiers for interoperability. Data is not openly downloadable — requires partnership or scraping of published lists. Coordinate with Agent 8 (Regulatory Integration) for formal data-sharing agreement."
     },
     {
@@ -85,6 +121,18 @@
       "ingestion_status": "not_started",
       "ingestion_priority": "critical",
       "quality_notes": "Gold-standard regulatory source for pharmacy registration status. No geocoordinates. Registration status may lag (expired licenses still listed). Includes both pharmacies and PPMVs with distinct category codes.",
+      "compliance_profile": {
+        "lawful_basis": "legal_obligation_regulatory_reference",
+        "retention_class": "R1_regulatory_source",
+        "sharing_constraints": [
+          "respect_regulator_terms_of_use",
+          "partner_agreement_required_for_raw_exchange"
+        ],
+        "pii_handling_requirements": [
+          "no_patient_data_allowed",
+          "restrict_raw_exports_to_authorized_roles"
+        ]
+      },
       "notes": "PCN premises registration number is the most important external identifier. Data access requires formal partnership — see Agent 8. PCN distinguishes between Community Pharmacy, Hospital Pharmacy, and PPMV categories."
     },
     {
@@ -105,6 +153,18 @@
       "ingestion_status": "not_started",
       "ingestion_priority": "medium",
       "quality_notes": "NAFDAC licensing data complements PCN registration. Some overlap with PCN dataset expected. Geocoding required.",
+      "compliance_profile": {
+        "lawful_basis": "legal_obligation_regulatory_reference",
+        "retention_class": "R1_regulatory_source",
+        "sharing_constraints": [
+          "respect_regulator_terms_of_use",
+          "partner_agreement_required_for_raw_exchange"
+        ],
+        "pii_handling_requirements": [
+          "no_patient_data_allowed",
+          "restrict_raw_exports_to_authorized_roles"
+        ]
+      },
       "notes": "NAFDAC license number is a valuable external identifier for cross-referencing. Data access requires partnership. Lower priority than PCN since PCN is the primary pharmacy regulator."
     },
     {
@@ -125,6 +185,19 @@
       "ingestion_status": "not_started",
       "ingestion_priority": "low",
       "quality_notes": "Fintech agent networks (Flutterwave, OPay, PalmPay) and MNOs (MTN MoMo) maintain pharmacy/PPMV location data for their agent networks. Quality varies. May include pharmacies that double as mobile money agents.",
+      "compliance_profile": {
+        "lawful_basis": "contractual_necessity_partner_data_exchange",
+        "retention_class": "R3_partner_restricted",
+        "sharing_constraints": [
+          "nda_required",
+          "no_third_party_raw_redistribution"
+        ],
+        "pii_handling_requirements": [
+          "no_patient_data_allowed",
+          "minimize_personal_contact_fields",
+          "apply_role_based_access_controls"
+        ]
+      },
       "notes": "Exploratory source. Requires commercial partnership. Useful for filling coverage gaps, especially for PPMVs in underserved areas. Coordinate with Agent 8 for partnership approach."
     },
     {
@@ -145,6 +218,18 @@
       "ingestion_status": "not_started",
       "ingestion_priority": "medium",
       "quality_notes": "State-level datasets vary significantly in quality and completeness. Some states maintain digital records, others have paper-only registers. Geocoding required.",
+      "compliance_profile": {
+        "lawful_basis": "public_interest_registry_operations",
+        "retention_class": "R2_standard_source",
+        "sharing_constraints": [
+          "state_specific_terms_apply",
+          "share_minimum_necessary_fields"
+        ],
+        "pii_handling_requirements": [
+          "no_patient_data_allowed",
+          "redact_direct_contacts_for_public_tier"
+        ]
+      },
       "notes": "Incremental ingestion strategy: start with pilot states (Lagos, FCT, Kano) then expand. Coordinate with state pharmacists' councils where possible."
     },
     {
@@ -166,10 +251,35 @@
       "ingestion_status": "not_started",
       "ingestion_priority": "medium",
       "quality_notes": "Quality depends on collector training. GPS accuracy varies by device. Photos provide evidence for L2 verification. Duplicate submissions likely — feed into deduplication pipeline.",
+      "compliance_profile": {
+        "lawful_basis": "consent_or_public_interest_for_field_collection",
+        "retention_class": "R3_partner_restricted",
+        "sharing_constraints": [
+          "storefront_photo_use_limited_to_verification",
+          "no_third_party_raw_redistribution"
+        ],
+        "pii_handling_requirements": [
+          "no_patient_data_allowed",
+          "pseudonymize_collector_identifiers_in_exports",
+          "redact_direct_contacts_for_public_tier"
+        ]
+      },
       "notes": "Future data source. Requires mobile data collection tool setup (KoboToolbox or custom app). Each submission creates an L0 record with photo evidence that can fast-track to L2. Collector ID enables accountability."
     }
   ],
   "source_type_enum": ["open_data", "partner", "regulator", "crowdsource"],
   "ingestion_status_enum": ["not_started", "pending", "in_progress", "completed", "paused", "failed"],
-  "ingestion_priority_enum": ["critical", "high", "medium", "low"]
+  "ingestion_priority_enum": ["critical", "high", "medium", "low"],
+  "lawful_basis_enum": [
+    "public_interest_registry_operations",
+    "legal_obligation_regulatory_reference",
+    "legitimate_interest_data_quality_improvement",
+    "contractual_necessity_partner_data_exchange",
+    "consent_or_public_interest_for_field_collection"
+  ],
+  "retention_class_enum": [
+    "R1_regulatory_source",
+    "R2_standard_source",
+    "R3_partner_restricted"
+  ]
 }

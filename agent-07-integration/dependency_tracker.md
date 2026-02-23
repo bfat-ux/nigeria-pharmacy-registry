@@ -1,7 +1,7 @@
 # Nigeria Pharmacy Registry — Cross-Agent Dependency Tracker
 
-> **Version:** 1.0
-> **Last updated:** 2026-02-17
+> **Version:** 1.1
+> **Last updated:** 2026-02-23
 > **Owner:** Agent 07 — Integration
 
 ---
@@ -17,7 +17,7 @@
 | 05 | Platform & API | 5 files (1 OpenAPI spec, 1 API guide, 3 middleware specs) | Complete |
 | 06 | Policy & Risk | 4 files (risk register, NDPA checklist, threat model, misuse playbook) | Complete |
 | 07 | Integration | 2 files (architecture overview, dependency tracker) | In Progress |
-| 08 | Regulatory Integration | 3 files (sync architecture, partnership playbook, status governance) | Complete |
+| 08 | Regulatory Integration | 0 files in repository (expected: sync architecture, partnership playbook, status governance) | Not delivered (blocked) |
 
 ---
 
@@ -102,7 +102,7 @@ Regular = informing dependency (enriches but does not block).
 | **Downstream** | Agent 04: L2->L3 promotion workflow |
 | **Nature** | L3 (Regulator Verified) can only be granted when regulator data is available via sync. Verification SOPs reference regulator cross-reference as the L2->L3 mechanism. |
 | **Risk** | Without regulator data, no records can reach L3. This is by design — verification proceeds to L2 independently. |
-| **Status** | Satisfied — verification SOPs correctly defer L3 to regulator sync. |
+| **Status** | Blocked/not delivered — Agent 08 artifacts are missing, so L3 promotion dependencies are documented but not yet implemented. |
 
 ---
 
@@ -151,7 +151,7 @@ Regular = informing dependency (enriches but does not block).
 | **Downstream** | Agent 05: API write endpoints (future registry_write tier) |
 | **Nature** | Write operations must enforce source tier governance — e.g., API users (T4) cannot assert L3 status. Auth middleware must map API tiers to source tiers. |
 | **Risk** | Write endpoint implementation must integrate governance rules. |
-| **Status** | Pending — write endpoints are specified but not yet implemented. |
+| **Status** | Blocked/not delivered — write endpoint governance cannot be finalized until Agent 08 `status_source_governance` artifact exists. |
 
 ---
 
@@ -209,7 +209,7 @@ Regular = informing dependency (enriches but does not block).
 | **Upstream** | Agent 06: risk register (REG-001 PCN challenge, REG-002 NDPA non-compliance) |
 | **Downstream** | Agent 08: partnership playbook, data sharing agreement terms |
 | **Nature** | Partnership agreements must address regulatory risks and NDPA requirements for data sharing with PCN/NAFDAC/NHIA. |
-| **Status** | Satisfied — partnership playbook includes DUA templates and permitted uses aligned with NDPA. |
+| **Status** | Blocked/not delivered — Agent 08 partnership artifacts are missing in-repo; DUA template alignment cannot be verified. |
 
 ---
 
@@ -229,7 +229,7 @@ Regular = informing dependency (enriches but does not block).
 | **Upstream** | Agent 08: PCN/NAFDAC/NHIA field requirements |
 | **Downstream** | Agent 01: `external_identifiers` table, schema field accommodations |
 | **Nature** | Schema must accommodate regulator-specific identifiers (pcn_premises_id, nafdac_facility_id, nhia_facility_id). The `external_identifiers` table with `identifier_type` + `identifier_value` handles this generically. |
-| **Status** | Satisfied — schema supports arbitrary external identifier types. |
+| **Status** | Partially satisfied — schema supports arbitrary external identifier types, but Agent 08 field-level requirements are not yet delivered in-repo. |
 
 ---
 
@@ -241,7 +241,7 @@ Regular = informing dependency (enriches but does not block).
 | **Downstream** | Agent 08: sync architecture, matching & reconciliation pipeline |
 | **Nature** | Regulator sync pipeline writes to `external_identifiers`, calls `record_validation_change()` for L3 promotion, logs to `provenance_records` with sync_batch_id. |
 | **Risk** | Schema changes break sync pipeline. |
-| **Status** | Satisfied — sync architecture references correct tables and functions. |
+| **Status** | Blocked/not delivered — Agent 08 sync architecture is not present in-repo, so this dependency cannot be validated. |
 
 ---
 
@@ -252,7 +252,7 @@ Regular = informing dependency (enriches but does not block).
 | **Upstream** | Agent 04: evidence schema, verification levels |
 | **Downstream** | Agent 08: L3 promotion via regulator cross-reference |
 | **Nature** | Regulator sync produces evidence of type `regulator_crossref` per `evidence_schema.json`. Evidence includes source, record_id, match_score, match_type, license_number, license_expiry. |
-| **Status** | Satisfied — evidence schema includes `regulator_crossref` type with all required fields. |
+| **Status** | Blocked/not delivered — Agent 08 implementation artifact for L3 cross-reference flow is missing in-repo. |
 
 ---
 
@@ -381,6 +381,7 @@ The following table maps each deliverable to the specific upstream deliverables 
 | R5 | FHIR endpoints are read-only | Low | 05, 01 | FHIR write operations deferred to future phase; documented as known gap |
 | R6 | Redis HA not specified for rate limiting | Low | 05 | Degraded mode (in-memory fallback) documented; production deployment should define Redis HA |
 | R7 | Data subject rights workflow not implemented | Medium | 06, 05 | NDPA checklist identifies requirements; API endpoints for data subject requests are not yet designed |
+| R8 | Agent 08 deliverables missing from repository | High | 01, 04, 05, 07, 08 | Mark Agent 08 dependencies as blocked/not-delivered until `sync_architecture.md`, `partnership_playbook.md`, and `status_source_governance.md` are added |
 
 ---
 
@@ -389,3 +390,4 @@ The following table maps each deliverable to the specific upstream deliverables 
 | Date | Change | Author |
 |------|--------|--------|
 | 2026-02-17 | Initial dependency tracker created from full deliverable review | Agent 07 |
+| 2026-02-23 | Corrected Agent 08 inventory/status claims to reflect missing in-repo artifacts and blocked dependencies | Agent 07 |

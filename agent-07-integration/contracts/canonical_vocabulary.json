@@ -1,0 +1,39 @@
+{
+  "version": "1.0.0",
+  "last_updated": "2026-02-23",
+  "source_of_truth": "agent-01-data-architecture/sql/001_core_schema.sql",
+  "enums": {
+    "facility_type": [
+      "pharmacy",
+      "hospital_pharmacy",
+      "ppmv"
+    ],
+    "operational_status": [
+      "operational",
+      "temporarily_closed",
+      "permanently_closed",
+      "unknown"
+    ],
+    "validation_level": [
+      "L0_mapped",
+      "L1_contact_confirmed",
+      "L2_evidence_documented",
+      "L3_regulator_verified",
+      "L4_high_assurance"
+    ]
+  },
+  "compatibility_aliases": {
+    "facility_type": {
+      "community_pharmacy": "pharmacy",
+      "patent medicine store": "ppmv",
+      "patent medicine vendor": "ppmv"
+    },
+    "validation_level": {
+      "L0": "L0_mapped",
+      "L1": "L1_contact_confirmed",
+      "L2": "L2_evidence_documented",
+      "L3": "L3_regulator_verified",
+      "L4": "L4_high_assurance"
+    }
+  }
+}

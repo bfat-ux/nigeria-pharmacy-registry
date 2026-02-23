@@ -1,0 +1,38 @@
+{
+  "version": "1.0.0",
+  "last_updated": "2026-02-23",
+  "contracts": [
+    {
+      "contract_id": "canonical_vocabulary",
+      "current_version": "1.0.0",
+      "owner_agent": "07",
+      "artifact_path": "agent-07-integration/contracts/canonical_vocabulary.json",
+      "status": "active",
+      "change_policy": "major_on_breaking_enum_change_minor_on_alias_or_metadata_patch_on_typo_or_docs"
+    },
+    {
+      "contract_id": "validation_ladder",
+      "current_version": "1.0.0",
+      "owner_agent": "04",
+      "artifact_path": "agent-01-data-architecture/sql/001_core_schema.sql#validation_level",
+      "status": "active",
+      "change_policy": "major_on_ladder_step_add_remove_or_rename_minor_on_label_clarification_patch_on_spelling"
+    },
+    {
+      "contract_id": "evidence_types",
+      "current_version": "1.0.0",
+      "owner_agent": "04",
+      "artifact_path": "agent-04-verification/schemas/evidence_schema.json",
+      "status": "active",
+      "change_policy": "major_on_required_field_changes_minor_on_optional_field_addition_patch_on_description_updates"
+    },
+    {
+      "contract_id": "source_tiers",
+      "current_version": "0.1.0",
+      "owner_agent": "08",
+      "artifact_path": "agent-08-regulatory-integration/status_source_governance.md",
+      "status": "blocked_not_delivered",
+      "change_policy": "major_on_authority_rule_change_minor_on_new_source_tier_patch_on_wording_only"
+    }
+  ]
+}

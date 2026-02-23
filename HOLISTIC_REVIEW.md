@@ -112,6 +112,25 @@ Source catalog has rich provenance metadata, but does not yet encode per-source 
 afa5b5f (Add Holistic Review document for Nigeria Pharmacy Registry)
 - Synthetic E2E run completes with full provenance chain and expected validation transitions.
 
+## Execution Status (2026-02-23)
+
+### Completed
+
+- P0.1: Canonical vocabulary contract created at `agent-07-integration/contracts/canonical_vocabulary.json`.
+- P0.2: Enum compatibility test implemented at `agent-07-integration/enum_contract_check.py`.
+- P0.3: Dependency tracker updated to reflect missing Agent 08 artifacts and blocked statuses.
+- P1.1: Ingestion now rejects non-canonical `facility_type` and emits machine-readable `error_codes`.
+- P1.2: `source_registry.json` now includes per-source structured compliance metadata (`lawful_basis`, `retention_class`, `sharing_constraints`, `pii_handling_requirements`).
+- P1.3: Implementation readiness gate checklist added at `agent-07-integration/implementation_readiness_checklist.md`.
+- P2.1: Contract registry/versioning scaffold added at `agent-07-integration/contracts/contract_registry.json`.
+- P2.2: End-to-end dry-run playbook added at `agent-07-integration/e2e_dry_run.md`.
+
+### Remaining
+
+- Wire enum contract check into CI (e.g., GitHub Actions).
+- Create and run a concrete synthetic dataset through the full dry-run workflow.
+- Add in-repo Agent 08 deliverables or formally defer with explicit timeline/owner.
+
 ## Overall Assessment
 
 Strong architecture and governance design. The next milestone should focus less on adding new documents and more on **contract consolidation + integration verification** so implementation can proceed without semantic drift.

@@ -43,7 +43,7 @@ except ImportError:
 # Constants
 # ---------------------------------------------------------------------------
 
-VALIDATION_LEVEL_L0 = "L0"
+VALIDATION_LEVEL_L0 = "L0_mapped"
 VALIDATION_LABEL_L0 = "Mapped"
 
 NIGERIAN_STATES = [
@@ -63,6 +63,14 @@ FACILITY_TYPE_MAP = {
     "ppmv": "ppmv",
     "patent medicine store": "ppmv",
     "patent medicine vendor": "ppmv",
+}
+
+ALLOWED_FACILITY_TYPES = {"pharmacy", "hospital_pharmacy", "ppmv"}
+ALLOWED_OPERATIONAL_STATUSES = {
+    "operational",
+    "temporarily_closed",
+    "permanently_closed",
+    "unknown",
 }
 
 logging.basicConfig(
@@ -156,9 +164,7 @@ class CanonicalRecord:
         self.pharmacy_id = str(uuid.uuid4())
         self.source_record_id = source_record.get("source_record_id")
         self.facility_name = source_record["facility_name"]
-        self.facility_type = self._normalize_facility_type(
-            source_record.get("facility_type", "unknown")
-        )
+        self.facility_type = source_record["facility_type"]
         self.address_line = source_record.get("address_line")
         self.ward = source_record.get("ward")
         self.lga = source_record.get("lga")
@@ -185,10 +191,6 @@ class CanonicalRecord:
             self.external_ids["nhia_facility"] = source_record["nhia_code"]
         if source_record.get("nafdac_license"):
             self.external_ids["nafdac_license"] = source_record["nafdac_license"]
-
-    @staticmethod
-    def _normalize_facility_type(raw: str) -> str:
-        return FACILITY_TYPE_MAP.get(raw.lower().strip(), "unknown")
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -305,6 +307,21 @@ def validate_record(record: dict[str, Any], template: dict[str, Any]) -> list[st
     if state and state not in NIGERIAN_STATES:
         errors.append(f"Unrecognized state: '{state}'. Must be a valid Nigerian state or 'FCT'.")
 
+    # Custom validation: canonical enum safety
+    facility_type = record.get("facility_type")
+    if facility_type not in ALLOWED_FACILITY_TYPES:
+        errors.append(
+            "Unsupported facility_type: "
+            f"'{facility_type}'. Allowed values: {sorted(ALLOWED_FACILITY_TYPES)}"
+        )
+
+    operational_status = record.get("operational_status", "unknown")
+    if operational_status not in ALLOWED_OPERATIONAL_STATUSES:
+        errors.append(
+            "Unsupported operational_status: "
+            f"'{operational_status}'. Allowed values: {sorted(ALLOWED_OPERATIONAL_STATUSES)}"
+        )
+
     # Custom validation: coordinate bounds (Nigeria bounding box)
     lat = record.get("latitude")
     lon = record.get("longitude")
@@ -326,6 +343,29 @@ def validate_record(record: dict[str, Any], template: dict[str, Any]) -> list[st
     return errors
 
 
+def classify_validation_error(error_message: str) -> str:
+    """
+    Convert free-text validation errors into stable machine-readable codes.
+    """
+    if "Missing required field" in error_message:
+        return "missing_required_field"
+    if "Unsupported facility_type" in error_message:
+        return "invalid_facility_type"
+    if "Unsupported operational_status" in error_message:
+        return "invalid_operational_status"
+    if "Unrecognized state" in error_message:
+        return "invalid_state"
+    if "Invalid latitude value" in error_message:
+        return "invalid_latitude_type"
+    if "Invalid longitude value" in error_message:
+        return "invalid_longitude_type"
+    if "outside Nigeria bounds" in error_message:
+        return "coordinate_out_of_bounds"
+    if error_message.startswith("$"):
+        return "json_schema_validation_error"
+    return "unknown_validation_error"
+
+
 def normalize_to_generic(record: dict[str, Any], source_id: str) -> dict[str, Any]:
     """
     Normalize a source-specific record into the generic import format.
@@ -333,13 +373,29 @@ def normalize_to_generic(record: dict[str, Any], source_id: str) -> dict[str, An
     """
     normalized = dict(record)
 
+    # Normalize free-text enums into canonical DB-safe values before validation.
+    raw_facility_type = normalized.get("facility_type")
+    if isinstance(raw_facility_type, str):
+        normalized["facility_type"] = FACILITY_TYPE_MAP.get(
+            raw_facility_type.lower().strip(),
+            raw_facility_type.lower().strip(),
+        )
+
+    raw_operational_status = normalized.get("operational_status")
+    if isinstance(raw_operational_status, str):
+        normalized["operational_status"] = raw_operational_status.lower().strip()
+
     # PCN-specific normalization
     if source_id == "src-pcn-premises":
         if "premises_name" in record and "facility_name" not in record:
             normalized["facility_name"] = record["premises_name"]
         if "facility_category" in record and "facility_type" not in record:
             cat = record["facility_category"]
-            normalized["facility_type"] = FACILITY_TYPE_MAP.get(cat, "unknown")
+            if isinstance(cat, str):
+                normalized["facility_type"] = FACILITY_TYPE_MAP.get(
+                    cat.lower().strip(),
+                    cat.lower().strip(),
+                )
         if "registration_number" in record:
             normalized["registration_number"] = record["registration_number"]
 
@@ -391,6 +447,7 @@ def process_batch(
     provenance_records = []
     status_entries = []
     rejected_records = []
+    rejection_reason_counts: dict[str, int] = {}
 
     for i, raw_record in enumerate(records):
         # Step 1: Normalize to generic format
@@ -399,10 +456,15 @@ def process_batch(
         # Step 2: Validate against template
         errors = validate_record(normalized, template)
         if errors:
+            error_codes = [classify_validation_error(e) for e in errors]
+            for code in error_codes:
+                rejection_reason_counts[code] = rejection_reason_counts.get(code, 0) + 1
+
             rejected_records.append({
                 "record_index": i,
                 "source_record": raw_record,
                 "errors": errors,
+                "error_codes": error_codes,
             })
             logger.warning(
                 "Record %d rejected: %s", i, "; ".join(errors)
@@ -447,6 +509,17 @@ def process_batch(
         "total_input": len(records),
         "accepted": len(canonical_records),
         "rejected": len(rejected_records),
+        "acceptance_rate": (
+            round((len(canonical_records) / len(records)) * 100, 2)
+            if records
+            else 0.0
+        ),
+        "rejection_rate": (
+            round((len(rejected_records) / len(records)) * 100, 2)
+            if records
+            else 0.0
+        ),
+        "rejection_reason_counts": rejection_reason_counts,
         "ingestion_timestamp": now,
         "actor": actor,
     }
