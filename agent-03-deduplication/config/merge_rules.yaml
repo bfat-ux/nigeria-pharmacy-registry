@@ -145,6 +145,7 @@ merge_field_precedence:
     - src-nhia-facility        # Regulator
     - src-state-moh            # Regulator (state-level)
     - src-crowdsource-field    # Field verification (direct observation)
+    - src-google-places        # Commercial geocoded data (Google Maps)
     - src-grid3-health         # Partner / curated open data
     - src-osm-pharmacy         # Community open data
     - src-flutterwave-agent    # Commercial partner

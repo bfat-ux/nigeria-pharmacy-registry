@@ -412,6 +412,16 @@ def normalize_to_generic(record: dict[str, Any], source_id: str) -> dict[str, An
         if "osm_id" in record:
             normalized["source_record_id"] = f"osm:{record['osm_type']}:{record['osm_id']}"
 
+    # Google Places-specific normalization
+    elif source_id == "src-google-places":
+        if "name" in record and "facility_name" not in record:
+            normalized["facility_name"] = record.get("name") or "Unnamed Pharmacy"
+        if "formatted_address" in record and "address_line" not in record:
+            normalized["address_line"] = record.get("short_address") or record.get("formatted_address")
+        normalized["facility_type"] = "pharmacy"  # Google Places search is filtered to pharmacy type
+        if "google_place_id" in record:
+            normalized["source_record_id"] = f"google:{record['google_place_id']}"
+
     # Ensure numeric types for coordinates
     for coord_field in ("latitude", "longitude"):
         val = normalized.get(coord_field)

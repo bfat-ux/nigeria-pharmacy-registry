@@ -38,21 +38,39 @@ _INDEX: dict[str, dict[str, Any]] = {}
 
 
 def load_all_canonical() -> None:
-    """Load all canonical_*.json files from the output directory tree."""
+    """
+    Load canonical pharmacy records.
+
+    Prefers the deduped registry (output/deduped/canonical_deduped_*.json)
+    when available. Falls back to loading all raw canonical_*.json files
+    from the full output tree if no deduped file exists.
+    """
     global _RECORDS, _INDEX  # noqa: PLW0603
 
     records = []
-    pattern = str(OUTPUT_DIR / "**" / "canonical_*.json")
-    files = glob.glob(pattern, recursive=True)
 
-    for fpath in files:
+    # Prefer deduped registry
+    deduped_pattern = str(OUTPUT_DIR / "deduped" / "canonical_deduped_*.json")
+    deduped_files = sorted(glob.glob(deduped_pattern))
+
+    if deduped_files:
+        # Use the latest deduped file
+        fpath = deduped_files[-1]
         with open(fpath, "r", encoding="utf-8") as f:
-            batch = json.load(f)
-        if isinstance(batch, list):
-            records.extend(batch)
-        logger.info("Loaded %d records from %s", len(batch) if isinstance(batch, list) else 0, fpath)
+            records = json.load(f)
+        logger.info("Loaded %d records from deduped registry: %s", len(records), fpath)
+    else:
+        # Fallback: load all raw canonical files
+        pattern = str(OUTPUT_DIR / "**" / "canonical_*.json")
+        files = glob.glob(pattern, recursive=True)
+        for fpath in files:
+            with open(fpath, "r", encoding="utf-8") as f:
+                batch = json.load(f)
+            if isinstance(batch, list):
+                records.extend(batch)
+            logger.info("Loaded %d records from %s", len(batch) if isinstance(batch, list) else 0, fpath)
 
-    # Deduplicate by pharmacy_id (in case of overlapping batches)
+    # Deduplicate by pharmacy_id (safety net)
     seen = set()
     unique = []
     for r in records:
@@ -110,7 +128,7 @@ async def list_pharmacies(
     facility_type: str | None = Query(None, description="Filter by facility type"),
     source_id: str | None = Query(None, description="Filter by data source"),
     q: str | None = Query(None, description="Search facility name (case-insensitive)"),
-    limit: int = Query(100, ge=1, le=2000),
+    limit: int = Query(100, ge=1, le=10000),
     offset: int = Query(0, ge=0),
 ) -> dict[str, Any]:
     """List pharmacy records with optional filters."""

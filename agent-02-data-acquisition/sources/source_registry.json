@@ -3,8 +3,41 @@
   "title": "Nigeria Pharmacy Registry — Data Source Catalog",
   "description": "Catalog of potential and active data sources for pharmacy/PPMV location ingestion. Each entry tracks provenance, licensing, and ingestion status.",
   "version": "1.0.0",
-  "last_updated": "2026-02-16",
+  "last_updated": "2026-02-23",
   "sources": [
+    {
+      "source_id": "src-google-places",
+      "source_name": "Google Places API — Pharmacy Listings",
+      "source_type": "open_data",
+      "url": "https://developers.google.com/maps/documentation/places/web-service",
+      "license": "Google Maps Platform Terms of Service — display only, no redistribution of raw data",
+      "coverage_scope": "National — commercial pharmacy listings indexed by Google",
+      "estimated_record_count": 5000,
+      "facility_types_included": ["pharmacy"],
+      "format": "JSON (REST API)",
+      "coordinate_system": "EPSG:4326",
+      "fields_available": [
+        "displayName", "formattedAddress", "location", "internationalPhoneNumber",
+        "nationalPhoneNumber", "types", "businessStatus", "addressComponents"
+      ],
+      "ingestion_status": "pending",
+      "ingestion_priority": "high",
+      "quality_notes": "High-quality geocoded listings from Google's commercial database. Strong urban coverage, phone numbers often available. Business status (open/closed) is a valuable signal. Duplicate detection needed against OSM and GRID3 records. Google place_id is a stable external identifier.",
+      "compliance_profile": {
+        "lawful_basis": "legitimate_interest_data_quality_improvement",
+        "retention_class": "R2_standard_source",
+        "sharing_constraints": [
+          "google_tos_no_raw_redistribution",
+          "display_results_with_google_attribution",
+          "derived_registry_records_only"
+        ],
+        "pii_handling_requirements": [
+          "no_patient_data_allowed",
+          "phone_numbers_are_business_contacts_not_pii"
+        ]
+      },
+      "notes": "Fetched via Places API (New) Nearby Search with grid-search strategy. Each request covers a 25km radius circle, ~1,200 grid points for national coverage. Cost: ~$0.032 per request. API key required (enable Places API New in Google Cloud Console). Google place_id is a stable identifier useful for cross-referencing."
+    },
     {
       "source_id": "src-grid3-health",
       "source_name": "GRID3 Nigeria Health Facilities",

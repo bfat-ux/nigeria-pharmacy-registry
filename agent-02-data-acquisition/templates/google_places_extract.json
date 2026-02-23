@@ -1,0 +1,96 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Google Places API Pharmacy Extract Template",
+  "description": "Validation schema for ingesting pharmacy POI data fetched from the Google Places API (New) via Nearby Search. Google Places provides high-quality geocoded business listings with phone numbers, business status, and structured address components.",
+  "version": "1.0.0",
+  "type": "object",
+  "required": ["source_id", "records"],
+  "properties": {
+    "source_id": {
+      "type": "string",
+      "const": "src-google-places",
+      "description": "Must reference the Google Places source entry in source_registry.json."
+    },
+    "ingestion_batch_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "ingestion_timestamp": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "google_places_query_timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Timestamp when the Google Places API queries were executed."
+    },
+    "scope": {
+      "type": "string",
+      "description": "Geographic scope of the fetch (e.g. 'National', 'Lagos')."
+    },
+    "search_radius_m": {
+      "type": "integer",
+      "description": "Search radius used for each grid cell in meters."
+    },
+    "records": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["google_place_id", "latitude", "longitude"],
+        "properties": {
+          "google_place_id": {
+            "type": "string",
+            "description": "Google Places unique identifier. Stable across API calls."
+          },
+          "name": {
+            "type": ["string", "null"],
+            "description": "Business display name from Google."
+          },
+          "formatted_address": {
+            "type": ["string", "null"],
+            "description": "Full formatted address string."
+          },
+          "short_address": {
+            "type": ["string", "null"],
+            "description": "Short-form formatted address."
+          },
+          "latitude": {
+            "type": "number",
+            "minimum": 3.0,
+            "maximum": 14.0,
+            "description": "WGS84 latitude from Google Places."
+          },
+          "longitude": {
+            "type": "number",
+            "minimum": 2.0,
+            "maximum": 15.0,
+            "description": "WGS84 longitude from Google Places."
+          },
+          "phone": {
+            "type": ["string", "null"],
+            "description": "Normalized Nigerian phone number (+234 format)."
+          },
+          "state": {
+            "type": ["string", "null"],
+            "description": "Nigerian state extracted from address components or coordinate lookup."
+          },
+          "lga": {
+            "type": ["string", "null"],
+            "description": "Local Government Area from address components."
+          },
+          "operational_status": {
+            "type": ["string", "null"],
+            "enum": ["operational", "temporarily_closed", "permanently_closed", "unknown", null],
+            "description": "Mapped from Google's businessStatus field."
+          },
+          "types": {
+            "type": ["array", "null"],
+            "items": { "type": "string" },
+            "description": "Google Places type tags (e.g. ['pharmacy', 'health', 'store'])."
+          }
+        }
+      }
+    }
+  }
+}
