@@ -10,5 +10,8 @@ PyYAML>=6.0,<7
 # Optional: schema validation for ingestion pipeline
 jsonschema>=4.21,<5
 
+# HTTP client for Overpass API / data fetching
+requests>=2.31,<3
+
 # Testing
 pytest>=8.0,<9
