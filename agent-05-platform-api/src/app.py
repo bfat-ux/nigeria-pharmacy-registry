@@ -12,7 +12,9 @@ Usage:
 
 from __future__ import annotations
 
+import csv
 import glob
+import io
 import json
 import logging
 from collections import Counter
@@ -22,7 +24,7 @@ from typing import Any
 
 from fastapi import Depends, FastAPI, HTTPException, Query, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
@@ -517,6 +519,9 @@ STATIC_DIR = Path(__file__).resolve().parent / "static"
 app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
 
 
+_SERVER_STARTED_AT = datetime.now(timezone.utc)
+
+
 @app.on_event("startup")
 async def startup():
     # Always load JSON (fallback data)
@@ -590,30 +595,55 @@ async def shutdown():
 
 @app.get("/api/health")
 async def health():
-    """Health check — reports mode, record count, version. Always open."""
+    """Health check — reports mode, record count, version, DB latency. Always open."""
+    import time
+
     mode = "database" if db.is_available() else "json_fallback"
     count = 0
+    db_ok = False
+    db_latency_ms: float | None = None
 
     if db.is_available():
         try:
+            t0 = time.monotonic()
             with db.get_conn() as conn:
                 with conn.cursor() as cur:
                     cur.execute("SELECT count(*) FROM pharmacy_locations")
                     count = cur.fetchone()[0]
+            db_latency_ms = round((time.monotonic() - t0) * 1000, 1)
+            db_ok = True
         except Exception:
             count = len(_RECORDS)
             mode = "json_fallback"
     else:
         count = len(_RECORDS)
 
-    return {
-        "status": "healthy",
-        "mode": mode,
-        "record_count": count,
-        "version": "0.3.0",
-        "database_connected": db.is_available(),
-        "auth_enabled": True,
-    }
+    uptime_seconds = round((datetime.now(timezone.utc) - _SERVER_STARTED_AT).total_seconds())
+
+    overall_status = "healthy" if db_ok else "degraded"
+    http_status = 200 if db_ok else 503
+
+    from starlette.responses import JSONResponse
+
+    return JSONResponse(
+        status_code=http_status,
+        content={
+            "status": overall_status,
+            "mode": mode,
+            "record_count": count,
+            "version": app.version,
+            "database_connected": db_ok,
+            "auth_enabled": True,
+            "started_at": _iso(_SERVER_STARTED_AT),
+            "uptime_seconds": uptime_seconds,
+            "checks": {
+                "database": {
+                    "status": "up" if db_ok else "down",
+                    "latency_ms": db_latency_ms,
+                },
+            },
+        },
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -1834,4 +1864,1993 @@ async def skip_task(request: Request, task_id: str, req: TaskSkipRequest):
         raise
     except Exception as e:
         logger.exception("Skip task failed")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# ---------------------------------------------------------------------------
+# Audit / Provenance endpoints (Phase 2)
+# ---------------------------------------------------------------------------
+
+
+def _parse_date_param(value: str | None, param_name: str) -> str | None:
+    """Validate an ISO 8601 date string.  Returns the value if valid, raises 400 if not."""
+    if value is None:
+        return None
+    try:
+        datetime.fromisoformat(value.replace("Z", "+00:00"))
+        return value
+    except (ValueError, TypeError):
+        raise HTTPException(
+            status_code=400,
+            detail=f"Invalid date format for '{param_name}'. Expected ISO 8601 (e.g. 2026-02-20T00:00:00Z)",
+        )
+
+
+# --- 1. Pharmacy Evidence ---
+
+
+@app.get(
+    "/api/pharmacies/{pharmacy_id}/evidence",
+    dependencies=[Depends(require_tier("registry_read"))],
+)
+async def get_pharmacy_evidence(
+    pharmacy_id: str,
+    include_detail: bool = Query(True, description="Include full evidence_detail JSONB"),
+    limit: int = Query(50, ge=1, le=500),
+    offset: int = Query(0, ge=0),
+):
+    """All evidence submitted for a pharmacy, extracted from validation_status_history."""
+    if not db.is_available():
+        raise HTTPException(status_code=503, detail="Database unavailable")
+
+    try:
+        with db.get_conn() as conn:
+            with conn.cursor(cursor_factory=extras.RealDictCursor) as cur:
+                cur.execute("SELECT id FROM pharmacy_locations WHERE id = %s", (pharmacy_id,))
+                if not cur.fetchone():
+                    raise HTTPException(status_code=404, detail="Pharmacy not found")
+
+                cur.execute(
+                    "SELECT count(*) FROM validation_status_history WHERE pharmacy_id = %s AND evidence_detail IS NOT NULL",
+                    (pharmacy_id,),
+                )
+                total = cur.fetchone()["count"]
+
+                cur.execute(
+                    """
+                    SELECT id, new_level::text, changed_at, changed_by, actor_type,
+                           evidence_reference, source_description, evidence_detail
+                    FROM validation_status_history
+                    WHERE pharmacy_id = %s AND evidence_detail IS NOT NULL
+                    ORDER BY changed_at DESC
+                    LIMIT %s OFFSET %s
+                    """,
+                    (pharmacy_id, limit, offset),
+                )
+                rows = cur.fetchall()
+
+        data = []
+        for r in rows:
+            ed = r["evidence_detail"] or {}
+            item = {
+                "id": str(r["id"]),
+                "validation_level": r["new_level"],
+                "validation_label": _level_label(r["new_level"]),
+                "evidence_type": ed.get("evidence_type"),
+                "capture_method": ed.get("capture_method"),
+                "actor": r["changed_by"],
+                "actor_type": r["actor_type"],
+                "evidence_reference": r["evidence_reference"],
+                "source_description": r["source_description"],
+                "timestamp": _iso(r["changed_at"]),
+            }
+            if include_detail:
+                item["evidence_detail"] = ed
+            data.append(item)
+
+        return {
+            "pharmacy_id": pharmacy_id,
+            "meta": {"total": total, "limit": limit, "offset": offset},
+            "data": data,
+        }
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.exception("Failed to get evidence for %s", pharmacy_id)
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# --- 2. Provenance Search ---
+
+
+@app.get(
+    "/api/provenance",
+    dependencies=[Depends(require_tier("registry_read"))],
+)
+async def search_provenance(
+    actor: str | None = Query(None),
+    actor_type: str | None = Query(None),
+    action: str | None = Query(None),
+    entity_type: str | None = Query(None),
+    entity_id: str | None = Query(None),
+    source_system: str | None = Query(None),
+    date_from: str | None = Query(None, description="ISO 8601 start date"),
+    date_to: str | None = Query(None, description="ISO 8601 end date"),
+    limit: int = Query(50, ge=1, le=500),
+    offset: int = Query(0, ge=0),
+):
+    """Search provenance records with filters."""
+    if not db.is_available():
+        raise HTTPException(status_code=503, detail="Database unavailable")
+
+    _parse_date_param(date_from, "date_from")
+    _parse_date_param(date_to, "date_to")
+
+    try:
+        conditions: list[str] = []
+        params: list[Any] = []
+
+        if actor:
+            conditions.append("actor = %s")
+            params.append(actor)
+        if actor_type:
+            conditions.append("actor_type = %s")
+            params.append(actor_type)
+        if action:
+            conditions.append("action = %s")
+            params.append(action)
+        if entity_type:
+            conditions.append("entity_type = %s")
+            params.append(entity_type)
+        if entity_id:
+            conditions.append("entity_id = %s::uuid")
+            params.append(entity_id)
+        if source_system:
+            conditions.append("source_system = %s")
+            params.append(source_system)
+        if date_from:
+            conditions.append("happened_at >= %s::timestamptz")
+            params.append(date_from)
+        if date_to:
+            conditions.append("happened_at <= %s::timestamptz")
+            params.append(date_to)
+
+        where = (" WHERE " + " AND ".join(conditions)) if conditions else ""
+
+        with db.get_conn() as conn:
+            with conn.cursor(cursor_factory=extras.RealDictCursor) as cur:
+                cur.execute(f"SELECT count(*) FROM provenance_records{where}", params)
+                total = cur.fetchone()["count"]
+
+                cur.execute(
+                    f"""
+                    SELECT id, entity_type, entity_id, action, actor, actor_type,
+                           source_system, source_dataset, source_record_id,
+                           happened_at, detail
+                    FROM provenance_records{where}
+                    ORDER BY happened_at DESC
+                    LIMIT %s OFFSET %s
+                    """,
+                    params + [limit, offset],
+                )
+                rows = cur.fetchall()
+
+        return {
+            "meta": {"total": total, "limit": limit, "offset": offset},
+            "data": [
+                {
+                    "id": str(r["id"]),
+                    "entity_type": r["entity_type"],
+                    "entity_id": str(r["entity_id"]),
+                    "action": r["action"],
+                    "actor": r["actor"],
+                    "actor_type": r["actor_type"],
+                    "source_system": r["source_system"],
+                    "source_dataset": r["source_dataset"],
+                    "source_record_id": r["source_record_id"],
+                    "happened_at": _iso(r["happened_at"]),
+                    "detail": r["detail"],
+                }
+                for r in rows
+            ],
+        }
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.exception("Provenance search failed")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# --- 3. Audit Log Search ---
+
+
+@app.get(
+    "/api/audit",
+    dependencies=[Depends(require_tier("admin"))],
+)
+async def search_audit_log(
+    actor: str | None = Query(None),
+    actor_type: str | None = Query(None),
+    event_type: str | None = Query(None),
+    event_action: str | None = Query(None),
+    resource_type: str | None = Query(None),
+    resource_id: str | None = Query(None),
+    date_from: str | None = Query(None, description="ISO 8601 start date"),
+    date_to: str | None = Query(None, description="ISO 8601 end date"),
+    response_status: int | None = Query(None),
+    limit: int = Query(50, ge=1, le=500),
+    offset: int = Query(0, ge=0),
+):
+    """Search audit log (admin only). Excludes IP/user-agent for privacy."""
+    if not db.is_available():
+        raise HTTPException(status_code=503, detail="Database unavailable")
+
+    _parse_date_param(date_from, "date_from")
+    _parse_date_param(date_to, "date_to")
+
+    try:
+        conditions: list[str] = []
+        params: list[Any] = []
+
+        if actor:
+            conditions.append("actor = %s")
+            params.append(actor)
+        if actor_type:
+            conditions.append("actor_type = %s")
+            params.append(actor_type)
+        if event_type:
+            conditions.append("event_type = %s")
+            params.append(event_type)
+        if event_action:
+            conditions.append("event_action = %s")
+            params.append(event_action)
+        if resource_type:
+            conditions.append("resource_type = %s")
+            params.append(resource_type)
+        if resource_id:
+            conditions.append("resource_id = %s::uuid")
+            params.append(resource_id)
+        if date_from:
+            conditions.append("happened_at >= %s::timestamptz")
+            params.append(date_from)
+        if date_to:
+            conditions.append("happened_at <= %s::timestamptz")
+            params.append(date_to)
+        if response_status is not None:
+            conditions.append("response_status = %s")
+            params.append(response_status)
+
+        where = (" WHERE " + " AND ".join(conditions)) if conditions else ""
+
+        with db.get_conn() as conn:
+            with conn.cursor(cursor_factory=extras.RealDictCursor) as cur:
+                cur.execute(f"SELECT count(*) FROM audit_log{where}", params)
+                total = cur.fetchone()["count"]
+
+                cur.execute(
+                    f"""
+                    SELECT id, event_type, event_action, actor, actor_type,
+                           resource_type, resource_id, request_path, request_method,
+                           response_status, duration_ms, detail, happened_at
+                    FROM audit_log{where}
+                    ORDER BY happened_at DESC
+                    LIMIT %s OFFSET %s
+                    """,
+                    params + [limit, offset],
+                )
+                rows = cur.fetchall()
+
+        return {
+            "meta": {"total": total, "limit": limit, "offset": offset},
+            "data": [
+                {
+                    "id": str(r["id"]),
+                    "event_type": r["event_type"],
+                    "event_action": r["event_action"],
+                    "actor": r["actor"],
+                    "actor_type": r["actor_type"],
+                    "resource_type": r["resource_type"],
+                    "resource_id": str(r["resource_id"]) if r["resource_id"] else None,
+                    "request_path": r["request_path"],
+                    "request_method": r["request_method"],
+                    "response_status": r["response_status"],
+                    "duration_ms": r["duration_ms"],
+                    "detail": r["detail"],
+                    "happened_at": _iso(r["happened_at"]),
+                }
+                for r in rows
+            ],
+        }
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.exception("Audit log search failed")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# --- 4. Actor Activity ---
+
+
+@app.get(
+    "/api/actors/{actor_id}/activity",
+    dependencies=[Depends(require_tier("admin"))],
+)
+async def get_actor_activity(
+    actor_id: str,
+    action: str | None = Query(None),
+    entity_type: str | None = Query(None),
+    date_from: str | None = Query(None, description="ISO 8601 start date"),
+    date_to: str | None = Query(None, description="ISO 8601 end date"),
+    limit: int = Query(50, ge=1, le=500),
+    offset: int = Query(0, ge=0),
+):
+    """Activity log and summary stats for a specific actor (admin only)."""
+    if not db.is_available():
+        raise HTTPException(status_code=503, detail="Database unavailable")
+
+    _parse_date_param(date_from, "date_from")
+    _parse_date_param(date_to, "date_to")
+
+    try:
+        with db.get_conn() as conn:
+            with conn.cursor(cursor_factory=extras.RealDictCursor) as cur:
+                # Summary stats
+                cur.execute(
+                    """
+                    SELECT
+                        count(*) AS total_actions,
+                        count(*) FILTER (WHERE action = 'verify') AS verifications_completed,
+                        count(*) FILTER (WHERE action = 'create') AS records_created,
+                        count(*) FILTER (WHERE action = 'update') AS records_updated,
+                        count(*) FILTER (WHERE action = 'merge') AS records_merged,
+                        count(*) FILTER (WHERE action = 'import') AS records_imported,
+                        min(happened_at) AS first_action_at,
+                        max(happened_at) AS last_action_at,
+                        count(DISTINCT entity_id) AS unique_entities_touched
+                    FROM provenance_records
+                    WHERE actor = %s
+                    """,
+                    (actor_id,),
+                )
+                stats = cur.fetchone()
+
+                # Paginated activity with optional filters
+                conditions: list[str] = ["actor = %s"]
+                params: list[Any] = [actor_id]
+
+                if action:
+                    conditions.append("action = %s")
+                    params.append(action)
+                if entity_type:
+                    conditions.append("entity_type = %s")
+                    params.append(entity_type)
+                if date_from:
+                    conditions.append("happened_at >= %s::timestamptz")
+                    params.append(date_from)
+                if date_to:
+                    conditions.append("happened_at <= %s::timestamptz")
+                    params.append(date_to)
+
+                where = " WHERE " + " AND ".join(conditions)
+
+                cur.execute(f"SELECT count(*) FROM provenance_records{where}", params)
+                total = cur.fetchone()["count"]
+
+                cur.execute(
+                    f"""
+                    SELECT id, entity_type, entity_id, action, actor_type,
+                           source_system, happened_at, detail
+                    FROM provenance_records{where}
+                    ORDER BY happened_at DESC
+                    LIMIT %s OFFSET %s
+                    """,
+                    params + [limit, offset],
+                )
+                rows = cur.fetchall()
+
+        return {
+            "actor_id": actor_id,
+            "summary": {
+                "total_actions": stats["total_actions"],
+                "verifications_completed": stats["verifications_completed"],
+                "records_created": stats["records_created"],
+                "records_updated": stats["records_updated"],
+                "records_merged": stats["records_merged"],
+                "records_imported": stats["records_imported"],
+                "unique_entities_touched": stats["unique_entities_touched"],
+                "first_action_at": _iso(stats["first_action_at"]),
+                "last_action_at": _iso(stats["last_action_at"]),
+            },
+            "meta": {"total": total, "limit": limit, "offset": offset},
+            "activity": [
+                {
+                    "id": str(r["id"]),
+                    "entity_type": r["entity_type"],
+                    "entity_id": str(r["entity_id"]),
+                    "action": r["action"],
+                    "actor_type": r["actor_type"],
+                    "source_system": r["source_system"],
+                    "happened_at": _iso(r["happened_at"]),
+                    "detail": r["detail"],
+                }
+                for r in rows
+            ],
+        }
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.exception("Actor activity lookup failed for %s", actor_id)
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# --- 5. Pharmacy Timeline ---
+
+
+@app.get(
+    "/api/pharmacies/{pharmacy_id}/timeline",
+    dependencies=[Depends(require_tier("registry_read"))],
+)
+async def get_pharmacy_timeline(
+    pharmacy_id: str,
+    event_type: str | None = Query(None, description="Filter by event type"),
+    limit: int = Query(50, ge=1, le=500),
+    offset: int = Query(0, ge=0),
+):
+    """Unified chronological timeline merging validation, provenance, and operational history."""
+    if not db.is_available():
+        raise HTTPException(status_code=503, detail="Database unavailable")
+
+    try:
+        with db.get_conn() as conn:
+            with conn.cursor(cursor_factory=extras.RealDictCursor) as cur:
+                cur.execute("SELECT id FROM pharmacy_locations WHERE id = %s", (pharmacy_id,))
+                if not cur.fetchone():
+                    raise HTTPException(status_code=404, detail="Pharmacy not found")
+
+                # Build CTE
+                cte = """
+                    WITH timeline AS (
+                        SELECT
+                            id,
+                            changed_at AS timestamp,
+                            'validation_change' AS event_type,
+                            'Validation: ' || COALESCE(old_level::text, 'none') || ' → ' || new_level::text AS summary,
+                            changed_by AS actor,
+                            actor_type,
+                            jsonb_build_object(
+                                'old_level', old_level::text,
+                                'new_level', new_level::text,
+                                'evidence_reference', evidence_reference,
+                                'source_description', source_description
+                            ) AS detail
+                        FROM validation_status_history
+                        WHERE pharmacy_id = %s
+
+                        UNION ALL
+
+                        SELECT
+                            id,
+                            happened_at AS timestamp,
+                            'provenance_' || action AS event_type,
+                            action || ' on ' || entity_type AS summary,
+                            actor,
+                            actor_type,
+                            detail
+                        FROM provenance_records
+                        WHERE entity_id = %s AND entity_type = 'pharmacy_location'
+
+                        UNION ALL
+
+                        SELECT
+                            id,
+                            changed_at AS timestamp,
+                            'operational_change' AS event_type,
+                            'Status: ' || COALESCE(old_status::text, 'none') || ' → ' || new_status::text AS summary,
+                            changed_by AS actor,
+                            'system' AS actor_type,
+                            jsonb_build_object(
+                                'old_status', old_status::text,
+                                'new_status', new_status::text,
+                                'reason', reason,
+                                'source_description', source_description
+                            ) AS detail
+                        FROM operational_status_history
+                        WHERE pharmacy_id = %s
+                    )
+                """
+                base_params = [pharmacy_id, pharmacy_id, pharmacy_id]
+
+                event_filter = ""
+                filter_params: list[Any] = []
+                if event_type:
+                    event_filter = " WHERE event_type = %s"
+                    filter_params = [event_type]
+
+                cur.execute(
+                    f"{cte} SELECT count(*) FROM timeline{event_filter}",
+                    base_params + filter_params,
+                )
+                total = cur.fetchone()["count"]
+
+                cur.execute(
+                    f"{cte} SELECT * FROM timeline{event_filter} ORDER BY timestamp DESC LIMIT %s OFFSET %s",
+                    base_params + filter_params + [limit, offset],
+                )
+                rows = cur.fetchall()
+
+        return {
+            "pharmacy_id": pharmacy_id,
+            "meta": {"total": total, "limit": limit, "offset": offset},
+            "timeline": [
+                {
+                    "id": str(r["id"]),
+                    "timestamp": _iso(r["timestamp"]),
+                    "event_type": r["event_type"],
+                    "summary": r["summary"],
+                    "actor": r["actor"],
+                    "actor_type": r["actor_type"],
+                    "detail": r["detail"],
+                }
+                for r in rows
+            ],
+        }
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.exception("Timeline failed for %s", pharmacy_id)
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# --- 6. Audit Stats ---
+
+
+@app.get(
+    "/api/audit/stats",
+    dependencies=[Depends(require_tier("registry_read"))],
+)
+async def audit_stats(
+    days: int = Query(30, ge=1, le=365, description="Lookback period in days"),
+):
+    """System-wide verification metrics and data quality stats."""
+    if not db.is_available():
+        raise HTTPException(status_code=503, detail="Database unavailable")
+
+    try:
+        from datetime import timedelta
+
+        cutoff = datetime.now(timezone.utc) - timedelta(days=days)
+
+        with db.get_conn() as conn:
+            with conn.cursor(cursor_factory=extras.RealDictCursor) as cur:
+                # 1. Verifications by day
+                cur.execute(
+                    """
+                    SELECT date_trunc('day', changed_at)::date AS day, count(*) AS count
+                    FROM validation_status_history
+                    WHERE changed_at >= %s
+                    GROUP BY day ORDER BY day
+                    """,
+                    (cutoff,),
+                )
+                by_day = [{"day": str(r["day"]), "count": r["count"]} for r in cur.fetchall()]
+
+                # 2. Verifications by actor_type
+                cur.execute(
+                    """
+                    SELECT actor_type, count(*) AS count
+                    FROM validation_status_history
+                    WHERE changed_at >= %s
+                    GROUP BY actor_type ORDER BY count DESC
+                    """,
+                    (cutoff,),
+                )
+                by_actor_type = {r["actor_type"]: r["count"] for r in cur.fetchall()}
+
+                # 3. Verifications by target level
+                cur.execute(
+                    """
+                    SELECT new_level::text AS target_level, count(*) AS count
+                    FROM validation_status_history
+                    WHERE changed_at >= %s
+                    GROUP BY new_level ORDER BY new_level
+                    """,
+                    (cutoff,),
+                )
+                by_level = [
+                    {
+                        "level": r["target_level"],
+                        "label": _level_label(r["target_level"]),
+                        "count": r["count"],
+                    }
+                    for r in cur.fetchall()
+                ]
+
+                # 4. Task completion time stats
+                cur.execute(
+                    """
+                    SELECT
+                        target_level::text,
+                        count(*) AS completed_count,
+                        round(avg(EXTRACT(EPOCH FROM (completed_at - created_at)) / 3600)::numeric, 1) AS avg_hours,
+                        round(min(EXTRACT(EPOCH FROM (completed_at - created_at)) / 3600)::numeric, 1) AS min_hours,
+                        round(max(EXTRACT(EPOCH FROM (completed_at - created_at)) / 3600)::numeric, 1) AS max_hours
+                    FROM verification_tasks
+                    WHERE status = 'completed' AND completed_at IS NOT NULL AND created_at >= %s
+                    GROUP BY target_level ORDER BY target_level
+                    """,
+                    (cutoff,),
+                )
+                completion_stats = [
+                    {
+                        "target_level": r["target_level"],
+                        "label": _level_label(r["target_level"]),
+                        "completed_count": r["completed_count"],
+                        "avg_hours": float(r["avg_hours"]) if r["avg_hours"] else None,
+                        "min_hours": float(r["min_hours"]) if r["min_hours"] else None,
+                        "max_hours": float(r["max_hours"]) if r["max_hours"] else None,
+                    }
+                    for r in cur.fetchall()
+                ]
+
+                # 5. Evidence types used
+                cur.execute(
+                    """
+                    SELECT
+                        evidence_detail->>'evidence_type' AS evidence_type,
+                        evidence_detail->>'capture_method' AS capture_method,
+                        count(*) AS count
+                    FROM validation_status_history
+                    WHERE evidence_detail IS NOT NULL AND changed_at >= %s
+                    GROUP BY evidence_type, capture_method
+                    ORDER BY count DESC
+                    """,
+                    (cutoff,),
+                )
+                evidence_types = [
+                    {
+                        "evidence_type": r["evidence_type"],
+                        "capture_method": r["capture_method"],
+                        "count": r["count"],
+                    }
+                    for r in cur.fetchall()
+                ]
+
+        return {
+            "period_days": days,
+            "cutoff_date": _iso(cutoff),
+            "verifications_by_day": by_day,
+            "verifications_by_actor_type": by_actor_type,
+            "verifications_by_target_level": by_level,
+            "task_completion_stats": completion_stats,
+            "evidence_types_used": evidence_types,
+        }
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.exception("Audit stats failed")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# ---------------------------------------------------------------------------
+# FHIR R4 Interoperability endpoints (Phase 2)
+# ---------------------------------------------------------------------------
+
+# --- FHIR value-map helpers ---
+
+_FHIR_LOCATION_STATUS = {
+    "operational": "active",
+    "temporarily_closed": "suspended",
+    "permanently_closed": "inactive",
+    "unknown": "active",
+}
+
+_FHIR_FACILITY_TYPE = {
+    "pharmacy": {"code": "PHARM", "display": "Community Pharmacy"},
+    "ppmv": {"code": "PPMV", "display": "Patent and Proprietary Medicine Vendor"},
+    "hospital_pharmacy": {"code": "HOSPHARM", "display": "Hospital Pharmacy"},
+}
+
+_FHIR_VALIDATION_LEVEL = {
+    "L0_mapped": {"code": "L0", "display": "Mapped"},
+    "L1_contact_confirmed": {"code": "L1", "display": "Contact Confirmed"},
+    "L2_evidence_documented": {"code": "L2", "display": "Evidence Documented"},
+    "L3_regulator_verified": {"code": "L3", "display": "Regulator/Partner Verified"},
+    "L4_high_assurance": {"code": "L4", "display": "High-Assurance"},
+}
+
+_FHIR_ORG_ACTIVE = {
+    "operational": True,
+    "temporarily_closed": True,
+    "permanently_closed": False,
+    "unknown": True,
+}
+
+_FHIR_EXT_ID_SYSTEM = {
+    "pcn_premises_id": "https://pcn.gov.ng/premises",
+    "nhia_facility_id": "https://nhia.gov.ng/facilities",
+    "osm_node_id": "https://www.openstreetmap.org/node",
+    "grid3_id": "https://grid3.gov.ng/facilities",
+    "google_place_id": "https://maps.google.com/place",
+}
+
+_FHIR_CONTACT_SYSTEM = {
+    "phone": "phone",
+    "email": "email",
+    "whatsapp": "other",
+}
+
+NPR_BASE = "https://nigeria-pharmacy-registry.internal/fhir"
+
+
+def _build_fhir_location(
+    row: dict,
+    contacts: list[dict],
+    ext_ids: list[dict],
+) -> dict:
+    """Build a FHIR R4 Location resource from DB rows."""
+    pharmacy_id = str(row["id"])
+    op_status = row.get("operational_status") or "unknown"
+    fac_type = row.get("facility_type") or "pharmacy"
+    val_level = row.get("current_validation_level") or "L0_mapped"
+
+    resource: dict[str, Any] = {
+        "resourceType": "Location",
+        "id": pharmacy_id,
+        "meta": {
+            "profile": [f"{NPR_BASE}/StructureDefinition/NPR-Location"],
+            "lastUpdated": _iso(row.get("updated_at")),
+        },
+        "name": row["name"],
+        "status": _FHIR_LOCATION_STATUS.get(op_status, "active"),
+    }
+
+    # --- type (CodeableConcept) ---
+    ft = _FHIR_FACILITY_TYPE.get(fac_type, {"code": fac_type, "display": fac_type})
+    resource["type"] = [
+        {
+            "coding": [
+                {
+                    "system": f"{NPR_BASE}/CodeSystem/facility-type",
+                    "code": ft["code"],
+                    "display": ft["display"],
+                }
+            ],
+            "text": ft["display"],
+        }
+    ]
+
+    # --- address ---
+    address: dict[str, Any] = {"use": "work", "country": row.get("country") or "NG"}
+    lines = []
+    if row.get("address_line_1"):
+        lines.append(row["address_line_1"])
+    if row.get("address_line_2"):
+        lines.append(row["address_line_2"])
+    if lines:
+        address["line"] = lines
+    if row.get("lga"):
+        address["district"] = row["lga"]
+    if row.get("state"):
+        address["state"] = row["state"]
+    if row.get("postal_code"):
+        address["postalCode"] = row["postal_code"]
+
+    # ward extension
+    if row.get("ward"):
+        address["extension"] = [
+            {
+                "url": f"{NPR_BASE}/StructureDefinition/address-ward",
+                "valueString": row["ward"],
+            }
+        ]
+
+    resource["address"] = address
+
+    # --- position (lat/lon) ---
+    lat = row.get("latitude")
+    lon = row.get("longitude")
+    if lat is not None and lon is not None:
+        resource["position"] = {
+            "latitude": float(lat),
+            "longitude": float(lon),
+        }
+
+    # --- telecom (contacts) ---
+    telecoms = []
+    for c in contacts:
+        sys = _FHIR_CONTACT_SYSTEM.get(c["contact_type"], "other")
+        tc: dict[str, Any] = {
+            "system": sys,
+            "value": c["contact_value"],
+            "use": "work",
+        }
+        if c.get("is_primary"):
+            tc["rank"] = 1
+        if sys == "other" and c["contact_type"] == "whatsapp":
+            tc["extension"] = [
+                {
+                    "url": f"{NPR_BASE}/StructureDefinition/telecom-platform",
+                    "valueString": "whatsapp",
+                }
+            ]
+        telecoms.append(tc)
+    if telecoms:
+        resource["telecom"] = telecoms
+
+    # --- identifier (external IDs) ---
+    identifiers = [
+        {
+            "system": f"{NPR_BASE}/pharmacy-id",
+            "value": pharmacy_id,
+        }
+    ]
+    for eid in ext_ids:
+        sys = _FHIR_EXT_ID_SYSTEM.get(eid["identifier_type"], f"{NPR_BASE}/id/{eid['identifier_type']}")
+        identifiers.append(
+            {
+                "system": sys,
+                "value": eid["identifier_value"],
+            }
+        )
+    resource["identifier"] = identifiers
+
+    # --- managingOrganization reference ---
+    resource["managingOrganization"] = {
+        "reference": f"Organization/org-{pharmacy_id}",
+        "display": row["name"],
+    }
+
+    # --- extensions ---
+    extensions = []
+
+    # validation level extension
+    vl = _FHIR_VALIDATION_LEVEL.get(val_level, {"code": val_level, "display": val_level})
+    extensions.append(
+        {
+            "url": f"{NPR_BASE}/StructureDefinition/validation-level",
+            "valueCoding": {
+                "system": f"{NPR_BASE}/CodeSystem/validation-level",
+                "code": vl["code"],
+                "display": vl["display"],
+            },
+        }
+    )
+
+    # primary source extension
+    if row.get("primary_source"):
+        extensions.append(
+            {
+                "url": f"{NPR_BASE}/StructureDefinition/primary-source",
+                "valueString": row["primary_source"],
+            }
+        )
+
+    # data-absent-reason for unknown status
+    if op_status == "unknown":
+        extensions.append(
+            {
+                "url": "http://hl7.org/fhir/StructureDefinition/data-absent-reason",
+                "valueCode": "unknown",
+            }
+        )
+
+    resource["extension"] = extensions
+
+    return resource
+
+
+def _build_fhir_organization(
+    row: dict,
+    contacts: list[dict],
+    ext_ids: list[dict],
+) -> dict:
+    """Build a FHIR R4 Organization resource from DB rows."""
+    pharmacy_id = str(row["id"])
+    op_status = row.get("operational_status") or "unknown"
+    fac_type = row.get("facility_type") or "pharmacy"
+
+    resource: dict[str, Any] = {
+        "resourceType": "Organization",
+        "id": f"org-{pharmacy_id}",
+        "meta": {
+            "profile": [f"{NPR_BASE}/StructureDefinition/NPR-Organization"],
+            "lastUpdated": _iso(row.get("updated_at")),
+        },
+        "name": row["name"],
+        "active": _FHIR_ORG_ACTIVE.get(op_status, True),
+    }
+
+    # --- type (dual coding: HL7 + NPR) ---
+    ft = _FHIR_FACILITY_TYPE.get(fac_type, {"code": fac_type, "display": fac_type})
+    resource["type"] = [
+        {
+            "coding": [
+                {
+                    "system": "http://terminology.hl7.org/CodeSystem/organization-type",
+                    "code": "prov",
+                    "display": "Healthcare Provider",
+                },
+                {
+                    "system": f"{NPR_BASE}/CodeSystem/facility-type",
+                    "code": ft["code"],
+                    "display": ft["display"],
+                },
+            ],
+            "text": ft["display"],
+        }
+    ]
+
+    # --- identifier ---
+    identifiers = [
+        {
+            "system": f"{NPR_BASE}/organization-id",
+            "value": f"org-{pharmacy_id}",
+        }
+    ]
+    for eid in ext_ids:
+        sys = _FHIR_EXT_ID_SYSTEM.get(eid["identifier_type"], f"{NPR_BASE}/id/{eid['identifier_type']}")
+        identifiers.append({"system": sys, "value": eid["identifier_value"]})
+    resource["identifier"] = identifiers
+
+    # --- telecom ---
+    telecoms = []
+    for c in contacts:
+        sys = _FHIR_CONTACT_SYSTEM.get(c["contact_type"], "other")
+        tc: dict[str, Any] = {"system": sys, "value": c["contact_value"], "use": "work"}
+        if c.get("is_primary"):
+            tc["rank"] = 1
+        telecoms.append(tc)
+    if telecoms:
+        resource["telecom"] = telecoms
+
+    # --- contact (named contacts) ---
+    named_contacts = []
+    for c in contacts:
+        if c.get("contact_person"):
+            named_contacts.append(
+                {
+                    "name": {"text": c["contact_person"]},
+                    "telecom": [
+                        {
+                            "system": _FHIR_CONTACT_SYSTEM.get(c["contact_type"], "other"),
+                            "value": c["contact_value"],
+                        }
+                    ],
+                }
+            )
+    if named_contacts:
+        resource["contact"] = named_contacts
+
+    # --- address ---
+    address: dict[str, Any] = {"use": "work", "country": row.get("country") or "NG"}
+    lines = []
+    if row.get("address_line_1"):
+        lines.append(row["address_line_1"])
+    if row.get("address_line_2"):
+        lines.append(row["address_line_2"])
+    if lines:
+        address["line"] = lines
+    if row.get("lga"):
+        address["district"] = row["lga"]
+    if row.get("state"):
+        address["state"] = row["state"]
+    if row.get("postal_code"):
+        address["postalCode"] = row["postal_code"]
+    resource["address"] = [address]
+
+    return resource
+
+
+def _fhir_bundle(
+    resources: list[dict],
+    total: int,
+    base_url: str,
+    resource_type: str,
+) -> dict:
+    """Wrap a list of FHIR resources in a searchset Bundle."""
+    entries = []
+    for r in resources:
+        entries.append(
+            {
+                "fullUrl": f"{base_url}/api/fhir/{resource_type}/{r['id']}",
+                "resource": r,
+                "search": {"mode": "match"},
+            }
+        )
+    return {
+        "resourceType": "Bundle",
+        "type": "searchset",
+        "total": total,
+        "entry": entries,
+    }
+
+
+# --- FHIR 1. Capability Statement ---
+
+
+@app.get("/api/fhir/metadata")
+async def fhir_metadata(request: Request):
+    """FHIR R4 CapabilityStatement — describes what this server supports."""
+    base = str(request.base_url).rstrip("/")
+    return {
+        "resourceType": "CapabilityStatement",
+        "status": "active",
+        "date": "2026-02-24",
+        "kind": "instance",
+        "fhirVersion": "4.0.1",
+        "format": ["json"],
+        "implementation": {
+            "description": "Nigeria Pharmacy Registry FHIR R4 read-only endpoint",
+            "url": f"{base}/api/fhir",
+        },
+        "rest": [
+            {
+                "mode": "server",
+                "resource": [
+                    {
+                        "type": "Location",
+                        "profile": f"{NPR_BASE}/StructureDefinition/NPR-Location",
+                        "interaction": [
+                            {"code": "read"},
+                            {"code": "search-type"},
+                        ],
+                        "searchParam": [
+                            {"name": "name", "type": "string"},
+                            {"name": "address-state", "type": "string"},
+                            {"name": "type", "type": "token"},
+                            {"name": "status", "type": "token"},
+                            {"name": "_count", "type": "number"},
+                            {"name": "_offset", "type": "number"},
+                        ],
+                    },
+                    {
+                        "type": "Organization",
+                        "profile": f"{NPR_BASE}/StructureDefinition/NPR-Organization",
+                        "interaction": [
+                            {"code": "read"},
+                            {"code": "search-type"},
+                        ],
+                        "searchParam": [
+                            {"name": "name", "type": "string"},
+                            {"name": "address-state", "type": "string"},
+                            {"name": "type", "type": "token"},
+                            {"name": "active", "type": "token"},
+                            {"name": "_count", "type": "number"},
+                            {"name": "_offset", "type": "number"},
+                        ],
+                    },
+                ],
+            }
+        ],
+    }
+
+
+# --- FHIR DB query helper ---
+
+
+def _fhir_query_pharmacy(
+    pharmacy_id: str,
+) -> tuple[dict | None, list[dict], list[dict]]:
+    """Fetch a pharmacy row with lat/lon, its contacts, and external IDs."""
+    with db.get_conn() as conn:
+        with conn.cursor(cursor_factory=extras.RealDictCursor) as cur:
+            cur.execute(
+                """
+                SELECT pl.*,
+                       ST_Y(pl.geolocation::geometry) AS latitude,
+                       ST_X(pl.geolocation::geometry) AS longitude
+                FROM pharmacy_locations pl
+                WHERE pl.id = %s
+                """,
+                (pharmacy_id,),
+            )
+            row = cur.fetchone()
+            if not row:
+                return None, [], []
+
+            cur.execute(
+                "SELECT * FROM contacts WHERE pharmacy_id = %s ORDER BY is_primary DESC",
+                (pharmacy_id,),
+            )
+            contacts = cur.fetchall()
+
+            cur.execute(
+                "SELECT * FROM external_identifiers WHERE pharmacy_id = %s AND is_current = true",
+                (pharmacy_id,),
+            )
+            ext_ids = cur.fetchall()
+
+    return row, list(contacts), list(ext_ids)
+
+
+# --- FHIR 2. Location read ---
+
+
+@app.get(
+    "/api/fhir/Location/{pharmacy_id}",
+    dependencies=[Depends(require_tier("registry_read"))],
+)
+async def fhir_location_read(pharmacy_id: str):
+    """Read a single pharmacy as a FHIR R4 Location resource."""
+    if not db.is_available():
+        raise HTTPException(status_code=503, detail="Database unavailable")
+
+    try:
+        row, contacts, ext_ids = _fhir_query_pharmacy(pharmacy_id)
+        if not row:
+            raise HTTPException(
+                status_code=404,
+                detail={
+                    "resourceType": "OperationOutcome",
+                    "issue": [
+                        {
+                            "severity": "error",
+                            "code": "not-found",
+                            "diagnostics": f"Location/{pharmacy_id} not found",
+                        }
+                    ],
+                },
+            )
+        return _build_fhir_location(row, contacts, ext_ids)
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.exception("FHIR Location read failed for %s", pharmacy_id)
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# --- FHIR 3. Location search ---
+
+
+@app.get(
+    "/api/fhir/Location",
+    dependencies=[Depends(require_tier("registry_read"))],
+)
+async def fhir_location_search(
+    request: Request,
+    name: str | None = Query(None, description="Name search (partial match)"),
+    address_state: str | None = Query(None, alias="address-state", description="State filter"),
+    type: str | None = Query(None, description="Facility type code (PHARM, PPMV, HOSPHARM)"),
+    status: str | None = Query(None, description="FHIR status (active, suspended, inactive)"),
+    _count: int = Query(50, ge=1, le=200, alias="_count"),
+    _offset: int = Query(0, ge=0, alias="_offset"),
+):
+    """Search pharmacies returned as FHIR R4 Location Bundle."""
+    if not db.is_available():
+        raise HTTPException(status_code=503, detail="Database unavailable")
+
+    try:
+        conditions: list[str] = []
+        params: list[Any] = []
+
+        if name:
+            conditions.append("pl.name ILIKE %s")
+            params.append(f"%{name}%")
+        if address_state:
+            conditions.append("pl.state ILIKE %s")
+            params.append(address_state)
+        if type:
+            # Map FHIR type code back to DB enum
+            code_to_enum = {"PHARM": "pharmacy", "PPMV": "ppmv", "HOSPHARM": "hospital_pharmacy"}
+            db_type = code_to_enum.get(type.upper(), type)
+            conditions.append("pl.facility_type = %s::facility_type")
+            params.append(db_type)
+        if status:
+            # Map FHIR status back to DB enum
+            status_to_enum = {"active": "operational", "suspended": "temporarily_closed", "inactive": "permanently_closed"}
+            db_status = status_to_enum.get(status.lower())
+            if db_status:
+                conditions.append("pl.operational_status = %s::operational_status")
+                params.append(db_status)
+
+        where = (" WHERE " + " AND ".join(conditions)) if conditions else ""
+
+        with db.get_conn() as conn:
+            with conn.cursor(cursor_factory=extras.RealDictCursor) as cur:
+                cur.execute(f"SELECT count(*) FROM pharmacy_locations pl{where}", params)
+                total = cur.fetchone()["count"]
+
+                cur.execute(
+                    f"""
+                    SELECT pl.*,
+                           ST_Y(pl.geolocation::geometry) AS latitude,
+                           ST_X(pl.geolocation::geometry) AS longitude
+                    FROM pharmacy_locations pl
+                    {where}
+                    ORDER BY pl.state, pl.name
+                    LIMIT %s OFFSET %s
+                    """,
+                    params + [_count, _offset],
+                )
+                rows = cur.fetchall()
+
+                # Batch-load contacts and ext IDs for returned pharmacy IDs
+                pharmacy_ids = [str(r["id"]) for r in rows]
+
+                contacts_map: dict[str, list[dict]] = {pid: [] for pid in pharmacy_ids}
+                ext_ids_map: dict[str, list[dict]] = {pid: [] for pid in pharmacy_ids}
+
+                if pharmacy_ids:
+                    cur.execute(
+                        "SELECT * FROM contacts WHERE pharmacy_id = ANY(%s::uuid[]) ORDER BY is_primary DESC",
+                        (pharmacy_ids,),
+                    )
+                    for c in cur.fetchall():
+                        contacts_map[str(c["pharmacy_id"])].append(c)
+
+                    cur.execute(
+                        "SELECT * FROM external_identifiers WHERE pharmacy_id = ANY(%s::uuid[]) AND is_current = true",
+                        (pharmacy_ids,),
+                    )
+                    for e in cur.fetchall():
+                        ext_ids_map[str(e["pharmacy_id"])].append(e)
+
+        resources = []
+        for r in rows:
+            pid = str(r["id"])
+            resources.append(
+                _build_fhir_location(r, contacts_map[pid], ext_ids_map[pid])
+            )
+
+        base = str(request.base_url).rstrip("/")
+        return _fhir_bundle(resources, total, base, "Location")
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.exception("FHIR Location search failed")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# --- FHIR 4. Organization read ---
+
+
+@app.get(
+    "/api/fhir/Organization/{org_id}",
+    dependencies=[Depends(require_tier("registry_read"))],
+)
+async def fhir_organization_read(org_id: str):
+    """Read a single pharmacy organization as a FHIR R4 Organization resource."""
+    if not db.is_available():
+        raise HTTPException(status_code=503, detail="Database unavailable")
+
+    # Strip "org-" prefix if present
+    pharmacy_id = org_id.removeprefix("org-")
+
+    try:
+        row, contacts, ext_ids = _fhir_query_pharmacy(pharmacy_id)
+        if not row:
+            raise HTTPException(
+                status_code=404,
+                detail={
+                    "resourceType": "OperationOutcome",
+                    "issue": [
+                        {
+                            "severity": "error",
+                            "code": "not-found",
+                            "diagnostics": f"Organization/{org_id} not found",
+                        }
+                    ],
+                },
+            )
+        return _build_fhir_organization(row, contacts, ext_ids)
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.exception("FHIR Organization read failed for %s", org_id)
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# --- FHIR 5. Organization search ---
+
+
+@app.get(
+    "/api/fhir/Organization",
+    dependencies=[Depends(require_tier("registry_read"))],
+)
+async def fhir_organization_search(
+    request: Request,
+    name: str | None = Query(None, description="Name search (partial match)"),
+    address_state: str | None = Query(None, alias="address-state", description="State filter"),
+    type: str | None = Query(None, description="Facility type code (PHARM, PPMV, HOSPHARM)"),
+    active: str | None = Query(None, description="true or false"),
+    _count: int = Query(50, ge=1, le=200, alias="_count"),
+    _offset: int = Query(0, ge=0, alias="_offset"),
+):
+    """Search pharmacy organizations as FHIR R4 Organization Bundle."""
+    if not db.is_available():
+        raise HTTPException(status_code=503, detail="Database unavailable")
+
+    try:
+        conditions: list[str] = []
+        params: list[Any] = []
+
+        if name:
+            conditions.append("pl.name ILIKE %s")
+            params.append(f"%{name}%")
+        if address_state:
+            conditions.append("pl.state ILIKE %s")
+            params.append(address_state)
+        if type:
+            code_to_enum = {"PHARM": "pharmacy", "PPMV": "ppmv", "HOSPHARM": "hospital_pharmacy"}
+            db_type = code_to_enum.get(type.upper(), type)
+            conditions.append("pl.facility_type = %s::facility_type")
+            params.append(db_type)
+        if active is not None:
+            if active.lower() == "false":
+                conditions.append("pl.operational_status = 'permanently_closed'::operational_status")
+            elif active.lower() == "true":
+                conditions.append("pl.operational_status != 'permanently_closed'::operational_status")
+
+        where = (" WHERE " + " AND ".join(conditions)) if conditions else ""
+
+        with db.get_conn() as conn:
+            with conn.cursor(cursor_factory=extras.RealDictCursor) as cur:
+                cur.execute(f"SELECT count(*) FROM pharmacy_locations pl{where}", params)
+                total = cur.fetchone()["count"]
+
+                cur.execute(
+                    f"""
+                    SELECT pl.*,
+                           ST_Y(pl.geolocation::geometry) AS latitude,
+                           ST_X(pl.geolocation::geometry) AS longitude
+                    FROM pharmacy_locations pl
+                    {where}
+                    ORDER BY pl.state, pl.name
+                    LIMIT %s OFFSET %s
+                    """,
+                    params + [_count, _offset],
+                )
+                rows = cur.fetchall()
+
+                pharmacy_ids = [str(r["id"]) for r in rows]
+                contacts_map: dict[str, list[dict]] = {pid: [] for pid in pharmacy_ids}
+                ext_ids_map: dict[str, list[dict]] = {pid: [] for pid in pharmacy_ids}
+
+                if pharmacy_ids:
+                    cur.execute(
+                        "SELECT * FROM contacts WHERE pharmacy_id = ANY(%s::uuid[]) ORDER BY is_primary DESC",
+                        (pharmacy_ids,),
+                    )
+                    for c in cur.fetchall():
+                        contacts_map[str(c["pharmacy_id"])].append(c)
+
+                    cur.execute(
+                        "SELECT * FROM external_identifiers WHERE pharmacy_id = ANY(%s::uuid[]) AND is_current = true",
+                        (pharmacy_ids,),
+                    )
+                    for e in cur.fetchall():
+                        ext_ids_map[str(e["pharmacy_id"])].append(e)
+
+        resources = []
+        for r in rows:
+            pid = str(r["id"])
+            resources.append(
+                _build_fhir_organization(r, contacts_map[pid], ext_ids_map[pid])
+            )
+
+        base = str(request.base_url).rstrip("/")
+        return _fhir_bundle(resources, total, base, "Organization")
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.exception("FHIR Organization search failed")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# ---------------------------------------------------------------------------
+# Bulk Export endpoints (Phase 2)
+# ---------------------------------------------------------------------------
+
+_EXPORT_CSV_COLUMNS = [
+    "pharmacy_id",
+    "name",
+    "facility_type",
+    "operational_status",
+    "validation_level",
+    "validation_label",
+    "address_line_1",
+    "address_line_2",
+    "ward",
+    "lga",
+    "state",
+    "country",
+    "postal_code",
+    "latitude",
+    "longitude",
+    "phone",
+    "email",
+    "primary_source",
+    "external_ids",
+    "created_at",
+    "updated_at",
+]
+
+
+def _export_query_pharmacies(
+    state: str | None,
+    lga: str | None,
+    facility_type: str | None,
+    validation_level: str | None,
+    source: str | None,
+) -> tuple[str, list[Any]]:
+    """Build the filtered export query.  Returns (sql, params)."""
+    conditions: list[str] = []
+    params: list[Any] = []
+
+    if state:
+        conditions.append("pl.state ILIKE %s")
+        params.append(state)
+    if lga:
+        conditions.append("pl.lga ILIKE %s")
+        params.append(lga)
+    if facility_type:
+        conditions.append("pl.facility_type = %s::facility_type")
+        params.append(facility_type)
+    if validation_level:
+        conditions.append("pl.current_validation_level = %s::validation_level")
+        params.append(validation_level)
+    if source:
+        conditions.append("pl.primary_source = %s")
+        params.append(source)
+
+    where = (" WHERE " + " AND ".join(conditions)) if conditions else ""
+
+    sql = f"""
+        SELECT
+            pl.id,
+            pl.name,
+            pl.facility_type::text,
+            pl.operational_status::text,
+            pl.current_validation_level::text,
+            pl.address_line_1,
+            pl.address_line_2,
+            pl.ward,
+            pl.lga,
+            pl.state,
+            pl.country,
+            pl.postal_code,
+            ST_Y(pl.geolocation::geometry) AS latitude,
+            ST_X(pl.geolocation::geometry) AS longitude,
+            pl.primary_source,
+            pl.created_at,
+            pl.updated_at,
+            (
+                SELECT string_agg(c.contact_value, '; ')
+                FROM contacts c
+                WHERE c.pharmacy_id = pl.id AND c.contact_type = 'phone'
+            ) AS phone,
+            (
+                SELECT string_agg(c.contact_value, '; ')
+                FROM contacts c
+                WHERE c.pharmacy_id = pl.id AND c.contact_type = 'email'
+            ) AS email,
+            (
+                SELECT string_agg(ei.identifier_type || ':' || ei.identifier_value, '; ')
+                FROM external_identifiers ei
+                WHERE ei.pharmacy_id = pl.id AND ei.is_current = true
+            ) AS external_ids
+        FROM pharmacy_locations pl
+        {where}
+        ORDER BY pl.state, pl.lga, pl.name
+    """
+    return sql, params
+
+
+def _row_to_export_dict(row: dict) -> dict:
+    """Normalise a DB row into the flat export dict."""
+    return {
+        "pharmacy_id": str(row["id"]),
+        "name": row["name"],
+        "facility_type": row["facility_type"],
+        "operational_status": row["operational_status"],
+        "validation_level": row["current_validation_level"],
+        "validation_label": _level_label(row["current_validation_level"]),
+        "address_line_1": row.get("address_line_1") or "",
+        "address_line_2": row.get("address_line_2") or "",
+        "ward": row.get("ward") or "",
+        "lga": row.get("lga") or "",
+        "state": row.get("state") or "",
+        "country": row.get("country") or "NG",
+        "postal_code": row.get("postal_code") or "",
+        "latitude": str(row["latitude"]) if row.get("latitude") is not None else "",
+        "longitude": str(row["longitude"]) if row.get("longitude") is not None else "",
+        "phone": row.get("phone") or "",
+        "email": row.get("email") or "",
+        "primary_source": row.get("primary_source") or "",
+        "external_ids": row.get("external_ids") or "",
+        "created_at": _iso(row.get("created_at")) or "",
+        "updated_at": _iso(row.get("updated_at")) or "",
+    }
+
+
+# --- Export 1. CSV ---
+
+
+@app.get(
+    "/api/export/pharmacies.csv",
+    dependencies=[Depends(require_tier("registry_read"))],
+)
+async def export_pharmacies_csv(
+    state: str | None = Query(None),
+    lga: str | None = Query(None),
+    facility_type: str | None = Query(None),
+    validation_level: str | None = Query(None),
+    source: str | None = Query(None),
+):
+    """Bulk export pharmacies as CSV.  Streams the result for large datasets."""
+    if not db.is_available():
+        raise HTTPException(status_code=503, detail="Database unavailable")
+
+    try:
+        sql, params = _export_query_pharmacies(state, lga, facility_type, validation_level, source)
+
+        with db.get_conn() as conn:
+            with conn.cursor(cursor_factory=extras.RealDictCursor) as cur:
+                cur.execute(sql, params)
+                rows = cur.fetchall()
+
+        def generate_csv():
+            buf = io.StringIO()
+            writer = csv.DictWriter(buf, fieldnames=_EXPORT_CSV_COLUMNS)
+            writer.writeheader()
+            yield buf.getvalue()
+            buf.seek(0)
+            buf.truncate(0)
+
+            for row in rows:
+                writer.writerow(_row_to_export_dict(row))
+                yield buf.getvalue()
+                buf.seek(0)
+                buf.truncate(0)
+
+        ts = datetime.now(timezone.utc).strftime("%Y%m%d")
+        filename = f"npr_pharmacies_{ts}.csv"
+
+        return StreamingResponse(
+            generate_csv(),
+            media_type="text/csv",
+            headers={"Content-Disposition": f'attachment; filename="{filename}"'},
+        )
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.exception("CSV export failed")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# --- Export 2. JSON ---
+
+
+@app.get(
+    "/api/export/pharmacies.json",
+    dependencies=[Depends(require_tier("registry_read"))],
+)
+async def export_pharmacies_json(
+    state: str | None = Query(None),
+    lga: str | None = Query(None),
+    facility_type: str | None = Query(None),
+    validation_level: str | None = Query(None),
+    source: str | None = Query(None),
+):
+    """Bulk export pharmacies as a JSON array."""
+    if not db.is_available():
+        raise HTTPException(status_code=503, detail="Database unavailable")
+
+    try:
+        sql, params = _export_query_pharmacies(state, lga, facility_type, validation_level, source)
+
+        with db.get_conn() as conn:
+            with conn.cursor(cursor_factory=extras.RealDictCursor) as cur:
+                cur.execute(sql, params)
+                rows = cur.fetchall()
+
+        data = [_row_to_export_dict(r) for r in rows]
+
+        ts = datetime.now(timezone.utc).strftime("%Y%m%d")
+        filename = f"npr_pharmacies_{ts}.json"
+
+        content = json.dumps({"export_date": _iso(datetime.now(timezone.utc)), "count": len(data), "pharmacies": data}, default=str)
+
+        return StreamingResponse(
+            iter([content]),
+            media_type="application/json",
+            headers={"Content-Disposition": f'attachment; filename="{filename}"'},
+        )
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.exception("JSON export failed")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# --- Export 3. FHIR ndjson (Bulk Data) ---
+
+
+@app.get(
+    "/api/export/fhir/Location.ndjson",
+    dependencies=[Depends(require_tier("registry_read"))],
+)
+async def export_fhir_ndjson(
+    state: str | None = Query(None),
+    lga: str | None = Query(None),
+    facility_type: str | None = Query(None),
+    validation_level: str | None = Query(None),
+):
+    """FHIR Bulk Data export — one Location resource per line (ndjson)."""
+    if not db.is_available():
+        raise HTTPException(status_code=503, detail="Database unavailable")
+
+    try:
+        conditions: list[str] = []
+        params: list[Any] = []
+        if state:
+            conditions.append("pl.state ILIKE %s")
+            params.append(state)
+        if lga:
+            conditions.append("pl.lga ILIKE %s")
+            params.append(lga)
+        if facility_type:
+            conditions.append("pl.facility_type = %s::facility_type")
+            params.append(facility_type)
+        if validation_level:
+            conditions.append("pl.current_validation_level = %s::validation_level")
+            params.append(validation_level)
+
+        where = (" WHERE " + " AND ".join(conditions)) if conditions else ""
+
+        with db.get_conn() as conn:
+            with conn.cursor(cursor_factory=extras.RealDictCursor) as cur:
+                cur.execute(
+                    f"""
+                    SELECT pl.*,
+                           ST_Y(pl.geolocation::geometry) AS latitude,
+                           ST_X(pl.geolocation::geometry) AS longitude
+                    FROM pharmacy_locations pl
+                    {where}
+                    ORDER BY pl.state, pl.name
+                    """,
+                    params,
+                )
+                rows = cur.fetchall()
+
+                # Batch contacts and ext IDs
+                pharmacy_ids = [str(r["id"]) for r in rows]
+                contacts_map: dict[str, list[dict]] = {pid: [] for pid in pharmacy_ids}
+                ext_ids_map: dict[str, list[dict]] = {pid: [] for pid in pharmacy_ids}
+
+                if pharmacy_ids:
+                    cur.execute(
+                        "SELECT * FROM contacts WHERE pharmacy_id = ANY(%s::uuid[]) ORDER BY is_primary DESC",
+                        (pharmacy_ids,),
+                    )
+                    for c in cur.fetchall():
+                        contacts_map[str(c["pharmacy_id"])].append(c)
+
+                    cur.execute(
+                        "SELECT * FROM external_identifiers WHERE pharmacy_id = ANY(%s::uuid[]) AND is_current = true",
+                        (pharmacy_ids,),
+                    )
+                    for e in cur.fetchall():
+                        ext_ids_map[str(e["pharmacy_id"])].append(e)
+
+        def generate_ndjson():
+            for r in rows:
+                pid = str(r["id"])
+                loc = _build_fhir_location(r, contacts_map[pid], ext_ids_map[pid])
+                yield json.dumps(loc, default=str) + "\n"
+
+        ts = datetime.now(timezone.utc).strftime("%Y%m%d")
+        filename = f"npr_fhir_location_{ts}.ndjson"
+
+        return StreamingResponse(
+            generate_ndjson(),
+            media_type="application/ndjson",
+            headers={"Content-Disposition": f'attachment; filename="{filename}"'},
+        )
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.exception("FHIR ndjson export failed")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# --- Export 4. Summary/metadata ---
+
+
+@app.get(
+    "/api/export/summary",
+    dependencies=[Depends(require_tier("registry_read"))],
+)
+async def export_summary(
+    state: str | None = Query(None),
+    lga: str | None = Query(None),
+    facility_type: str | None = Query(None),
+    validation_level: str | None = Query(None),
+    source: str | None = Query(None),
+):
+    """Preview what an export would contain — counts and breakdowns without downloading data."""
+    if not db.is_available():
+        raise HTTPException(status_code=503, detail="Database unavailable")
+
+    try:
+        conditions: list[str] = []
+        params: list[Any] = []
+        if state:
+            conditions.append("pl.state ILIKE %s")
+            params.append(state)
+        if lga:
+            conditions.append("pl.lga ILIKE %s")
+            params.append(lga)
+        if facility_type:
+            conditions.append("pl.facility_type = %s::facility_type")
+            params.append(facility_type)
+        if validation_level:
+            conditions.append("pl.current_validation_level = %s::validation_level")
+            params.append(validation_level)
+        if source:
+            conditions.append("pl.primary_source = %s")
+            params.append(source)
+
+        where = (" WHERE " + " AND ".join(conditions)) if conditions else ""
+
+        with db.get_conn() as conn:
+            with conn.cursor(cursor_factory=extras.RealDictCursor) as cur:
+                cur.execute(f"SELECT count(*) FROM pharmacy_locations pl{where}", params)
+                total = cur.fetchone()["count"]
+
+                cur.execute(
+                    f"SELECT state, count(*) AS cnt FROM pharmacy_locations pl{where} GROUP BY state ORDER BY cnt DESC",
+                    params,
+                )
+                by_state = {r["state"]: r["cnt"] for r in cur.fetchall()}
+
+                cur.execute(
+                    f"SELECT facility_type::text, count(*) AS cnt FROM pharmacy_locations pl{where} GROUP BY facility_type ORDER BY cnt DESC",
+                    params,
+                )
+                by_type = {r["facility_type"]: r["cnt"] for r in cur.fetchall()}
+
+                cur.execute(
+                    f"SELECT current_validation_level::text AS lvl, count(*) AS cnt FROM pharmacy_locations pl{where} GROUP BY lvl ORDER BY lvl",
+                    params,
+                )
+                by_level = [
+                    {"level": r["lvl"], "label": _level_label(r["lvl"]), "count": r["cnt"]}
+                    for r in cur.fetchall()
+                ]
+
+        return {
+            "filters_applied": {
+                "state": state,
+                "lga": lga,
+                "facility_type": facility_type,
+                "validation_level": validation_level,
+                "source": source,
+            },
+            "total_records": total,
+            "by_state": by_state,
+            "by_facility_type": by_type,
+            "by_validation_level": by_level,
+            "available_formats": [
+                {"format": "csv", "url": "/api/export/pharmacies.csv"},
+                {"format": "json", "url": "/api/export/pharmacies.json"},
+                {"format": "fhir_ndjson", "url": "/api/export/fhir/Location.ndjson"},
+            ],
+        }
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.exception("Export summary failed")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# ---------------------------------------------------------------------------
+# Monitoring / Health endpoints (Phase 2)
+# ---------------------------------------------------------------------------
+
+
+
+@app.get(
+    "/api/health/detailed",
+    dependencies=[Depends(require_tier("admin"))],
+)
+async def health_detailed():
+    """Detailed system health — admin only.  Includes table counts, DB size, data quality."""
+    if not db.is_available():
+        raise HTTPException(status_code=503, detail="Database unavailable")
+
+    try:
+        import time
+
+        t0 = time.monotonic()
+
+        with db.get_conn() as conn:
+            with conn.cursor(cursor_factory=extras.RealDictCursor) as cur:
+                # DB connectivity
+                cur.execute("SELECT 1")
+                db_latency_ms = round((time.monotonic() - t0) * 1000, 1)
+
+                # Database size
+                cur.execute("SELECT pg_database_size(current_database()) AS db_size")
+                db_size_bytes = cur.fetchone()["db_size"]
+
+                # Table row counts
+                tables = [
+                    "pharmacy_locations",
+                    "contacts",
+                    "external_identifiers",
+                    "validation_status_history",
+                    "provenance_records",
+                    "audit_log",
+                    "operational_status_history",
+                    "verification_tasks",
+                    "raw_ingested_records",
+                ]
+                table_counts = {}
+                for t in tables:
+                    try:
+                        cur.execute(f"SELECT count(*) FROM {t}")  # noqa: S608
+                        table_counts[t] = cur.fetchone()["count"]
+                    except Exception:
+                        table_counts[t] = None
+                        conn.rollback()
+
+                # Data quality metrics
+                cur.execute("""
+                    SELECT
+                        count(*) AS total,
+                        count(*) FILTER (WHERE geolocation IS NOT NULL) AS has_geo,
+                        count(*) FILTER (WHERE address_line_1 IS NOT NULL AND address_line_1 != '') AS has_address,
+                        count(*) FILTER (WHERE current_validation_level != 'L0_mapped') AS above_l0
+                    FROM pharmacy_locations
+                """)
+                quality = cur.fetchone()
+
+                cur.execute("""
+                    SELECT count(DISTINCT pharmacy_id) AS pharmacies_with_contact
+                    FROM contacts
+                """)
+                contact_coverage = cur.fetchone()["pharmacies_with_contact"]
+
+                cur.execute("""
+                    SELECT count(DISTINCT pharmacy_id) AS pharmacies_with_ext_id
+                    FROM external_identifiers WHERE is_current = true
+                """)
+                ext_id_coverage = cur.fetchone()["pharmacies_with_ext_id"]
+
+                # Verification pipeline stats
+                cur.execute("""
+                    SELECT
+                        count(*) AS total_tasks,
+                        count(*) FILTER (WHERE status = 'pending') AS pending,
+                        count(*) FILTER (WHERE status = 'assigned') AS assigned,
+                        count(*) FILTER (WHERE status = 'completed') AS completed,
+                        count(*) FILTER (WHERE status = 'skipped') AS skipped
+                    FROM verification_tasks
+                """)
+                pipeline = cur.fetchone()
+
+        total = quality["total"] or 1  # avoid div-by-zero
+
+        uptime_seconds = (datetime.now(timezone.utc) - _SERVER_STARTED_AT).total_seconds()
+
+        return {
+            "status": "healthy",
+            "version": app.version,
+            "started_at": _iso(_SERVER_STARTED_AT),
+            "uptime_seconds": round(uptime_seconds),
+            "database": {
+                "status": "up",
+                "latency_ms": db_latency_ms,
+                "size_mb": round(db_size_bytes / (1024 * 1024), 1),
+            },
+            "table_counts": table_counts,
+            "data_quality": {
+                "total_pharmacies": quality["total"],
+                "geocoded": quality["has_geo"],
+                "geocoded_pct": round(quality["has_geo"] / total * 100, 1),
+                "has_address": quality["has_address"],
+                "has_address_pct": round(quality["has_address"] / total * 100, 1),
+                "has_contact": contact_coverage,
+                "has_contact_pct": round(contact_coverage / total * 100, 1),
+                "has_external_id": ext_id_coverage,
+                "has_external_id_pct": round(ext_id_coverage / total * 100, 1),
+                "above_l0": quality["above_l0"],
+                "above_l0_pct": round(quality["above_l0"] / total * 100, 1),
+            },
+            "verification_pipeline": {
+                "total_tasks": pipeline["total_tasks"],
+                "pending": pipeline["pending"],
+                "assigned": pipeline["assigned"],
+                "completed": pipeline["completed"],
+                "skipped": pipeline["skipped"],
+            },
+        }
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.exception("Detailed health check failed")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get(
+    "/api/health/data-quality",
+    dependencies=[Depends(require_tier("registry_read"))],
+)
+async def data_quality_report():
+    """Data quality breakdown by state — completeness metrics for each field."""
+    if not db.is_available():
+        raise HTTPException(status_code=503, detail="Database unavailable")
+
+    try:
+        with db.get_conn() as conn:
+            with conn.cursor(cursor_factory=extras.RealDictCursor) as cur:
+                cur.execute("""
+                    SELECT
+                        pl.state,
+                        count(*) AS total,
+                        count(*) FILTER (WHERE pl.geolocation IS NOT NULL) AS has_geo,
+                        count(*) FILTER (WHERE pl.address_line_1 IS NOT NULL AND pl.address_line_1 != '') AS has_address,
+                        count(*) FILTER (WHERE c.pharmacy_id IS NOT NULL) AS has_contact,
+                        count(*) FILTER (WHERE pl.current_validation_level != 'L0_mapped') AS above_l0
+                    FROM pharmacy_locations pl
+                    LEFT JOIN (
+                        SELECT DISTINCT pharmacy_id FROM contacts
+                    ) c ON c.pharmacy_id = pl.id
+                    GROUP BY pl.state
+                    ORDER BY pl.state
+                """)
+                rows = cur.fetchall()
+
+                # Overall totals
+                cur.execute("""
+                    SELECT
+                        count(*) AS total,
+                        count(*) FILTER (WHERE geolocation IS NOT NULL) AS has_geo,
+                        count(*) FILTER (WHERE address_line_1 IS NOT NULL AND address_line_1 != '') AS has_address,
+                        count(*) FILTER (WHERE current_validation_level != 'L0_mapped') AS above_l0
+                    FROM pharmacy_locations
+                """)
+                totals = cur.fetchone()
+
+        by_state = []
+        for r in rows:
+            t = r["total"] or 1
+            by_state.append({
+                "state": r["state"],
+                "total": r["total"],
+                "geocoded_pct": round(r["has_geo"] / t * 100, 1),
+                "has_address_pct": round(r["has_address"] / t * 100, 1),
+                "has_contact_pct": round(r["has_contact"] / t * 100, 1),
+                "above_l0_pct": round(r["above_l0"] / t * 100, 1),
+            })
+
+        grand_total = totals["total"] or 1
+        return {
+            "overall": {
+                "total_pharmacies": totals["total"],
+                "geocoded_pct": round(totals["has_geo"] / grand_total * 100, 1),
+                "has_address_pct": round(totals["has_address"] / grand_total * 100, 1),
+                "above_l0_pct": round(totals["above_l0"] / grand_total * 100, 1),
+            },
+            "by_state": by_state,
+        }
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.exception("Data quality report failed")
         raise HTTPException(status_code=500, detail=str(e))
