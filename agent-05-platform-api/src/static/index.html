@@ -17,10 +17,19 @@
         .header .stats { font-size: 13px; opacity: 0.9; }
         .header .stats span { background: rgba(255,255,255,0.2); padding: 3px 10px; border-radius: 12px; margin-left: 8px; }
 
-        /* Layout */
-        .container { display: flex; height: calc(100vh - 48px); }
+        /* Tab bar */
+        .tab-bar { display: flex; background: #145a32; padding: 0 24px; border-bottom: 1px solid #0d4a28; }
+        .tab-btn { padding: 9px 20px; background: none; border: none; color: rgba(255,255,255,0.65); font-size: 13px; font-weight: 500; cursor: pointer; border-bottom: 2px solid transparent; transition: color 0.15s, border-color 0.15s; }
+        .tab-btn:hover { color: white; }
+        .tab-btn.active { color: white; border-bottom-color: #4caf50; }
 
-        /* Sidebar */
+        /* Views */
+        .view-map, .view-queue { display: none; }
+        .view-map.active { display: flex; }
+        .view-queue.active { display: flex; flex-direction: column; }
+        .view-map, .view-queue { height: calc(100vh - 48px - 37px); }
+
+        /* ============ MAP VIEW (existing styles preserved) ============ */
         .sidebar { width: 420px; min-width: 420px; display: flex; flex-direction: column; background: white; border-right: 1px solid #ddd; }
         .filters { padding: 12px; border-bottom: 1px solid #eee; display: flex; flex-direction: column; gap: 8px; }
         .filter-row { display: flex; gap: 8px; }
@@ -30,14 +39,13 @@
         }
         .filter-row input { flex: 2; }
 
-        /* Table */
         .table-wrap { flex: 1; overflow-y: auto; }
         table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
         thead { position: sticky; top: 0; background: #f8f8f8; z-index: 1; }
         th { text-align: left; padding: 8px 10px; font-weight: 600; border-bottom: 2px solid #ddd; color: #555; }
         td { padding: 7px 10px; border-bottom: 1px solid #eee; }
         tr:hover { background: #f0f7f2; cursor: pointer; }
-        .badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 500; }
+        .badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 500; white-space: nowrap; }
         .badge-pharmacy { background: #e3f2fd; color: #1565c0; }
         .badge-ppmv { background: #fff3e0; color: #e65100; }
         .badge-hospital { background: #f3e5f5; color: #7b1fa2; }
@@ -45,21 +53,148 @@
         .badge-grid3 { background: #fff8e1; color: #f57f17; }
         .badge-google { background: #e8f5e9; color: #1b5e20; }
         .row-count { padding: 8px 12px; font-size: 12px; color: #888; border-top: 1px solid #eee; }
-
-        /* Map */
         .map-wrap { flex: 1; position: relative; }
         #map { width: 100%; height: 100%; }
-
-        /* Popup */
         .popup-title { font-weight: 600; font-size: 14px; margin-bottom: 6px; }
         .popup-row { font-size: 12px; margin: 2px 0; color: #555; }
         .popup-row strong { color: #333; }
-
-        /* Loading */
         .loading { display: flex; align-items: center; justify-content: center; height: 100%; color: #888; font-size: 14px; }
+
+        /* ============ QUEUE VIEW ============ */
+
+        /* Auth bar */
+        .queue-auth-bar { display: flex; align-items: center; gap: 12px; padding: 8px 16px; background: #fff8e1; border-bottom: 1px solid #ffe082; font-size: 13px; flex-shrink: 0; }
+        .auth-status { display: flex; align-items: center; gap: 6px; }
+        .auth-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; }
+        .auth-dot-off { background: #bdbdbd; }
+        .auth-dot-on { background: #43a047; }
+        .auth-dot-err { background: #e53935; }
+        .auth-form { display: flex; gap: 8px; }
+        .auth-form input { width: 280px; padding: 6px 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 13px; font-family: monospace; }
+        .auth-form input.auth-err { border-color: #e53935; }
+        .auth-msg { font-size: 12px; }
+        .auth-msg-err { color: #c62828; }
+        .auth-msg-ok { color: #2e7d32; }
+        .btn { padding: 6px 14px; border: none; border-radius: 6px; font-size: 13px; font-weight: 500; cursor: pointer; transition: background 0.15s; }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .btn-primary { background: #1a6b3c; color: white; }
+        .btn-primary:hover:not(:disabled) { background: #145a32; }
+        .btn-success { background: #2e7d32; color: white; }
+        .btn-success:hover:not(:disabled) { background: #1b5e20; }
+        .btn-danger { background: #c62828; color: white; }
+        .btn-danger:hover:not(:disabled) { background: #b71c1c; }
+        .btn-secondary { background: #e0e0e0; color: #333; }
+        .btn-secondary:hover:not(:disabled) { background: #bdbdbd; }
+        .btn-sm { padding: 4px 10px; font-size: 12px; }
+
+        /* Stats cards */
+        .queue-stats { display: flex; gap: 10px; padding: 12px 16px; background: #f8f8f8; border-bottom: 1px solid #eee; flex-shrink: 0; flex-wrap: wrap; }
+        .stat-card { flex: 1; min-width: 90px; padding: 10px 12px; background: white; border-radius: 8px; border: 1px solid #e0e0e0; text-align: center; }
+        .stat-value { font-size: 22px; font-weight: 700; color: #1a6b3c; }
+        .stat-label { font-size: 10px; color: #888; margin-top: 2px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .stat-pending .stat-value { color: #f57f17; }
+        .stat-assigned .stat-value { color: #1565c0; }
+        .stat-completed .stat-value { color: #2e7d32; }
+        .stat-skipped .stat-value { color: #757575; }
+        .stat-overdue .stat-value { color: #c62828; }
+
+        /* Queue body: sidebar + detail */
+        .queue-body { display: flex; flex: 1; overflow: hidden; }
+        .queue-sidebar { width: 480px; min-width: 480px; display: flex; flex-direction: column; background: white; border-right: 1px solid #ddd; }
+        .queue-detail { flex: 1; overflow-y: auto; padding: 20px; background: #fafafa; }
+        .detail-placeholder { display: flex; align-items: center; justify-content: center; height: 100%; color: #aaa; font-size: 14px; }
+
+        /* Queue filters */
+        .q-filters { padding: 10px 12px; border-bottom: 1px solid #eee; display: flex; flex-direction: column; gap: 6px; }
+        .q-filter-row { display: flex; gap: 6px; }
+        .q-filter-row select { flex: 1; padding: 6px 8px; border: 1px solid #ccc; border-radius: 6px; font-size: 12px; background: white; }
+
+        /* Queue table */
+        #queue-table { font-size: 12px; }
+        #queue-table th { padding: 7px 8px; font-size: 11px; }
+        #queue-table td { padding: 6px 8px; }
+        #queue-table td:first-child { max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        tr.selected { background: #e8f5e9 !important; }
+        tr.task-mine { background: #f0f7ff; }
+        tr.task-overdue td:first-child { border-left: 3px solid #c62828; }
+
+        /* Status + level badges */
+        .badge-pending { background: #fff3e0; color: #e65100; }
+        .badge-assigned { background: #e3f2fd; color: #1565c0; }
+        .badge-in_progress { background: #e3f2fd; color: #0d47a1; }
+        .badge-completed { background: #e8f5e9; color: #2e7d32; }
+        .badge-failed { background: #ffebee; color: #c62828; }
+        .badge-skipped { background: #f5f5f5; color: #757575; }
+        .badge-L1 { background: #e8f5e9; color: #2e7d32; }
+        .badge-L2 { background: #e3f2fd; color: #1565c0; }
+        .badge-L3 { background: #f3e5f5; color: #7b1fa2; }
+        .badge-L4 { background: #fff8e1; color: #f57f17; }
+        .priority-1 { color: #c62828; font-weight: 700; }
+        .priority-2 { color: #e65100; font-weight: 600; }
+        .priority-3 { color: #555; }
+        .priority-4 { color: #999; }
+        .priority-5 { color: #bbb; }
+
+        /* Pagination */
+        .queue-pagination { display: flex; align-items: center; justify-content: center; gap: 12px; padding: 8px 12px; border-top: 1px solid #eee; font-size: 12px; color: #666; flex-shrink: 0; }
+
+        /* Task detail */
+        .td-header { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+        .td-header h3 { font-size: 17px; font-weight: 600; margin: 0; color: #1a6b3c; }
+        .td-meta { margin-bottom: 16px; background: white; border-radius: 8px; border: 1px solid #e0e0e0; overflow: hidden; }
+        .td-row { display: flex; font-size: 13px; padding: 7px 12px; border-bottom: 1px solid #f0f0f0; }
+        .td-row:last-child { border-bottom: none; }
+        .td-row strong { width: 130px; flex-shrink: 0; color: #555; }
+        .td-actions { display: flex; gap: 8px; margin-bottom: 16px; }
+        .td-result { margin-top: 16px; }
+        .td-result-title { font-size: 13px; font-weight: 600; color: #555; margin-bottom: 6px; }
+        .td-result pre { background: #f5f5f5; padding: 10px; border-radius: 6px; font-size: 11px; overflow-x: auto; max-height: 200px; border: 1px solid #e0e0e0; }
+
+        /* Evidence / Skip forms */
+        .evidence-form { margin-top: 16px; padding: 16px; background: white; border: 1px solid #ddd; border-radius: 8px; }
+        .evidence-form h4 { margin: 0 0 14px 0; font-size: 14px; color: #1a6b3c; border-bottom: 1px solid #eee; padding-bottom: 8px; }
+        .evidence-form label { display: block; font-size: 12px; font-weight: 600; color: #555; margin: 10px 0 4px; }
+        .evidence-form input[type="text"],
+        .evidence-form input[type="number"],
+        .evidence-form select,
+        .evidence-form textarea { width: 100%; padding: 7px 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 13px; font-family: inherit; }
+        .evidence-form textarea { resize: vertical; }
+        .evidence-form input:focus, .evidence-form select:focus, .evidence-form textarea:focus { outline: none; border-color: #1a6b3c; box-shadow: 0 0 0 2px rgba(26,107,60,0.1); }
+        .form-row-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .checkbox-label { display: flex; align-items: center; gap: 6px; font-weight: 400 !important; cursor: pointer; margin-top: 8px !important; }
+        .checkbox-label input[type="checkbox"] { width: auto; }
+        .form-actions { display: flex; gap: 8px; margin-top: 16px; padding-top: 12px; border-top: 1px solid #eee; }
+
+        /* Toast */
+        .toast { position: fixed; top: 60px; right: 20px; padding: 10px 16px; border-radius: 8px; font-size: 13px; z-index: 9999; animation: toastIn 0.25s ease; max-width: 420px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+        .toast-success { background: #e8f5e9; color: #1b5e20; border: 1px solid #a5d6a7; }
+        .toast-error { background: #ffebee; color: #b71c1c; border: 1px solid #ef9a9a; }
+        @keyframes toastIn { from { transform: translateY(-20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+        /* Mobile */
+        @media (max-width: 768px) {
+            .header { padding: 10px 14px; }
+            .header h1 { font-size: 15px; }
+            .header .stats { display: none; }
+            .tab-bar { padding: 0 12px; }
+            .view-map { flex-direction: column; }
+            .sidebar { width: 100%; min-width: 100%; max-height: 45vh; }
+            .map-wrap { flex: 1; min-height: 40vh; }
+            .queue-body { flex-direction: column; }
+            .queue-sidebar { width: 100%; min-width: 100%; max-height: 50vh; }
+            .queue-detail { min-height: 40vh; }
+            .queue-stats { gap: 6px; padding: 8px 12px; }
+            .stat-card { min-width: 70px; padding: 8px 6px; }
+            .stat-value { font-size: 18px; }
+            .stat-label { font-size: 9px; }
+            .auth-form input { width: 160px; }
+            .form-row-2col { grid-template-columns: 1fr; }
+            .queue-auth-bar { flex-wrap: wrap; }
+        }
     </style>
 </head>
 <body>
+    <!-- Header -->
     <div class="header">
         <h1>Nigeria Pharmacy Registry</h1>
         <div class="stats">
@@ -68,7 +203,15 @@
             <span id="stat-sources"></span>
         </div>
     </div>
-    <div class="container">
+
+    <!-- Tab bar -->
+    <div class="tab-bar">
+        <button class="tab-btn active" data-view="map">Map</button>
+        <button class="tab-btn" data-view="queue">Verification Queue</button>
+    </div>
+
+    <!-- ============ MAP VIEW (preserved) ============ -->
+    <div class="view-map active">
         <div class="sidebar">
             <div class="filters">
                 <div class="filter-row">
@@ -92,17 +235,8 @@
             </div>
             <div class="table-wrap">
                 <table>
-                    <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th>Type</th>
-                            <th>State</th>
-                            <th>Source</th>
-                        </tr>
-                    </thead>
-                    <tbody id="table-body">
-                        <tr><td colspan="4" class="loading">Loading...</td></tr>
-                    </tbody>
+                    <thead><tr><th>Name</th><th>Type</th><th>State</th><th>Source</th></tr></thead>
+                    <tbody id="table-body"><tr><td colspan="4" class="loading">Loading...</td></tr></tbody>
                 </table>
             </div>
             <div class="row-count" id="row-count"></div>
@@ -112,173 +246,774 @@
         </div>
     </div>
 
+    <!-- ============ QUEUE VIEW ============ -->
+    <div class="view-queue">
+        <!-- Auth bar -->
+        <div class="queue-auth-bar">
+            <div class="auth-status" id="auth-status">
+                <span class="auth-dot auth-dot-off" id="auth-dot"></span>
+                <span id="auth-label">Not connected</span>
+            </div>
+            <div class="auth-form" id="auth-form">
+                <input type="password" id="api-key-input" placeholder="Enter API key (npr_...)" autocomplete="off" />
+                <button class="btn btn-primary" id="auth-connect-btn">Connect</button>
+            </div>
+            <button class="btn btn-secondary btn-sm" id="auth-disconnect-btn" style="display:none;">Disconnect</button>
+            <span class="auth-msg" id="auth-msg"></span>
+        </div>
+
+        <!-- Stats cards -->
+        <div class="queue-stats" id="queue-stats">
+            <div class="stat-card"><div class="stat-value" id="qs-total">--</div><div class="stat-label">Total</div></div>
+            <div class="stat-card stat-pending"><div class="stat-value" id="qs-pending">--</div><div class="stat-label">Pending</div></div>
+            <div class="stat-card stat-assigned"><div class="stat-value" id="qs-assigned">--</div><div class="stat-label">Assigned</div></div>
+            <div class="stat-card stat-completed"><div class="stat-value" id="qs-completed">--</div><div class="stat-label">Completed</div></div>
+            <div class="stat-card stat-skipped"><div class="stat-value" id="qs-skipped">--</div><div class="stat-label">Skipped</div></div>
+            <div class="stat-card stat-overdue"><div class="stat-value" id="qs-overdue">--</div><div class="stat-label">Overdue</div></div>
+        </div>
+
+        <!-- Queue body -->
+        <div class="queue-body">
+            <!-- Task list sidebar -->
+            <div class="queue-sidebar">
+                <div class="q-filters">
+                    <div class="q-filter-row">
+                        <select id="qf-status">
+                            <option value="">All statuses</option>
+                            <option value="pending" selected>Pending</option>
+                            <option value="assigned">Assigned</option>
+                            <option value="in_progress">In Progress</option>
+                            <option value="completed">Completed</option>
+                            <option value="skipped">Skipped</option>
+                            <option value="failed">Failed</option>
+                        </select>
+                        <select id="qf-level">
+                            <option value="">All levels</option>
+                            <option value="L1_contact_confirmed">L1 Contact</option>
+                            <option value="L2_evidence_documented">L2 Evidence</option>
+                            <option value="L3_regulator_verified">L3 Regulator</option>
+                            <option value="L4_high_assurance">L4 High Assurance</option>
+                        </select>
+                    </div>
+                    <div class="q-filter-row">
+                        <select id="qf-state"><option value="">All states</option></select>
+                        <select id="qf-priority">
+                            <option value="">All priorities</option>
+                            <option value="1">P1 Urgent</option>
+                            <option value="2">P2 High</option>
+                            <option value="3">P3 Normal</option>
+                            <option value="4">P4 Low</option>
+                            <option value="5">P5 Routine</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="table-wrap">
+                    <table id="queue-table">
+                        <thead><tr><th>Pharmacy</th><th>State</th><th>Target</th><th>Status</th><th>Pri</th></tr></thead>
+                        <tbody id="queue-table-body"><tr><td colspan="5" style="text-align:center;padding:40px;color:#aaa;">Connect with an API key to view the queue</td></tr></tbody>
+                    </table>
+                </div>
+                <div class="queue-pagination" id="queue-pagination">
+                    <button class="btn btn-secondary btn-sm" id="qp-prev" disabled>&laquo; Prev</button>
+                    <span id="qp-info">--</span>
+                    <button class="btn btn-secondary btn-sm" id="qp-next" disabled>Next &raquo;</button>
+                </div>
+            </div>
+
+            <!-- Task detail panel -->
+            <div class="queue-detail" id="queue-detail">
+                <div class="detail-placeholder">Select a task from the list</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast container -->
+    <div id="toast-container"></div>
+
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
     <script>
-    (function () {
-        // --- Map setup ---
-        const map = L.map("map").setView([9.05, 7.49], 6);  // Nigeria center
+    /* ================================================================
+       MAP VIEW — original code, minimally refactored to expose map
+       ================================================================ */
+    var MapView = (function () {
+        var map = L.map("map").setView([9.05, 7.49], 6);
         L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-            attribution: '&copy; OpenStreetMap contributors',
-            maxZoom: 19,
+            attribution: '&copy; OpenStreetMap contributors', maxZoom: 19,
         }).addTo(map);
 
-        const markers = L.markerClusterGroup({ maxClusterRadius: 40, spiderfyOnMaxZoom: true });
+        var markers = L.markerClusterGroup({ maxClusterRadius: 40, spiderfyOnMaxZoom: true });
         map.addLayer(markers);
 
-        // Source colors
-        const sourceColors = {
-            "src-osm-pharmacy": "#2196f3",
-            "src-grid3-health": "#ff9800",
-            "src-google-places": "#4caf50",
-        };
+        var sourceColors = { "src-osm-pharmacy": "#2196f3", "src-grid3-health": "#ff9800", "src-google-places": "#4caf50" };
 
         function makeIcon(sourceId) {
-            const color = sourceColors[sourceId] || "#666";
+            var color = sourceColors[sourceId] || "#666";
             return L.divIcon({
                 className: "",
-                html: `<div style="
-                    width:10px;height:10px;border-radius:50%;
-                    background:${color};border:2px solid white;
-                    box-shadow:0 1px 3px rgba(0,0,0,0.4);
-                "></div>`,
-                iconSize: [14, 14],
-                iconAnchor: [7, 7],
+                html: '<div style="width:10px;height:10px;border-radius:50%;background:' + color + ';border:2px solid white;box-shadow:0 1px 3px rgba(0,0,0,0.4);"></div>',
+                iconSize: [14, 14], iconAnchor: [7, 7],
             });
         }
 
-        // --- State ---
-        let allData = [];
-        let filteredData = [];
-        let markerMap = {};  // pharmacy_id -> marker
+        var allData = [], filteredData = [], markerMap = {};
 
-        // --- Load stats ---
-        fetch("/api/stats").then(r => r.json()).then(stats => {
+        fetch("/api/stats").then(function(r) { return r.json(); }).then(function(stats) {
             document.getElementById("stat-total").textContent = stats.total.toLocaleString() + " pharmacies";
             document.getElementById("stat-states").textContent = stats.states_covered + " states";
-            const srcParts = Object.entries(stats.by_source).map(([k, v]) => {
-                const label = k.replace("src-", "").replace("-pharmacy", "").replace("-health", "").toUpperCase();
-                return label + ": " + v;
+            var srcParts = Object.entries(stats.by_source).map(function(e) {
+                return e[0].replace("src-","").replace("-pharmacy","").replace("-health","").toUpperCase() + ": " + e[1];
             });
             document.getElementById("stat-sources").textContent = srcParts.join(" | ");
-
-            // Populate state dropdown
-            const stateSelect = document.getElementById("filter-state");
-            Object.keys(stats.by_state).sort().forEach(state => {
-                const opt = document.createElement("option");
-                opt.value = state;
-                opt.textContent = state + " (" + stats.by_state[state] + ")";
+            var stateSelect = document.getElementById("filter-state");
+            Object.keys(stats.by_state).sort().forEach(function(state) {
+                var opt = document.createElement("option");
+                opt.value = state; opt.textContent = state + " (" + stats.by_state[state] + ")";
                 stateSelect.appendChild(opt);
             });
         });
 
-        // --- Load all data ---
-        fetch("/api/pharmacies?limit=8000").then(r => r.json()).then(result => {
-            allData = result.data;
-            applyFilters();
+        fetch("/api/pharmacies?limit=8000").then(function(r) { return r.json(); }).then(function(result) {
+            allData = result.data; applyFilters();
         });
 
-        // --- Filters ---
-        const filterSearch = document.getElementById("filter-search");
-        const filterState = document.getElementById("filter-state");
-        const filterType = document.getElementById("filter-type");
-        const filterSource = document.getElementById("filter-source");
-
-        let debounceTimer;
-        filterSearch.addEventListener("input", () => {
-            clearTimeout(debounceTimer);
-            debounceTimer = setTimeout(applyFilters, 200);
-        });
+        var filterSearch = document.getElementById("filter-search");
+        var filterState = document.getElementById("filter-state");
+        var filterType = document.getElementById("filter-type");
+        var filterSource = document.getElementById("filter-source");
+        var debounceTimer;
+        filterSearch.addEventListener("input", function() { clearTimeout(debounceTimer); debounceTimer = setTimeout(applyFilters, 200); });
         filterState.addEventListener("change", applyFilters);
         filterType.addEventListener("change", applyFilters);
         filterSource.addEventListener("change", applyFilters);
 
         function applyFilters() {
-            const q = filterSearch.value.toLowerCase();
-            const state = filterState.value;
-            const type = filterType.value;
-            const source = filterSource.value;
-
-            filteredData = allData.filter(r => {
+            var q = filterSearch.value.toLowerCase();
+            var state = filterState.value, type = filterType.value, source = filterSource.value;
+            filteredData = allData.filter(function(r) {
                 if (q && !(r.facility_name || "").toLowerCase().includes(q)) return false;
                 if (state && r.state !== state) return false;
                 if (type && r.facility_type !== type) return false;
                 if (source && r.source_id !== source) return false;
                 return true;
             });
-
-            renderTable();
-            renderMarkers();
+            renderTable(); renderMarkers();
         }
 
         function renderTable() {
-            const tbody = document.getElementById("table-body");
-            const rows = filteredData.slice(0, 500);  // cap for DOM performance
-
-            tbody.innerHTML = rows.map(r => `
-                <tr data-id="${r.pharmacy_id}">
-                    <td>${esc(r.facility_name || "Unnamed")}</td>
-                    <td><span class="badge badge-${typeBadge(r.facility_type)}">${esc(r.facility_type || "?")}</span></td>
-                    <td>${esc(r.state || "?")}</td>
-                    <td><span class="badge badge-${sourceBadge(r.source_id)}">${sourceLabel(r.source_id)}</span></td>
-                </tr>
-            `).join("");
-
-            // Click handler
-            tbody.querySelectorAll("tr").forEach(tr => {
-                tr.addEventListener("click", () => {
-                    const id = tr.dataset.id;
-                    const m = markerMap[id];
-                    if (m) {
-                        markers.zoomToShowLayer(m, () => m.openPopup());
-                    }
+            var tbody = document.getElementById("table-body");
+            var rows = filteredData.slice(0, 500);
+            tbody.innerHTML = rows.map(function(r) {
+                return '<tr data-id="' + r.pharmacy_id + '"><td>' + esc(r.facility_name || "Unnamed") + '</td><td><span class="badge badge-' + typeBadge(r.facility_type) + '">' + esc(r.facility_type || "?") + '</span></td><td>' + esc(r.state || "?") + '</td><td><span class="badge badge-' + sourceBadge(r.source_id) + '">' + sourceLabel(r.source_id) + '</span></td></tr>';
+            }).join("");
+            tbody.querySelectorAll("tr").forEach(function(tr) {
+                tr.addEventListener("click", function() {
+                    var m = markerMap[tr.dataset.id];
+                    if (m) markers.zoomToShowLayer(m, function() { m.openPopup(); });
                 });
             });
-
-            document.getElementById("row-count").textContent =
-                filteredData.length.toLocaleString() + " records" +
-                (filteredData.length > 500 ? " (showing first 500 in table)" : "");
+            document.getElementById("row-count").textContent = filteredData.length.toLocaleString() + " records" + (filteredData.length > 500 ? " (showing first 500 in table)" : "");
         }
 
         function renderMarkers() {
-            markers.clearLayers();
-            markerMap = {};
-
-            filteredData.forEach(r => {
+            markers.clearLayers(); markerMap = {};
+            filteredData.forEach(function(r) {
                 if (r.latitude == null || r.longitude == null) return;
-                const m = L.marker([r.latitude, r.longitude], { icon: makeIcon(r.source_id) });
-                m.bindPopup(makePopup(r));
-                markers.addLayer(m);
-                markerMap[r.pharmacy_id] = m;
+                var m = L.marker([r.latitude, r.longitude], { icon: makeIcon(r.source_id) });
+                m.bindPopup(makePopup(r)); markers.addLayer(m); markerMap[r.pharmacy_id] = m;
             });
         }
 
         function makePopup(r) {
-            const lines = [
-                `<div class="popup-title">${esc(r.facility_name || "Unnamed")}</div>`,
-                row("Type", r.facility_type),
-                row("State", r.state),
-                row("LGA", r.lga),
-                row("Address", r.address_line),
-                row("Phone", r.phone),
-                row("Source", sourceLabel(r.source_id)),
-                row("Status", r.operational_status),
-                row("Validation", r.validation_label),
-                row("Coordinates", r.latitude?.toFixed(5) + ", " + r.longitude?.toFixed(5)),
-            ];
-            return lines.filter(Boolean).join("");
+            return '<div class="popup-title">' + esc(r.facility_name || "Unnamed") + '</div>' +
+                popRow("Type", r.facility_type) + popRow("State", r.state) + popRow("LGA", r.lga) +
+                popRow("Address", r.address_line) + popRow("Phone", r.phone) +
+                popRow("Source", sourceLabel(r.source_id)) + popRow("Status", r.operational_status) +
+                popRow("Validation", r.validation_label) +
+                popRow("Coords", r.latitude != null ? r.latitude.toFixed(5) + ", " + r.longitude.toFixed(5) : null);
         }
-
-        function row(label, val) {
-            if (!val || val === "unknown" || val === "null") return "";
-            return `<div class="popup-row"><strong>${label}:</strong> ${esc(String(val))}</div>`;
-        }
-
-        // --- Helpers ---
-        function esc(s) { const d = document.createElement("div"); d.textContent = s; return d.innerHTML; }
+        function popRow(label, val) { return (!val || val === "unknown") ? "" : '<div class="popup-row"><strong>' + label + ':</strong> ' + esc(String(val)) + '</div>'; }
+        function esc(s) { var d = document.createElement("div"); d.textContent = s; return d.innerHTML; }
         function typeBadge(t) { return t === "ppmv" ? "ppmv" : t === "hospital_pharmacy" ? "hospital" : "pharmacy"; }
         function sourceBadge(s) { return s === "src-osm-pharmacy" ? "osm" : s === "src-grid3-health" ? "grid3" : s === "src-google-places" ? "google" : "osm"; }
         function sourceLabel(s) { return s === "src-osm-pharmacy" ? "OSM" : s === "src-grid3-health" ? "GRID3" : s === "src-google-places" ? "Google" : s || "?"; }
+
+        return { invalidateSize: function() { map.invalidateSize(); } };
+    })();
+
+    /* ================================================================
+       TAB SWITCHING
+       ================================================================ */
+    (function() {
+        var tabBtns = document.querySelectorAll(".tab-btn");
+        tabBtns.forEach(function(btn) {
+            btn.addEventListener("click", function() {
+                tabBtns.forEach(function(b) { b.classList.remove("active"); });
+                btn.classList.add("active");
+                var view = btn.dataset.view;
+                document.querySelectorAll(".view-map, .view-queue").forEach(function(v) { v.classList.remove("active"); });
+                document.querySelector(".view-" + view).classList.add("active");
+                if (view === "map") {
+                    setTimeout(function() { MapView.invalidateSize(); }, 50);
+                } else if (view === "queue") {
+                    Queue.init();
+                }
+            });
+        });
+    })();
+
+    /* ================================================================
+       QUEUE MODULE
+       ================================================================ */
+    var Queue = (function() {
+        // --- Helpers ---
+        function esc(s) { var d = document.createElement("div"); d.textContent = s || ""; return d.innerHTML; }
+
+        function toast(msg, type) {
+            var el = document.createElement("div");
+            el.className = "toast toast-" + (type || "success");
+            el.textContent = msg;
+            document.getElementById("toast-container").appendChild(el);
+            setTimeout(function() { el.remove(); }, 4500);
+        }
+
+        function formatDate(iso) {
+            if (!iso) return "--";
+            var d = new Date(iso);
+            return d.toLocaleDateString() + " " + d.toLocaleTimeString([], {hour:"2-digit",minute:"2-digit"});
+        }
+
+        function levelBadge(lvl) {
+            if (!lvl) return "";
+            if (lvl.indexOf("L1") !== -1) return "L1";
+            if (lvl.indexOf("L2") !== -1) return "L2";
+            if (lvl.indexOf("L3") !== -1) return "L3";
+            if (lvl.indexOf("L4") !== -1) return "L4";
+            return "";
+        }
+
+        function levelShort(lvl) {
+            if (!lvl) return "?";
+            if (lvl.indexOf("L1") !== -1) return "L1";
+            if (lvl.indexOf("L2") !== -1) return "L2";
+            if (lvl.indexOf("L3") !== -1) return "L3";
+            if (lvl.indexOf("L4") !== -1) return "L4";
+            return "?";
+        }
+
+        // --- State ---
+        var authState = { key: null, actorId: null, connected: false, tier: null };
+        var qState = { offset: 0, limit: 50, total: 0, tasks: [], selectedId: null, selectedTask: null, initialized: false };
+
+        // --- API ---
+        function apiFetch(url, opts) {
+            opts = opts || {};
+            var headers = opts.headers || {};
+            headers["Content-Type"] = "application/json";
+            if (authState.key) headers["X-API-Key"] = authState.key;
+            opts.headers = headers;
+            return fetch(url, opts).then(function(r) {
+                if (!r.ok) return r.json().then(function(e) { var err = new Error(e.detail || "Request failed"); err.status = r.status; throw err; });
+                return r.json();
+            });
+        }
+
+        // --- Auth ---
+        function connect() {
+            var input = document.getElementById("api-key-input");
+            var key = input.value.trim();
+            if (!key) { showAuthMsg("Enter an API key", true); return; }
+
+            var btn = document.getElementById("auth-connect-btn");
+            btn.disabled = true; btn.textContent = "Connecting...";
+
+            // Test key against stats endpoint
+            var testHeaders = { "Content-Type": "application/json", "X-API-Key": key };
+            fetch("/api/queue/stats", { headers: testHeaders }).then(function(r) {
+                if (r.ok) return r.json();
+                if (r.status === 401) throw new Error("Invalid API key");
+                if (r.status === 403) throw new Error("Insufficient permissions (need registry_read or higher)");
+                throw new Error("Connection failed (HTTP " + r.status + ")");
+            }).then(function(data) {
+                authState.key = key;
+                authState.connected = true;
+                document.getElementById("auth-dot").className = "auth-dot auth-dot-on";
+                document.getElementById("auth-label").textContent = "Connected";
+                document.getElementById("auth-form").style.display = "none";
+                document.getElementById("auth-disconnect-btn").style.display = "";
+                showAuthMsg("", false);
+                // Determine write capability by trying claim tier
+                // We'll discover it from actions
+                renderStats(data);
+                populateStateFilter(data);
+                loadQueue();
+            }).catch(function(err) {
+                showAuthMsg(err.message, true);
+                input.classList.add("auth-err");
+                setTimeout(function() { input.classList.remove("auth-err"); }, 2000);
+            }).finally(function() {
+                btn.disabled = false; btn.textContent = "Connect";
+            });
+        }
+
+        function disconnect() {
+            authState = { key: null, actorId: null, connected: false, tier: null };
+            document.getElementById("auth-dot").className = "auth-dot auth-dot-off";
+            document.getElementById("auth-label").textContent = "Not connected";
+            document.getElementById("auth-form").style.display = "";
+            document.getElementById("auth-disconnect-btn").style.display = "none";
+            document.getElementById("api-key-input").value = "";
+            showAuthMsg("", false);
+            resetStats();
+            document.getElementById("queue-table-body").innerHTML = '<tr><td colspan="5" style="text-align:center;padding:40px;color:#aaa;">Connect with an API key to view the queue</td></tr>';
+            document.getElementById("queue-detail").innerHTML = '<div class="detail-placeholder">Select a task from the list</div>';
+            document.getElementById("qp-info").textContent = "--";
+            document.getElementById("qp-prev").disabled = true;
+            document.getElementById("qp-next").disabled = true;
+        }
+
+        function showAuthMsg(msg, isError) {
+            var el = document.getElementById("auth-msg");
+            el.textContent = msg;
+            el.className = "auth-msg" + (isError ? " auth-msg-err" : " auth-msg-ok");
+        }
+
+        // --- Stats ---
+        function loadStats() {
+            apiFetch("/api/queue/stats").then(function(data) {
+                renderStats(data);
+            }).catch(function() {});
+        }
+
+        function renderStats(data) {
+            document.getElementById("qs-total").textContent = (data.total_tasks || 0).toLocaleString();
+            document.getElementById("qs-pending").textContent = (data.by_status && data.by_status.pending || 0).toLocaleString();
+            document.getElementById("qs-assigned").textContent = ((data.by_status && data.by_status.assigned || 0) + (data.by_status && data.by_status.in_progress || 0)).toLocaleString();
+            document.getElementById("qs-completed").textContent = (data.by_status && data.by_status.completed || 0).toLocaleString();
+            document.getElementById("qs-skipped").textContent = (data.by_status && data.by_status.skipped || 0).toLocaleString();
+            document.getElementById("qs-overdue").textContent = (data.overdue_count || 0).toLocaleString();
+        }
+
+        function resetStats() {
+            ["qs-total","qs-pending","qs-assigned","qs-completed","qs-skipped","qs-overdue"].forEach(function(id) {
+                document.getElementById(id).textContent = "--";
+            });
+        }
+
+        function populateStateFilter(statsData) {
+            var sel = document.getElementById("qf-state");
+            // Clear existing options beyond first
+            while (sel.options.length > 1) sel.remove(1);
+            if (statsData.by_state) {
+                Object.keys(statsData.by_state).sort().forEach(function(state) {
+                    var opt = document.createElement("option");
+                    opt.value = state;
+                    var cnt = 0;
+                    Object.values(statsData.by_state[state]).forEach(function(v) { cnt += v; });
+                    opt.textContent = state + " (" + cnt + ")";
+                    sel.appendChild(opt);
+                });
+            }
+        }
+
+        // --- Queue List ---
+        function loadQueue() {
+            if (!authState.connected) return;
+            var params = new URLSearchParams();
+            params.set("limit", qState.limit);
+            params.set("offset", qState.offset);
+            var status = document.getElementById("qf-status").value;
+            var level = document.getElementById("qf-level").value;
+            var state = document.getElementById("qf-state").value;
+            var priority = document.getElementById("qf-priority").value;
+            if (status) params.set("status", status);
+            if (level) params.set("target_level", level);
+            if (state) params.set("state", state);
+            if (priority) params.set("priority", priority);
+
+            apiFetch("/api/queue?" + params.toString()).then(function(data) {
+                qState.total = data.meta.total;
+                qState.tasks = data.data;
+                renderQueueTable(data.data);
+                renderPagination();
+            }).catch(function(err) {
+                toast("Failed to load queue: " + err.message, "error");
+            });
+        }
+
+        function renderQueueTable(tasks) {
+            var tbody = document.getElementById("queue-table-body");
+            if (!tasks.length) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:40px;color:#aaa;">No tasks found</td></tr>';
+                return;
+            }
+            tbody.innerHTML = tasks.map(function(t) {
+                var mine = authState.actorId && t.assigned_to === authState.actorId;
+                var overdue = t.due_date && t.status !== "completed" && t.status !== "skipped" && t.status !== "failed" && new Date(t.due_date) < new Date();
+                var cls = [];
+                if (mine) cls.push("task-mine");
+                if (overdue) cls.push("task-overdue");
+                if (qState.selectedId === t.id) cls.push("selected");
+                return '<tr data-id="' + t.id + '" class="' + cls.join(" ") + '">' +
+                    '<td title="' + esc(t.pharmacy_name) + '">' + esc(t.pharmacy_name || "?") + '</td>' +
+                    '<td>' + esc(t.pharmacy_state || "?") + '</td>' +
+                    '<td><span class="badge badge-' + levelBadge(t.target_level) + '">' + levelShort(t.target_level) + '</span></td>' +
+                    '<td><span class="badge badge-' + t.status + '">' + esc(t.status) + '</span></td>' +
+                    '<td class="priority-' + t.priority + '">P' + t.priority + '</td>' +
+                    '</tr>';
+            }).join("");
+
+            tbody.querySelectorAll("tr").forEach(function(tr) {
+                tr.addEventListener("click", function() {
+                    selectTask(tr.dataset.id);
+                    tbody.querySelectorAll("tr").forEach(function(r) { r.classList.remove("selected"); });
+                    tr.classList.add("selected");
+                });
+            });
+        }
+
+        function renderPagination() {
+            var start = qState.total === 0 ? 0 : qState.offset + 1;
+            var end = Math.min(qState.offset + qState.limit, qState.total);
+            document.getElementById("qp-info").textContent = start + "-" + end + " of " + qState.total.toLocaleString();
+            document.getElementById("qp-prev").disabled = qState.offset === 0;
+            document.getElementById("qp-next").disabled = qState.offset + qState.limit >= qState.total;
+        }
+
+        // --- Task Detail ---
+        function selectTask(taskId) {
+            qState.selectedId = taskId;
+            apiFetch("/api/queue/" + taskId).then(function(res) {
+                qState.selectedTask = res.data;
+                renderTaskDetail(res.data);
+            }).catch(function(err) {
+                toast("Failed to load task: " + err.message, "error");
+            });
+        }
+
+        function renderTaskDetail(task) {
+            var panel = document.getElementById("queue-detail");
+            var isMine = authState.actorId && task.assigned_to === authState.actorId;
+            var isPending = task.status === "pending";
+            var isActive = task.status === "assigned" || task.status === "in_progress";
+            var isTerminal = task.status === "completed" || task.status === "skipped" || task.status === "failed";
+
+            var html = '<div class="td-header"><h3>' + esc(task.pharmacy_name || "Unknown Pharmacy") + '</h3>' +
+                '<span class="badge badge-' + (task.pharmacy_facility_type === "ppmv" ? "ppmv" : task.pharmacy_facility_type === "hospital_pharmacy" ? "hospital" : "pharmacy") + '">' + esc(task.pharmacy_facility_type || "?") + '</span></div>';
+
+            html += '<div class="td-meta">';
+            html += tdRow("State / LGA", esc(task.pharmacy_state || "?") + " / " + esc(task.pharmacy_lga || "?"));
+            html += tdRow("Current Level", esc(task.pharmacy_current_level || "?"));
+            html += tdRow("Target Level", '<span class="badge badge-' + levelBadge(task.target_level) + '">' + esc(task.target_label || task.target_level) + '</span>');
+            html += tdRow("Priority", '<span class="priority-' + task.priority + '">P' + task.priority + '</span>');
+            html += tdRow("Status", '<span class="badge badge-' + task.status + '">' + esc(task.status) + '</span>');
+            html += tdRow("Assignee", task.assigned_to ? esc(task.assigned_to) : '<span style="color:#aaa">Unassigned</span>');
+            html += tdRow("Due Date", task.due_date || '<span style="color:#aaa">None</span>');
+            html += tdRow("Attempt", task.attempt_count + " of " + task.max_attempts);
+            html += tdRow("Created", formatDate(task.created_at));
+            if (task.assigned_at) html += tdRow("Assigned", formatDate(task.assigned_at));
+            if (task.completed_at) html += tdRow("Completed", formatDate(task.completed_at));
+            if (task.notes) html += tdRow("Notes", esc(task.notes));
+            html += '</div>';
+
+            // Action buttons
+            html += '<div class="td-actions">';
+            if (isPending) {
+                html += '<button class="btn btn-primary" onclick="Queue.claimTask(\'' + task.id + '\')">Claim Task</button>';
+            }
+            if (isActive && isMine) {
+                html += '<button class="btn btn-success" onclick="Queue.showCompleteForm(\'' + task.id + '\')">Complete</button>';
+                html += '<button class="btn btn-secondary" onclick="Queue.showSkipForm(\'' + task.id + '\')">Skip</button>';
+                html += '<button class="btn btn-secondary" onclick="Queue.releaseTask(\'' + task.id + '\')">Release</button>';
+            }
+            if (isActive && !isMine && authState.actorId) {
+                html += '<span style="font-size:12px;color:#888;">Assigned to another agent</span>';
+            }
+            if (isActive && !authState.actorId) {
+                html += '<span style="font-size:12px;color:#888;">Claim a task first to enable actions</span>';
+            }
+            html += '</div>';
+
+            html += '<div id="td-form-area"></div>';
+
+            // Result detail for completed/skipped tasks
+            if (task.result_detail) {
+                html += '<div class="td-result"><div class="td-result-title">' + (task.status === "completed" ? "Verification Result" : "Result Detail") + '</div>';
+                html += '<pre>' + esc(JSON.stringify(task.result_detail, null, 2)) + '</pre></div>';
+            }
+
+            panel.innerHTML = html;
+        }
+
+        function tdRow(label, val) {
+            return '<div class="td-row"><strong>' + label + '</strong><span>' + val + '</span></div>';
+        }
+
+        // --- Actions ---
+        function claimTask(taskId) {
+            apiFetch("/api/queue/" + taskId + "/claim", { method: "POST" }).then(function(res) {
+                authState.actorId = res.assigned_to;
+                toast("Task claimed!", "success");
+                loadStats();
+                loadQueue();
+                selectTask(taskId);
+            }).catch(function(err) {
+                if (err.status === 409) toast("Task already claimed by someone else", "error");
+                else if (err.status === 403) toast("Insufficient permissions to claim tasks", "error");
+                else toast("Claim failed: " + err.message, "error");
+            });
+        }
+
+        function releaseTask(taskId) {
+            if (!confirm("Release this task back to the queue?")) return;
+            apiFetch("/api/queue/" + taskId + "/release", { method: "POST" }).then(function() {
+                toast("Task released", "success");
+                loadStats();
+                loadQueue();
+                selectTask(taskId);
+            }).catch(function(err) {
+                toast("Release failed: " + err.message, "error");
+            });
+        }
+
+        function showCompleteForm(taskId) {
+            // Find task in current list or use stored selected task
+            var task = null;
+            for (var i = 0; i < qState.tasks.length; i++) {
+                if (qState.tasks[i].id === taskId) { task = qState.tasks[i]; break; }
+            }
+            if (!task && qState.selectedTask && qState.selectedTask.id === taskId) {
+                task = qState.selectedTask;
+            }
+            if (!task) {
+                // Fetch and then show form
+                apiFetch("/api/queue/" + taskId).then(function(res) {
+                    qState.selectedTask = res.data;
+                    renderTaskDetail(res.data);
+                    showCompleteForm(taskId);
+                }).catch(function(err) { toast("Failed to load task: " + err.message, "error"); });
+                return;
+            }
+
+            var area = document.getElementById("td-form-area");
+            var isL1 = task.target_level && task.target_level.indexOf("L1") !== -1;
+            var isL2 = task.target_level && task.target_level.indexOf("L2") !== -1;
+
+            if (isL1) {
+                area.innerHTML =
+                    '<form class="evidence-form" id="evidence-form"><h4>L1: Contact Confirmation Evidence</h4>' +
+                    '<label>Respondent Name *</label><input type="text" id="ef-resp-name" required />' +
+                    '<label>Respondent Role *</label><select id="ef-resp-role" required><option value="">Select role...</option><option value="pharmacist">Pharmacist</option><option value="attendant">Attendant</option><option value="owner">Owner</option><option value="manager">Manager</option></select>' +
+                    '<label>Facility Name (as confirmed) *</label><input type="text" id="ef-fac-name" value="' + esc(task.pharmacy_name || "") + '" required />' +
+                    '<label>Operating Status *</label><select id="ef-op-status" required><option value="">Select status...</option><option value="operating" selected>Operating</option><option value="closed">Closed</option><option value="relocated">Relocated</option><option value="unknown">Unknown</option></select>' +
+                    '<label>Capture Method *</label><select id="ef-method"><option value="phone_call">Phone Call</option><option value="email_reply">Email Reply</option><option value="sms_reply">SMS Reply</option></select>' +
+                    '<label>Notes (optional)</label><textarea id="ef-notes" rows="2" placeholder="Additional observations..."></textarea>' +
+                    '<div class="form-actions"><button type="submit" class="btn btn-success">Submit Evidence</button><button type="button" class="btn btn-secondary" onclick="Queue.hideForm()">Cancel</button></div>' +
+                    '</form>';
+                document.getElementById("evidence-form").addEventListener("submit", function(e) {
+                    e.preventDefault(); submitL1(taskId, task);
+                });
+            } else if (isL2) {
+                area.innerHTML =
+                    '<form class="evidence-form" id="evidence-form"><h4>L2: Location Confirmation Evidence</h4>' +
+                    '<div class="form-row-2col"><div><label>GPS Latitude *</label><input type="number" id="ef-lat" step="any" min="4" max="14" required placeholder="e.g. 6.5244" /></div>' +
+                    '<div><label>GPS Longitude *</label><input type="number" id="ef-lon" step="any" min="2.5" max="15" required placeholder="e.g. 3.3792" /></div></div>' +
+                    '<label>GPS Accuracy (meters) *</label><input type="number" id="ef-accuracy" min="0" step="any" required placeholder="e.g. 10" />' +
+                    '<button type="button" class="btn btn-secondary btn-sm" id="ef-gps-btn" style="margin:6px 0 4px;">Use Device GPS</button>' +
+                    '<div style="display:flex;gap:20px;margin-top:8px;">' +
+                    '<label class="checkbox-label"><input type="checkbox" id="ef-signage" checked /> Signage Visible</label>' +
+                    '<label class="checkbox-label"><input type="checkbox" id="ef-operational" checked /> Facility Operational</label></div>' +
+                    '<label>Photo Count *</label><input type="number" id="ef-photo-count" min="0" value="1" required />' +
+                    '<label>Photo References (comma-separated URLs)</label><input type="text" id="ef-photo-refs" placeholder="https://storage.example.com/photo1.jpg" />' +
+                    '<label>Notes (optional)</label><textarea id="ef-notes" rows="2" placeholder="Observations from field visit..."></textarea>' +
+                    '<div class="form-actions"><button type="submit" class="btn btn-success">Submit Evidence</button><button type="button" class="btn btn-secondary" onclick="Queue.hideForm()">Cancel</button></div>' +
+                    '</form>';
+                document.getElementById("evidence-form").addEventListener("submit", function(e) {
+                    e.preventDefault(); submitL2(taskId, task);
+                });
+                document.getElementById("ef-gps-btn").addEventListener("click", function() {
+                    if (!navigator.geolocation) { alert("Geolocation not supported"); return; }
+                    this.textContent = "Getting GPS..."; this.disabled = true;
+                    var btn = this;
+                    navigator.geolocation.getCurrentPosition(function(pos) {
+                        document.getElementById("ef-lat").value = pos.coords.latitude.toFixed(6);
+                        document.getElementById("ef-lon").value = pos.coords.longitude.toFixed(6);
+                        document.getElementById("ef-accuracy").value = Math.round(pos.coords.accuracy);
+                        btn.textContent = "GPS Captured"; btn.disabled = false;
+                    }, function(err) {
+                        alert("GPS error: " + err.message); btn.textContent = "Use Device GPS"; btn.disabled = false;
+                    }, { enableHighAccuracy: true, timeout: 15000 });
+                });
+            } else {
+                area.innerHTML = '<div class="evidence-form"><h4>Evidence submission for ' + esc(task.target_level) + ' is not yet supported in the UI.</h4></div>';
+            }
+        }
+
+        function submitL1(taskId, task) {
+            var name = document.getElementById("ef-resp-name").value.trim();
+            var role = document.getElementById("ef-resp-role").value;
+            var facName = document.getElementById("ef-fac-name").value.trim();
+            var opStatus = document.getElementById("ef-op-status").value;
+            var method = document.getElementById("ef-method").value;
+            var notes = document.getElementById("ef-notes").value.trim();
+
+            if (!name || !role || !facName || !opStatus) { toast("Please fill all required fields", "error"); return; }
+
+            var body = {
+                target_level: task.target_level,
+                evidence_type: "contact_confirmation",
+                capture_method: method,
+                actor_id: authState.actorId || "ui_agent",
+                actor_type: "field_agent",
+                source_description: "Contact confirmed via " + method + ". Respondent: " + name + " (" + role + ")",
+                evidence_detail: {
+                    respondent_name: name,
+                    respondent_role: role,
+                    facility_name_confirmed: facName,
+                    operating_status_confirmed: opStatus,
+                }
+            };
+            if (notes) body.evidence_detail.verification_notes = notes;
+
+            submitComplete(taskId, body);
+        }
+
+        function submitL2(taskId, task) {
+            var lat = parseFloat(document.getElementById("ef-lat").value);
+            var lon = parseFloat(document.getElementById("ef-lon").value);
+            var acc = parseFloat(document.getElementById("ef-accuracy").value);
+            var signage = document.getElementById("ef-signage").checked;
+            var operational = document.getElementById("ef-operational").checked;
+            var photoCount = parseInt(document.getElementById("ef-photo-count").value) || 0;
+            var photoRefs = document.getElementById("ef-photo-refs").value.trim();
+            var notes = document.getElementById("ef-notes").value.trim();
+
+            if (isNaN(lat) || isNaN(lon) || isNaN(acc)) { toast("Please fill GPS fields", "error"); return; }
+            if (lat < 4 || lat > 14 || lon < 2.5 || lon > 15) { toast("GPS coordinates outside Nigeria bounds", "error"); return; }
+
+            var body = {
+                target_level: task.target_level,
+                evidence_type: "location_confirmation",
+                capture_method: "field_visit",
+                actor_id: authState.actorId || "ui_agent",
+                actor_type: "field_agent",
+                source_description: "Location confirmed via field visit. Signage: " + (signage ? "yes" : "no") + ", Operational: " + (operational ? "yes" : "no"),
+                evidence_detail: {
+                    gps_latitude: lat,
+                    gps_longitude: lon,
+                    gps_accuracy_meters: acc,
+                    signage_visible: signage,
+                    facility_operational: operational,
+                    photo_count: photoCount,
+                    photo_references: photoRefs ? photoRefs.split(",").map(function(s) { return s.trim(); }) : [],
+                }
+            };
+            if (notes) body.evidence_detail.verification_notes = notes;
+
+            submitComplete(taskId, body);
+        }
+
+        function submitComplete(taskId, body) {
+            var btn = document.querySelector("#evidence-form .btn-success");
+            if (btn) { btn.disabled = true; btn.textContent = "Submitting..."; }
+
+            apiFetch("/api/queue/" + taskId + "/complete", {
+                method: "POST",
+                body: JSON.stringify(body)
+            }).then(function(res) {
+                toast("Verification complete! " + (res.verification && res.verification.message || ""), "success");
+                hideForm();
+                loadStats();
+                loadQueue();
+                selectTask(taskId);
+            }).catch(function(err) {
+                toast("Submission failed: " + err.message, "error");
+                if (btn) { btn.disabled = false; btn.textContent = "Submit Evidence"; }
+            });
+        }
+
+        function showSkipForm(taskId) {
+            var area = document.getElementById("td-form-area");
+            area.innerHTML =
+                '<form class="evidence-form" id="skip-form"><h4>Skip Task</h4>' +
+                '<label>Reason *</label><textarea id="sf-reason" rows="3" required placeholder="Why is this task being skipped?"></textarea>' +
+                '<label class="checkbox-label"><input type="checkbox" id="sf-reschedule" checked /> Reschedule for another attempt</label>' +
+                '<div class="form-actions"><button type="submit" class="btn btn-danger">Skip Task</button><button type="button" class="btn btn-secondary" onclick="Queue.hideForm()">Cancel</button></div>' +
+                '</form>';
+            document.getElementById("skip-form").addEventListener("submit", function(e) {
+                e.preventDefault();
+                var reason = document.getElementById("sf-reason").value.trim();
+                var reschedule = document.getElementById("sf-reschedule").checked;
+                if (!reason) { toast("Please provide a reason", "error"); return; }
+
+                var btn = document.querySelector("#skip-form .btn-danger");
+                if (btn) { btn.disabled = true; btn.textContent = "Skipping..."; }
+
+                apiFetch("/api/queue/" + taskId + "/skip", {
+                    method: "POST",
+                    body: JSON.stringify({ reason: reason, reschedule: reschedule })
+                }).then(function(res) {
+                    var msg = "Task skipped";
+                    if (res.rescheduled) msg += " and rescheduled (new task created)";
+                    toast(msg, "success");
+                    hideForm();
+                    loadStats();
+                    loadQueue();
+                    selectTask(taskId);
+                }).catch(function(err) {
+                    toast("Skip failed: " + err.message, "error");
+                    if (btn) { btn.disabled = false; btn.textContent = "Skip Task"; }
+                });
+            });
+        }
+
+        function hideForm() {
+            var area = document.getElementById("td-form-area");
+            if (area) area.innerHTML = "";
+        }
+
+        // --- Init ---
+        function init() {
+            if (qState.initialized) return;
+            qState.initialized = true;
+
+            // Auth events
+            document.getElementById("auth-connect-btn").addEventListener("click", connect);
+            document.getElementById("auth-disconnect-btn").addEventListener("click", disconnect);
+            document.getElementById("api-key-input").addEventListener("keydown", function(e) {
+                if (e.key === "Enter") connect();
+            });
+
+            // Filter events
+            var filterDebounce;
+            ["qf-status","qf-level","qf-state","qf-priority"].forEach(function(id) {
+                document.getElementById(id).addEventListener("change", function() {
+                    clearTimeout(filterDebounce);
+                    filterDebounce = setTimeout(function() {
+                        qState.offset = 0;
+                        loadQueue();
+                    }, 150);
+                });
+            });
+
+            // Pagination events
+            document.getElementById("qp-prev").addEventListener("click", function() {
+                if (qState.offset > 0) { qState.offset = Math.max(0, qState.offset - qState.limit); loadQueue(); }
+            });
+            document.getElementById("qp-next").addEventListener("click", function() {
+                if (qState.offset + qState.limit < qState.total) { qState.offset += qState.limit; loadQueue(); }
+            });
+        }
+
+        // --- Public API ---
+        return {
+            init: init,
+            claimTask: claimTask,
+            releaseTask: releaseTask,
+            showCompleteForm: showCompleteForm,
+            showSkipForm: showSkipForm,
+            hideForm: hideForm,
+        };
     })();
     </script>
 </body>

@@ -1,7 +1,4 @@
-# Claude Code — Starter Prompts
-
-Copy-paste these prompts into Claude Code to execute each workstream.
-Always run from the project root: `nigeria-pharmacy-registry/`
+# Claude Code — St
 
 ---
 

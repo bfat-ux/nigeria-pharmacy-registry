@@ -20,14 +20,22 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-from fastapi import FastAPI, HTTPException, Query
+from fastapi import Depends, FastAPI, HTTPException, Query, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
 from . import db
+from .auth import (
+    ANONYMOUS,
+    AuthContext,
+    auth_middleware,
+    redact_contacts_in_response,
+    require_tier,
+)
 from .db import extras
+from .rate_limiter import rate_limit_middleware
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 logger = logging.getLogger(__name__)
@@ -444,13 +452,51 @@ class VerifyRequest(BaseModel):
     )
 
 
+class TaskGenerateRequest(BaseModel):
+    target_level: str = Field(
+        ...,
+        description="Target validation level (e.g. L1_contact_confirmed)",
+    )
+    filters: dict | None = Field(
+        None,
+        description="Optional filters: {state, lga, facility_type}",
+    )
+    priority: int = Field(
+        3,
+        ge=1,
+        le=5,
+        description="Task priority: 1=highest (urgent), 5=lowest (routine)",
+    )
+    due_date: str | None = Field(
+        None,
+        description="Due date in YYYY-MM-DD format",
+    )
+    max_attempts: int = Field(
+        3,
+        ge=1,
+        le=10,
+        description="Maximum attempts before task is abandoned",
+    )
+
+
+class TaskSkipRequest(BaseModel):
+    reason: str = Field(
+        ...,
+        description="Reason for skipping the task",
+    )
+    reschedule: bool = Field(
+        False,
+        description="If true, create a new task with attempt_count+1",
+    )
+
+
 # ---------------------------------------------------------------------------
 # FastAPI app
 # ---------------------------------------------------------------------------
 
 app = FastAPI(
     title="Nigeria Pharmacy Registry",
-    version="0.2.0",
+    version="0.3.0",
     description="Dashboard + Verification API for the Nigeria Pharmacy Registry",
 )
 
@@ -460,6 +506,12 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Auth + rate limiting middleware (order matters: auth first, then rate limit)
+# Starlette middleware executes in reverse registration order,
+# so we register rate_limit first (runs second) then auth (runs first).
+app.middleware("http")(rate_limit_middleware)
+app.middleware("http")(auth_middleware)
 
 STATIC_DIR = Path(__file__).resolve().parent / "static"
 app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
@@ -472,8 +524,58 @@ async def startup():
     # Try to connect to DB (best-effort)
     if db.init_pool():
         logger.info("Running in DATABASE mode")
+        _ensure_api_keys_table()
+        _ensure_verification_tasks_table()
     else:
         logger.info("Running in JSON FALLBACK mode")
+
+
+def _ensure_api_keys_table():
+    """Run 005_api_keys.sql if the table doesn't exist yet."""
+    try:
+        with db.get_conn() as conn:
+            with conn.cursor() as cur:
+                cur.execute(
+                    "SELECT EXISTS (SELECT FROM information_schema.tables WHERE table_name = 'api_keys')"
+                )
+                exists = cur.fetchone()[0]
+                if exists:
+                    return
+
+        sql_path = ROOT / "agent-01-data-architecture" / "sql" / "005_api_keys.sql"
+        if sql_path.exists():
+            with db.get_conn() as conn:
+                with conn.cursor() as cur:
+                    cur.execute(sql_path.read_text())
+            logger.info("Applied 005_api_keys.sql migration")
+        else:
+            logger.warning("005_api_keys.sql not found at %s", sql_path)
+    except Exception as e:
+        logger.warning("Could not ensure api_keys table: %s", e)
+
+
+def _ensure_verification_tasks_table():
+    """Run 006_verification_tasks.sql if the table doesn't exist yet."""
+    try:
+        with db.get_conn() as conn:
+            with conn.cursor() as cur:
+                cur.execute(
+                    "SELECT EXISTS (SELECT FROM information_schema.tables WHERE table_name = 'verification_tasks')"
+                )
+                exists = cur.fetchone()[0]
+                if exists:
+                    return
+
+        sql_path = ROOT / "agent-01-data-architecture" / "sql" / "006_verification_tasks.sql"
+        if sql_path.exists():
+            with db.get_conn() as conn:
+                with conn.cursor() as cur:
+                    cur.execute(sql_path.read_text())
+            logger.info("Applied 006_verification_tasks.sql migration")
+        else:
+            logger.warning("006_verification_tasks.sql not found at %s", sql_path)
+    except Exception as e:
+        logger.warning("Could not ensure verification_tasks table: %s", e)
 
 
 @app.on_event("shutdown")
@@ -488,7 +590,7 @@ async def shutdown():
 
 @app.get("/api/health")
 async def health():
-    """Health check — reports mode, record count, version."""
+    """Health check — reports mode, record count, version. Always open."""
     mode = "database" if db.is_available() else "json_fallback"
     count = 0
 
@@ -508,8 +610,9 @@ async def health():
         "status": "healthy",
         "mode": mode,
         "record_count": count,
-        "version": "0.2.0",
+        "version": "0.3.0",
         "database_connected": db.is_available(),
+        "auth_enabled": True,
     }
 
 
@@ -531,6 +634,7 @@ async def index():
 
 @app.get("/api/pharmacies")
 async def list_pharmacies(
+    request: Request,
     state: str | None = Query(None, description="Filter by state name"),
     lga: str | None = Query(None, description="Filter by LGA"),
     facility_type: str | None = Query(None, description="Filter by facility type"),
@@ -539,10 +643,13 @@ async def list_pharmacies(
     limit: int = Query(100, ge=1, le=10000),
     offset: int = Query(0, ge=0),
 ) -> dict[str, Any]:
-    """List pharmacy records with optional filters."""
+    """List pharmacy records with optional filters. Contacts redacted for public tier."""
+    auth: AuthContext = getattr(request.state, "auth", ANONYMOUS)
+
     # Try DB first
     result = _db_list_pharmacies(state, lga, facility_type, source_id, q, limit, offset)
     if result is not None:
+        redact_contacts_in_response(result.get("data", []), auth)
         return result
 
     # JSON fallback
@@ -564,7 +671,8 @@ async def list_pharmacies(
         results = [r for r in results if q_lower in (r.get("facility_name") or "").lower()]
 
     total = len(results)
-    page = results[offset : offset + limit]
+    page = [dict(r) for r in results[offset : offset + limit]]  # shallow copy for redaction
+    redact_contacts_in_response(page, auth)
 
     return {
         "meta": {"total": total, "limit": limit, "offset": offset},
@@ -574,6 +682,7 @@ async def list_pharmacies(
 
 @app.get("/api/pharmacies/nearby")
 async def nearby_pharmacies(
+    request: Request,
     lat: float = Query(..., description="Latitude"),
     lon: float = Query(..., description="Longitude"),
     radius_km: float = Query(5.0, ge=0.1, le=100, description="Search radius in km"),
@@ -627,20 +736,25 @@ async def nearby_pharmacies(
 
 
 @app.get("/api/pharmacies/{pharmacy_id}")
-async def get_pharmacy(pharmacy_id: str) -> dict[str, Any]:
-    """Get a single pharmacy record by ID."""
+async def get_pharmacy(request: Request, pharmacy_id: str) -> dict[str, Any]:
+    """Get a single pharmacy record by ID. Contacts redacted for public tier."""
+    auth: AuthContext = getattr(request.state, "auth", ANONYMOUS)
+
     # Try DB first
     result = _db_get_pharmacy(pharmacy_id)
     if result is not None:
         if result.get("data") is None:
             raise HTTPException(status_code=404, detail="Pharmacy not found")
+        redact_contacts_in_response(result.get("data"), auth)
         return result
 
     # JSON fallback
     record = _INDEX.get(pharmacy_id)
     if not record:
         raise HTTPException(status_code=404, detail="Pharmacy not found")
-    return {"data": record}
+    data = dict(record)  # shallow copy for redaction
+    redact_contacts_in_response(data, auth)
+    return {"data": data}
 
 
 @app.get("/api/stats")
@@ -669,14 +783,18 @@ async def get_stats() -> dict[str, Any]:
 
 @app.get("/api/geojson")
 async def get_geojson(
+    request: Request,
     state: str | None = Query(None),
     source_id: str | None = Query(None),
     facility_type: str | None = Query(None),
 ) -> dict[str, Any]:
-    """Return records as GeoJSON FeatureCollection for map rendering."""
+    """Return records as GeoJSON FeatureCollection for map rendering. Contacts redacted for public."""
+    auth: AuthContext = getattr(request.state, "auth", ANONYMOUS)
+
     # Try DB first
     result = _db_get_geojson(state, source_id, facility_type)
     if result is not None:
+        redact_contacts_in_response(result.get("features", []), auth)
         return result
 
     # JSON fallback
@@ -718,18 +836,17 @@ async def get_geojson(
 
 
 # ---------------------------------------------------------------------------
-# Verification endpoints (database required)
+# Verification core logic (reused by direct endpoint and queue completion)
 # ---------------------------------------------------------------------------
 
 
-@app.post("/api/pharmacies/{pharmacy_id}/verify")
-async def verify_pharmacy(pharmacy_id: str, req: VerifyRequest):
+def _execute_verification(pharmacy_id: str, req: VerifyRequest, auth: AuthContext) -> dict:
     """
-    Advance a pharmacy through the validation ladder.
+    Core verification logic. Validates transition rules, records evidence,
+    and updates the pharmacy's validation level.
 
-    Validates transition rules, records evidence, and updates the
-    pharmacy's validation level via the record_validation_change()
-    PL/pgSQL function.
+    Returns: {success, pharmacy_id, old_level, new_level, history_id, message}
+    Raises HTTPException on validation/business-rule errors.
     """
     if not db.is_available():
         raise HTTPException(
@@ -747,7 +864,6 @@ async def verify_pharmacy(pharmacy_id: str, req: VerifyRequest):
     # Validate evidence type matches target level
     required = REQUIRED_EVIDENCE.get(target)
     if required and req.evidence_type != required:
-        # Exception: regulator_sync actors can jump L0→L3
         if not (req.actor_type == "regulator_sync" and target == "L3_regulator_verified"):
             raise HTTPException(
                 status_code=400,
@@ -771,7 +887,6 @@ async def verify_pharmacy(pharmacy_id: str, req: VerifyRequest):
                 target_idx = _LEVEL_INDEX[target]
 
                 # Validate transition: must go up one step at a time
-                # Exception: regulator_sync can jump L0→L3
                 if req.actor_type == "regulator_sync" and target == "L3_regulator_verified":
                     if current_idx >= target_idx:
                         raise HTTPException(
@@ -837,6 +952,30 @@ async def verify_pharmacy(pharmacy_id: str, req: VerifyRequest):
                     ),
                 )
 
+                # Audit log
+                cur.execute(
+                    """
+                    SELECT log_audit(
+                        'api_request', 'POST',
+                        %s, %s,
+                        'pharmacy_location', %s::uuid,
+                        %s, 'POST', NULL, 200, NULL,
+                        %s::jsonb
+                    )
+                    """,
+                    (
+                        auth.actor_id,
+                        auth.actor_type,
+                        pharmacy_id,
+                        f"/api/pharmacies/{pharmacy_id}/verify",
+                        json.dumps({
+                            "action": "verify",
+                            "old_level": current_level,
+                            "new_level": target,
+                        }),
+                    ),
+                )
+
         return {
             "success": True,
             "pharmacy_id": pharmacy_id,
@@ -853,10 +992,34 @@ async def verify_pharmacy(pharmacy_id: str, req: VerifyRequest):
         raise HTTPException(status_code=500, detail=f"Verification failed: {e}")
 
 
-@app.get("/api/pharmacies/{pharmacy_id}/validation-history")
+# ---------------------------------------------------------------------------
+# Verification endpoints (database required)
+# ---------------------------------------------------------------------------
+
+
+@app.post(
+    "/api/pharmacies/{pharmacy_id}/verify",
+    dependencies=[Depends(require_tier("registry_write"))],
+)
+async def verify_pharmacy(request: Request, pharmacy_id: str, req: VerifyRequest):
+    """
+    Advance a pharmacy through the validation ladder.
+
+    Requires: registry_write tier or higher.
+    """
+    auth: AuthContext = getattr(request.state, "auth", ANONYMOUS)
+    return _execute_verification(pharmacy_id, req, auth)
+
+
+@app.get(
+    "/api/pharmacies/{pharmacy_id}/validation-history",
+    dependencies=[Depends(require_tier("registry_read"))],
+)
 async def get_validation_history(pharmacy_id: str):
     """
     Get the full append-only validation history for a pharmacy.
+
+    Requires: registry_read tier or higher.
     Returns all status transitions ordered by most recent first.
     """
     if not db.is_available():
@@ -971,3 +1134,704 @@ async def get_validation_summary():
     }
 
 
+# ---------------------------------------------------------------------------
+# Verification queue endpoints
+# ---------------------------------------------------------------------------
+
+# Map target level → task_type enum value
+_TASK_TYPE_MAP = {
+    "L1_contact_confirmed": "verify_L1",
+    "L2_evidence_documented": "verify_L2",
+    "L3_regulator_verified": "verify_L3",
+    "L4_high_assurance": "verify_L4",
+}
+
+
+def _task_row_to_dict(row: dict) -> dict:
+    """Convert a verification_tasks JOIN row to API dict."""
+    return {
+        "id": str(row["id"]),
+        "pharmacy_id": str(row["pharmacy_id"]),
+        "pharmacy_name": row.get("pharmacy_name"),
+        "pharmacy_state": row.get("pharmacy_state"),
+        "pharmacy_lga": row.get("pharmacy_lga"),
+        "pharmacy_facility_type": row.get("pharmacy_facility_type"),
+        "pharmacy_current_level": row.get("pharmacy_current_level"),
+        "task_type": row.get("task_type"),
+        "target_level": row.get("target_level"),
+        "target_label": _level_label(row.get("target_level")),
+        "status": row.get("status"),
+        "priority": row.get("priority"),
+        "assigned_to": row.get("assigned_to"),
+        "assigned_at": _iso(row.get("assigned_at")),
+        "completed_at": _iso(row.get("completed_at")),
+        "due_date": str(row["due_date"]) if row.get("due_date") else None,
+        "attempt_count": row.get("attempt_count"),
+        "max_attempts": row.get("max_attempts"),
+        "notes": row.get("notes"),
+        "result_detail": row.get("result_detail"),
+        "created_at": _iso(row.get("created_at")),
+        "updated_at": _iso(row.get("updated_at")),
+        "created_by": row.get("created_by"),
+    }
+
+
+_TASK_QUERY_BASE = """
+    SELECT
+        vt.id, vt.pharmacy_id, vt.task_type::text, vt.target_level::text,
+        vt.status::text, vt.priority, vt.assigned_to, vt.assigned_at,
+        vt.completed_at, vt.due_date, vt.attempt_count, vt.max_attempts,
+        vt.notes, vt.result_detail,
+        vt.created_at, vt.updated_at, vt.created_by,
+        pl.name AS pharmacy_name,
+        pl.state AS pharmacy_state,
+        pl.lga AS pharmacy_lga,
+        pl.facility_type::text AS pharmacy_facility_type,
+        pl.current_validation_level::text AS pharmacy_current_level
+    FROM verification_tasks vt
+    JOIN pharmacy_locations pl ON pl.id = vt.pharmacy_id
+"""
+
+
+@app.get(
+    "/api/queue",
+    dependencies=[Depends(require_tier("registry_read"))],
+)
+async def list_queue(
+    request: Request,
+    status: str | None = Query(None, description="Filter by task status"),
+    target_level: str | None = Query(None, description="Filter by target level"),
+    state: str | None = Query(None, description="Filter by pharmacy state"),
+    lga: str | None = Query(None, description="Filter by pharmacy LGA"),
+    assigned_to: str | None = Query(None, description="Filter by assignee"),
+    priority: int | None = Query(None, ge=1, le=5, description="Filter by priority"),
+    limit: int = Query(50, ge=1, le=500),
+    offset: int = Query(0, ge=0),
+):
+    """List verification tasks with optional filters. Requires registry_read."""
+    if not db.is_available():
+        raise HTTPException(status_code=503, detail="Database unavailable")
+
+    try:
+        conditions: list[str] = []
+        params: list[Any] = []
+
+        if status:
+            conditions.append("vt.status = %s::task_status")
+            params.append(status)
+        if target_level:
+            conditions.append("vt.target_level = %s::validation_level")
+            params.append(target_level)
+        if state:
+            conditions.append("pl.state ILIKE %s")
+            params.append(state)
+        if lga:
+            conditions.append("pl.lga ILIKE %s")
+            params.append(lga)
+        if assigned_to:
+            conditions.append("vt.assigned_to = %s")
+            params.append(assigned_to)
+        if priority is not None:
+            conditions.append("vt.priority = %s")
+            params.append(priority)
+
+        where = (" WHERE " + " AND ".join(conditions)) if conditions else ""
+
+        with db.get_conn() as conn:
+            with conn.cursor(cursor_factory=extras.RealDictCursor) as cur:
+                cur.execute(
+                    f"SELECT count(*) FROM verification_tasks vt JOIN pharmacy_locations pl ON pl.id = vt.pharmacy_id{where}",
+                    params,
+                )
+                total = cur.fetchone()["count"]
+
+                cur.execute(
+                    f"{_TASK_QUERY_BASE}{where} ORDER BY vt.priority ASC, vt.created_at ASC LIMIT %s OFFSET %s",
+                    params + [limit, offset],
+                )
+                rows = cur.fetchall()
+
+        return {
+            "meta": {"total": total, "limit": limit, "offset": offset},
+            "data": [_task_row_to_dict(r) for r in rows],
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.exception("Queue list failed")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get(
+    "/api/queue/stats",
+    dependencies=[Depends(require_tier("registry_read"))],
+)
+async def queue_stats():
+    """Queue statistics: counts by status, level, assignee, state."""
+    if not db.is_available():
+        raise HTTPException(status_code=503, detail="Database unavailable")
+
+    try:
+        with db.get_conn() as conn:
+            with conn.cursor(cursor_factory=extras.RealDictCursor) as cur:
+                # Total by status
+                cur.execute(
+                    "SELECT status::text, count(*) AS cnt FROM verification_tasks GROUP BY status"
+                )
+                by_status = {r["status"]: r["cnt"] for r in cur.fetchall()}
+
+                # By target_level x status
+                cur.execute(
+                    """
+                    SELECT target_level::text, status::text, count(*) AS cnt
+                    FROM verification_tasks
+                    GROUP BY target_level, status
+                    ORDER BY target_level, status
+                    """
+                )
+                by_level: dict[str, dict[str, int]] = {}
+                for r in cur.fetchall():
+                    by_level.setdefault(r["target_level"], {})[r["status"]] = r["cnt"]
+
+                # By assignee (active only)
+                cur.execute(
+                    """
+                    SELECT assigned_to, count(*) AS cnt
+                    FROM verification_tasks
+                    WHERE assigned_to IS NOT NULL
+                      AND status IN ('assigned', 'in_progress')
+                    GROUP BY assigned_to
+                    ORDER BY cnt DESC
+                    """
+                )
+                by_assignee = [
+                    {"assigned_to": r["assigned_to"], "count": r["cnt"]}
+                    for r in cur.fetchall()
+                ]
+
+                # By state (active only)
+                cur.execute(
+                    """
+                    SELECT pl.state, vt.status::text, count(*) AS cnt
+                    FROM verification_tasks vt
+                    JOIN pharmacy_locations pl ON pl.id = vt.pharmacy_id
+                    WHERE vt.status IN ('pending', 'assigned', 'in_progress')
+                    GROUP BY pl.state, vt.status
+                    ORDER BY pl.state
+                    """
+                )
+                by_state: dict[str, dict[str, int]] = {}
+                for r in cur.fetchall():
+                    by_state.setdefault(r["state"], {})[r["status"]] = r["cnt"]
+
+                # Overdue count
+                cur.execute(
+                    """
+                    SELECT count(*) AS cnt
+                    FROM verification_tasks
+                    WHERE status IN ('pending', 'assigned', 'in_progress')
+                      AND due_date IS NOT NULL
+                      AND due_date < CURRENT_DATE
+                    """
+                )
+                overdue = cur.fetchone()["cnt"]
+
+        total = sum(by_status.values())
+        return {
+            "total_tasks": total,
+            "by_status": by_status,
+            "by_target_level": by_level,
+            "by_assignee": by_assignee,
+            "by_state": by_state,
+            "overdue_count": overdue,
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.exception("Queue stats failed")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get(
+    "/api/queue/{task_id}",
+    dependencies=[Depends(require_tier("registry_read"))],
+)
+async def get_task(task_id: str):
+    """Get a single verification task with pharmacy info."""
+    if not db.is_available():
+        raise HTTPException(status_code=503, detail="Database unavailable")
+
+    try:
+        with db.get_conn() as conn:
+            with conn.cursor(cursor_factory=extras.RealDictCursor) as cur:
+                cur.execute(
+                    f"{_TASK_QUERY_BASE} WHERE vt.id = %s",
+                    (task_id,),
+                )
+                row = cur.fetchone()
+
+        if not row:
+            raise HTTPException(status_code=404, detail="Task not found")
+        return {"data": _task_row_to_dict(row)}
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.exception("Get task failed")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post(
+    "/api/queue/generate",
+    dependencies=[Depends(require_tier("admin"))],
+)
+async def generate_queue(request: Request, req: TaskGenerateRequest):
+    """
+    Batch-generate verification tasks for pharmacies at the prerequisite level.
+
+    Requires: admin tier.
+    """
+    if not db.is_available():
+        raise HTTPException(status_code=503, detail="Database unavailable")
+
+    target = req.target_level
+    if target not in _LEVEL_INDEX:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Invalid target_level '{target}'. Valid levels: {VALIDATION_LEVELS}",
+        )
+
+    target_idx = _LEVEL_INDEX[target]
+    if target_idx == 0:
+        raise HTTPException(status_code=400, detail="Cannot generate tasks for L0 — that's the initial state")
+
+    prereq_level = VALIDATION_LEVELS[target_idx - 1]
+    task_type = _TASK_TYPE_MAP.get(target)
+    if not task_type:
+        raise HTTPException(status_code=400, detail=f"No task_type mapping for {target}")
+
+    auth: AuthContext = getattr(request.state, "auth", ANONYMOUS)
+
+    try:
+        # Build filter conditions
+        conditions: list[str] = [
+            "pl.current_validation_level = %s::validation_level",
+        ]
+        params: list[Any] = [prereq_level]
+
+        # Exclude pharmacies with existing active tasks for this target
+        conditions.append(
+            """NOT EXISTS (
+                SELECT 1 FROM verification_tasks vt
+                WHERE vt.pharmacy_id = pl.id
+                  AND vt.target_level = %s::validation_level
+                  AND vt.status NOT IN ('completed', 'failed', 'skipped')
+            )"""
+        )
+        params.append(target)
+
+        # Optional geographic/type filters
+        filters = req.filters or {}
+        if filters.get("state"):
+            conditions.append("pl.state ILIKE %s")
+            params.append(filters["state"])
+        if filters.get("lga"):
+            conditions.append("pl.lga ILIKE %s")
+            params.append(filters["lga"])
+        if filters.get("facility_type"):
+            conditions.append("pl.facility_type = %s::facility_type")
+            params.append(filters["facility_type"])
+
+        where = " WHERE " + " AND ".join(conditions)
+
+        with db.get_conn() as conn:
+            with conn.cursor(cursor_factory=extras.RealDictCursor) as cur:
+                # Find eligible pharmacies
+                cur.execute(f"SELECT pl.id FROM pharmacy_locations pl{where}", params)
+                pharmacy_ids = [row["id"] for row in cur.fetchall()]
+
+                if not pharmacy_ids:
+                    return {
+                        "success": True,
+                        "target_level": target,
+                        "tasks_created": 0,
+                        "filters_applied": filters,
+                        "message": f"No eligible pharmacies found at {prereq_level}",
+                    }
+
+                # Batch insert
+                values = [
+                    (
+                        pid,
+                        task_type,
+                        target,
+                        req.priority,
+                        req.due_date,
+                        req.max_attempts,
+                        auth.actor_id,
+                        auth.actor_id,
+                    )
+                    for pid in pharmacy_ids
+                ]
+
+                extras.execute_values(
+                    cur,
+                    """
+                    INSERT INTO verification_tasks
+                        (pharmacy_id, task_type, target_level, priority, due_date,
+                         max_attempts, created_by, updated_by)
+                    VALUES %s
+                    """,
+                    values,
+                    template="(%s, %s::task_type, %s::validation_level, %s, %s::date, %s, %s, %s)",
+                )
+
+                created = len(pharmacy_ids)
+
+                # Log provenance for the batch
+                cur.execute(
+                    """
+                    SELECT log_provenance(
+                        'verification_task', gen_random_uuid(), 'batch_generate',
+                        %s, %s, NULL, NULL, NULL, %s::jsonb
+                    )
+                    """,
+                    (
+                        auth.actor_id,
+                        auth.actor_type,
+                        json.dumps({
+                            "target_level": target,
+                            "task_type": task_type,
+                            "tasks_created": created,
+                            "filters": filters,
+                        }),
+                    ),
+                )
+
+        return {
+            "success": True,
+            "target_level": target,
+            "prerequisite_level": prereq_level,
+            "task_type": task_type,
+            "tasks_created": created,
+            "filters_applied": filters,
+            "message": f"Created {created} {task_type} tasks for pharmacies at {prereq_level}",
+        }
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.exception("Queue generation failed")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post(
+    "/api/queue/{task_id}/claim",
+    dependencies=[Depends(require_tier("registry_write"))],
+)
+async def claim_task(request: Request, task_id: str):
+    """Claim a pending task. Requires registry_write."""
+    if not db.is_available():
+        raise HTTPException(status_code=503, detail="Database unavailable")
+
+    auth: AuthContext = getattr(request.state, "auth", ANONYMOUS)
+
+    try:
+        with db.get_conn() as conn:
+            with conn.cursor(cursor_factory=extras.RealDictCursor) as cur:
+                cur.execute(
+                    """
+                    UPDATE verification_tasks
+                    SET status = 'assigned'::task_status,
+                        assigned_to = %s,
+                        assigned_at = now(),
+                        updated_at = now(),
+                        updated_by = %s
+                    WHERE id = %s
+                      AND status = 'pending'::task_status
+                    RETURNING id, status::text, assigned_to, assigned_at
+                    """,
+                    (auth.actor_id, auth.actor_id, task_id),
+                )
+                row = cur.fetchone()
+
+        if not row:
+            # Check if task exists at all
+            with db.get_conn() as conn:
+                with conn.cursor() as cur:
+                    cur.execute("SELECT status::text FROM verification_tasks WHERE id = %s", (task_id,))
+                    existing = cur.fetchone()
+            if not existing:
+                raise HTTPException(status_code=404, detail="Task not found")
+            raise HTTPException(
+                status_code=409,
+                detail=f"Task cannot be claimed — current status: {existing[0]}",
+            )
+
+        return {
+            "success": True,
+            "task_id": str(row["id"]),
+            "status": row["status"],
+            "assigned_to": row["assigned_to"],
+            "assigned_at": _iso(row["assigned_at"]),
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.exception("Claim task failed")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post(
+    "/api/queue/{task_id}/release",
+    dependencies=[Depends(require_tier("registry_write"))],
+)
+async def release_task(request: Request, task_id: str):
+    """Release a claimed task back to pending. Only assignee or admin."""
+    if not db.is_available():
+        raise HTTPException(status_code=503, detail="Database unavailable")
+
+    auth: AuthContext = getattr(request.state, "auth", ANONYMOUS)
+
+    try:
+        with db.get_conn() as conn:
+            with conn.cursor(cursor_factory=extras.RealDictCursor) as cur:
+                # Get current task state
+                cur.execute(
+                    "SELECT id, status::text, assigned_to FROM verification_tasks WHERE id = %s",
+                    (task_id,),
+                )
+                task = cur.fetchone()
+                if not task:
+                    raise HTTPException(status_code=404, detail="Task not found")
+
+                if task["status"] not in ("assigned", "in_progress"):
+                    raise HTTPException(
+                        status_code=409,
+                        detail=f"Cannot release — task status is '{task['status']}', expected 'assigned' or 'in_progress'",
+                    )
+
+                # Only assignee or admin
+                if task["assigned_to"] != auth.actor_id and auth.tier != "admin":
+                    raise HTTPException(
+                        status_code=403,
+                        detail="Can only release your own tasks (or be admin)",
+                    )
+
+                cur.execute(
+                    """
+                    UPDATE verification_tasks
+                    SET status = 'pending'::task_status,
+                        assigned_to = NULL,
+                        assigned_at = NULL,
+                        updated_at = now(),
+                        updated_by = %s
+                    WHERE id = %s
+                    RETURNING id
+                    """,
+                    (auth.actor_id, task_id),
+                )
+
+        return {
+            "success": True,
+            "task_id": task_id,
+            "status": "pending",
+            "message": "Task released back to queue",
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.exception("Release task failed")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post(
+    "/api/queue/{task_id}/complete",
+    dependencies=[Depends(require_tier("registry_write"))],
+)
+async def complete_task(request: Request, task_id: str, req: VerifyRequest):
+    """
+    Complete a verification task with evidence.
+    Internally calls the same verification logic as POST /verify.
+    Requires registry_write. Only assignee or admin.
+    """
+    if not db.is_available():
+        raise HTTPException(status_code=503, detail="Database unavailable")
+
+    auth: AuthContext = getattr(request.state, "auth", ANONYMOUS)
+
+    try:
+        # Get task
+        with db.get_conn() as conn:
+            with conn.cursor(cursor_factory=extras.RealDictCursor) as cur:
+                cur.execute(
+                    "SELECT id, pharmacy_id, target_level::text, status::text, assigned_to FROM verification_tasks WHERE id = %s",
+                    (task_id,),
+                )
+                task = cur.fetchone()
+
+        if not task:
+            raise HTTPException(status_code=404, detail="Task not found")
+
+        if task["status"] not in ("assigned", "in_progress"):
+            raise HTTPException(
+                status_code=409,
+                detail=f"Cannot complete — task status is '{task['status']}', expected 'assigned' or 'in_progress'",
+            )
+
+        # Only assignee or admin
+        if task["assigned_to"] != auth.actor_id and auth.tier != "admin":
+            raise HTTPException(
+                status_code=403,
+                detail="Can only complete your own tasks (or be admin)",
+            )
+
+        # Ensure target_level matches
+        if req.target_level != task["target_level"]:
+            raise HTTPException(
+                status_code=400,
+                detail=f"target_level mismatch: task expects '{task['target_level']}', request says '{req.target_level}'",
+            )
+
+        # Execute the verification
+        pharmacy_id = str(task["pharmacy_id"])
+        verification_result = _execute_verification(pharmacy_id, req, auth)
+
+        # Mark task as completed
+        with db.get_conn() as conn:
+            with conn.cursor() as cur:
+                cur.execute(
+                    """
+                    UPDATE verification_tasks
+                    SET status = 'completed'::task_status,
+                        completed_at = now(),
+                        result_detail = %s::jsonb,
+                        updated_at = now(),
+                        updated_by = %s
+                    WHERE id = %s
+                    """,
+                    (
+                        json.dumps(verification_result),
+                        auth.actor_id,
+                        task_id,
+                    ),
+                )
+
+        return {
+            "success": True,
+            "task_id": task_id,
+            "status": "completed",
+            "verification": verification_result,
+        }
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.exception("Complete task failed")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post(
+    "/api/queue/{task_id}/skip",
+    dependencies=[Depends(require_tier("registry_write"))],
+)
+async def skip_task(request: Request, task_id: str, req: TaskSkipRequest):
+    """
+    Skip a verification task with a reason.
+    Optionally reschedule with attempt_count+1.
+    Requires registry_write. Only assignee or admin.
+    """
+    if not db.is_available():
+        raise HTTPException(status_code=503, detail="Database unavailable")
+
+    auth: AuthContext = getattr(request.state, "auth", ANONYMOUS)
+
+    try:
+        with db.get_conn() as conn:
+            with conn.cursor(cursor_factory=extras.RealDictCursor) as cur:
+                # Get task
+                cur.execute(
+                    """
+                    SELECT id, pharmacy_id, task_type::text, target_level::text,
+                           status::text, assigned_to, priority, due_date,
+                           attempt_count, max_attempts
+                    FROM verification_tasks WHERE id = %s
+                    """,
+                    (task_id,),
+                )
+                task = cur.fetchone()
+
+                if not task:
+                    raise HTTPException(status_code=404, detail="Task not found")
+
+                if task["status"] not in ("assigned", "in_progress"):
+                    raise HTTPException(
+                        status_code=409,
+                        detail=f"Cannot skip — task status is '{task['status']}', expected 'assigned' or 'in_progress'",
+                    )
+
+                if task["assigned_to"] != auth.actor_id and auth.tier != "admin":
+                    raise HTTPException(
+                        status_code=403,
+                        detail="Can only skip your own tasks (or be admin)",
+                    )
+
+                # Mark as skipped
+                result_detail = {
+                    "skip_reason": req.reason,
+                    "skipped_by": auth.actor_id,
+                }
+                cur.execute(
+                    """
+                    UPDATE verification_tasks
+                    SET status = 'skipped'::task_status,
+                        completed_at = now(),
+                        result_detail = %s::jsonb,
+                        updated_at = now(),
+                        updated_by = %s
+                    WHERE id = %s
+                    """,
+                    (json.dumps(result_detail), auth.actor_id, task_id),
+                )
+
+                # Optionally reschedule
+                new_task_id = None
+                if req.reschedule and task["attempt_count"] < task["max_attempts"]:
+                    cur.execute(
+                        """
+                        INSERT INTO verification_tasks
+                            (pharmacy_id, task_type, target_level, priority,
+                             due_date, attempt_count, max_attempts,
+                             notes, created_by, updated_by)
+                        VALUES (%s, %s::task_type, %s::validation_level, %s,
+                                %s::date, %s, %s, %s, %s, %s)
+                        RETURNING id
+                        """,
+                        (
+                            str(task["pharmacy_id"]),
+                            task["task_type"],
+                            task["target_level"],
+                            task["priority"],
+                            str(task["due_date"]) if task["due_date"] else None,
+                            task["attempt_count"] + 1,
+                            task["max_attempts"],
+                            f"Rescheduled from {task_id}: {req.reason}",
+                            auth.actor_id,
+                            auth.actor_id,
+                        ),
+                    )
+                    new_task_id = str(cur.fetchone()["id"])
+
+        return {
+            "success": True,
+            "task_id": task_id,
+            "status": "skipped",
+            "reason": req.reason,
+            "rescheduled": new_task_id is not None,
+            "new_task_id": new_task_id,
+        }
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.exception("Skip task failed")
+        raise HTTPException(status_code=500, detail=str(e))
