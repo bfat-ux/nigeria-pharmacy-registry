@@ -1,79 +1,87 @@
 # Nigeria Pharmacy Registry
 
-A national dispensing-endpoint infrastructure layer for Nigeria's digital medication ecosystem.
+An open registry of pharmacy and medicine vendor locations across Nigeria.
 
-## What This Is
+**Live at [openhealthregistry.org](https://openhealthregistry.org/)**
 
-An open registry of pharmacy and medicine vendor dispensing locations across Nigeria, designed to be:
+## Current Status
 
-- **Continuously ingestible** — new data sources can be added incrementally
-- **Progressively validated** — records climb a trust ladder (L0–L4) as evidence accumulates
-- **Interoperable** — FHIR R4 Location/Organization mappings for health information exchange
-- **Regulator-alignment ready** — schema supports future PCN, NAFDAC, and NHIA data synchronization
+- **6,891 pharmacies** across all 36 states + FCT
+- **Sources**: GRID3 Nigeria, OpenStreetMap, Google Places
+- **First SMS campaign**: 98 messages sent to Ogun State pharmacies (Feb 2026)
+- **347 tests passing**
+- **Stage**: Working prototype — deployed on a Raspberry Pi 5
 
-## What This Is NOT
+## What This Does
 
-- Not a patient data system
-- Not a prescription or dispensing transaction system
-- Not a replacement for official regulator registries — it's a complement designed to eventually sync with them
+1. **Ingests** pharmacy location data from multiple open sources
+2. **Deduplicates** records using fuzzy name matching + geospatial proximity
+3. **Progressively verifies** via SMS contact confirmation (L0 → L1)
+4. **Exposes** a REST API + FHIR R4 endpoints + dashboard
 
 ## Validation Ladder
 
-| Level | Label | How It's Earned |
-|-------|-------|-----------------|
-| L0 | Mapped | Ingested from a data source |
-| L1 | Contact Confirmed | Outbound contact verification |
-| L2 | Evidence Documented | Location + photo evidence |
-| L3 | Regulator/Partner Verified | Official dataset cross-reference |
-| L4 | High-Assurance (Future) | In-person audit or biometric |
+Records start untrusted and earn trust through evidence:
+
+| Level | Label | How Earned | Count |
+|-------|-------|------------|-------|
+| L0 | Mapped | Ingested from data source | ~6,887 |
+| L1 | Contact Confirmed | SMS/phone reply received | ~3 |
+| L2 | Evidence Documented | GPS + photo from field visit | ~1 |
+| L3 | Regulator Verified | PCN/NAFDAC cross-reference | 0 |
+| L4 | High-Assurance | In-person audit (future) | 0 |
 
 ## Quick Start
 
 ### Prerequisites
 
-- [Docker](https://docs.docker.com/get-docker/) (for the database)
+- Docker (for the database) or PostgreSQL 17+ with PostGIS
 - Python 3.10+
 
-### 1. Start the database
+### Setup
 
 ```bash
+# Start the database
 docker compose up -d
-```
 
-This launches PostgreSQL 16 + PostGIS 3.4 and automatically runs all schema
-migrations on first startup. The database is available at `localhost:5432`
-(user: `npr`, password: `npr_local_dev`, database: `npr_registry`).
-
-### 2. Install Python dependencies
-
-```bash
+# Install dependencies
 python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
+
+# Run the API + dashboard
+python serve.py
 ```
 
-### 3. Verify
+The dashboard is at `http://localhost:8000`. The database is at
+`localhost:5432` (user: `npr`, password: `npr_local_dev`, database: `npr_registry`).
+
+### Run Tests
 
 ```bash
-# Check the database is healthy
-docker compose ps
-
-# Connect and inspect
-psql -h localhost -U npr -d npr_registry -c "\dt"
+python -m pytest tests/ -q
 ```
-
-## Project Structure
-
-See `CLAUDE.md` for the full workstream breakdown and execution order.
 
 ## Technology Stack
 
-- PostgreSQL + PostGIS (relational + geospatial)
-- Python (data pipelines, entity resolution)
-- TypeScript (API layer)
-- FHIR R4 (interoperability)
-- OpenAPI 3.1 (API specification)
+| Layer | Technology |
+|-------|-----------|
+| Database | PostgreSQL + PostGIS |
+| API | Python / FastAPI |
+| Entity resolution | Python (rapidfuzz) |
+| SMS | Africa's Talking |
+| Hosting | Raspberry Pi 5 + nginx + Let's Encrypt |
+
+## Documentation
+
+- **[METHODOLOGY.md](METHODOLOGY.md)** — How this was built, what worked, what didn't, lessons learned
+- **[CLAUDE.md](CLAUDE.md)** — Original project plan and coding standards
+
+## What This Is NOT
+
+- Not a patient data system — locations only, no patient or transaction data
+- Not a replacement for PCN/NAFDAC registries — a complement designed to eventually sync with them
 
 ## License
 
-TBD — to be determined based on project governance decisions.
+TBD
