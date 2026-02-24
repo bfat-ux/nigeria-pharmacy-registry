@@ -39,10 +39,18 @@ _AT_INTERMEDIATE = {"Sent", "Buffered", "Submitted"}
 
 
 def _require_at_webhook_secret(request: Request):
-    """Validate X-AT-Webhook-Secret header against AT_WEBHOOK_SECRET env var."""
+    """Validate X-AT-Webhook-Secret header against AT_WEBHOOK_SECRET env var.
+
+    If AT_WEBHOOK_SECRET is not set, webhook auth is bypassed (open mode).
+    This allows Africa's Talking callbacks to work without a proxy that injects
+    the header. Set AT_WEBHOOK_SECRET in production to enforce authentication.
+    """
     secret = os.environ.get("AT_WEBHOOK_SECRET", "")
+    if not secret:
+        # No secret configured — allow all requests (open mode)
+        return
     provided = request.headers.get("X-AT-Webhook-Secret", "")
-    if not secret or provided != secret:
+    if provided != secret:
         raise HTTPException(status_code=401, detail="Invalid or missing AT webhook secret")
 
 

@@ -16,19 +16,31 @@ import pytest
 class TestAtDeliveryWebhook:
     """POST /api/sms/at/delivery — form-encoded AT delivery callbacks."""
 
-    def test_rejects_without_webhook_secret(self, client):
+    def test_allows_without_webhook_secret_configured(self, client):
+        """When AT_WEBHOOK_SECRET is not set, open mode allows all requests."""
         resp = client.post(
             "/api/sms/at/delivery",
-            data={"id": "ATXid_123", "status": "Success"},
+            data={"id": "ATXid_123", "status": "Sent"},
         )
-        assert resp.status_code == 401
+        # Should pass auth (open mode) — Sent is intermediate so 200 with skipped
+        assert resp.status_code == 200
 
     def test_rejects_wrong_webhook_secret(self, client):
-        resp = client.post(
-            "/api/sms/at/delivery",
-            data={"id": "ATXid_123", "status": "Success"},
-            headers={"X-AT-Webhook-Secret": "wrong-secret"},
-        )
+        with patch.dict(os.environ, {"AT_WEBHOOK_SECRET": "real-secret"}):
+            resp = client.post(
+                "/api/sms/at/delivery",
+                data={"id": "ATXid_123", "status": "Success"},
+                headers={"X-AT-Webhook-Secret": "wrong-secret"},
+            )
+        assert resp.status_code == 401
+
+    def test_rejects_missing_secret_when_configured(self, client):
+        """When AT_WEBHOOK_SECRET IS set, missing header should reject."""
+        with patch.dict(os.environ, {"AT_WEBHOOK_SECRET": "real-secret"}):
+            resp = client.post(
+                "/api/sms/at/delivery",
+                data={"id": "ATXid_123", "status": "Success"},
+            )
         assert resp.status_code == 401
 
     def test_skips_intermediate_status_sent(self, client):
@@ -148,19 +160,31 @@ class TestAtDeliveryWebhook:
 class TestAtReplyWebhook:
     """POST /api/sms/at/reply — form-encoded AT inbound SMS callbacks."""
 
-    def test_rejects_without_webhook_secret(self, client):
+    def test_allows_without_webhook_secret_configured(self, client):
+        """When AT_WEBHOOK_SECRET is not set, open mode allows all requests."""
         resp = client.post(
             "/api/sms/at/reply",
             data={"from": "+2348012345678", "text": "YES"},
         )
-        assert resp.status_code == 401
+        # Should pass auth (open mode) — will fail on DB (503), not auth (401)
+        assert resp.status_code != 401
 
     def test_rejects_wrong_webhook_secret(self, client):
-        resp = client.post(
-            "/api/sms/at/reply",
-            data={"from": "+2348012345678", "text": "YES"},
-            headers={"X-AT-Webhook-Secret": "wrong-secret"},
-        )
+        with patch.dict(os.environ, {"AT_WEBHOOK_SECRET": "real-secret"}):
+            resp = client.post(
+                "/api/sms/at/reply",
+                data={"from": "+2348012345678", "text": "YES"},
+                headers={"X-AT-Webhook-Secret": "wrong-secret"},
+            )
+        assert resp.status_code == 401
+
+    def test_rejects_missing_secret_when_configured(self, client):
+        """When AT_WEBHOOK_SECRET IS set, missing header should reject."""
+        with patch.dict(os.environ, {"AT_WEBHOOK_SECRET": "real-secret"}):
+            resp = client.post(
+                "/api/sms/at/reply",
+                data={"from": "+2348012345678", "text": "YES"},
+            )
         assert resp.status_code == 401
 
     def test_returns_503_with_valid_secret_but_no_db(self, client):
