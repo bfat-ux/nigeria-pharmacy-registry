@@ -78,7 +78,7 @@ def normalize_nigerian_phone(phone: str) -> str:
 def api_headers() -> dict:
     """Standard headers for NPR API requests."""
     return {
-        "Authorization": f"Bearer {NPR_API_KEY}",
+        "X-API-Key": NPR_API_KEY,
         "Content-Type": "application/json",
     }
 
@@ -165,12 +165,12 @@ def cmd_send(args: argparse.Namespace):
         print(f"Fetched {len(messages)} pending messages...")
 
         sent_ids = []
-        provider_ids = []
+        provider_ids = {}
 
         for msg in messages:
-            msg_id = msg["id"]
+            msg_id = msg["message_id"]
             phone = normalize_nigerian_phone(msg["phone_number"])
-            text = msg["message_text"]
+            text = msg["outbound_message"]
 
             if args.dry_run:
                 print(f"  [DRY RUN] Would send to {phone}: {text[:60]}...")
@@ -195,7 +195,7 @@ def cmd_send(args: argparse.Namespace):
                     at_cost = recipients[0].get("cost", "")
                     print(f"  Sent to {phone} — AT ID: {provider_msg_id}, Status: {at_status}, Cost: {at_cost}")
                     sent_ids.append(msg_id)
-                    provider_ids.append(provider_msg_id)
+                    provider_ids[msg_id] = provider_msg_id
                 else:
                     print(f"  WARNING: No recipients in AT response for {phone}")
                     total_failed += 1
@@ -208,23 +208,31 @@ def cmd_send(args: argparse.Namespace):
             if delay > 0:
                 time.sleep(delay)
 
+        # In dry-run mode, break after first batch (messages stay pending)
+        if args.dry_run:
+            break
+
+        # If nothing was sent in this batch, stop to avoid infinite loop
+        if not sent_ids:
+            print("  No messages sent in this batch — stopping.")
+            break
+
         # Mark sent messages via API
-        if sent_ids and not args.dry_run:
-            try:
-                result = api_post(
-                    f"/api/sms/campaigns/{campaign_id}/mark-sent",
-                    body={"message_ids": sent_ids, "provider_ids": provider_ids},
-                )
-                marked = result.get("marked_sent", 0)
-                total_sent += marked
-                print(f"  Marked {marked} messages as sent.")
-            except requests.HTTPError as e:
-                print(
-                    f"  WARNING: Failed to mark-sent (messages already dispatched!): {e}",
-                    file=sys.stderr,
-                )
-                # Don't re-send — messages are already out
-                total_sent += len(sent_ids)
+        try:
+            result = api_post(
+                f"/api/sms/campaigns/{campaign_id}/mark-sent",
+                body={"message_ids": sent_ids, "provider_ids": provider_ids},
+            )
+            marked = result.get("updated", 0)
+            total_sent += marked
+            print(f"  Marked {marked} messages as sent.")
+        except requests.HTTPError as e:
+            print(
+                f"  WARNING: Failed to mark-sent (messages already dispatched!): {e}",
+                file=sys.stderr,
+            )
+            # Don't re-send — messages are already out
+            total_sent += len(sent_ids)
 
     print()
     print(f"Summary: {total_sent} sent, {total_failed} failed, {total_skipped} skipped")
