@@ -181,6 +181,7 @@ def cmd_send(args: argparse.Namespace):
                 send_kwargs = {
                     "message": text,
                     "recipients": [phone],
+                    "enqueue": True,
                 }
                 if AT_SENDER_ID:
                     send_kwargs["sender_id"] = AT_SENDER_ID
