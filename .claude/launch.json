@@ -3,7 +3,7 @@
   "configurations": [
     {
       "name": "dashboard",
-      "runtimeExecutable": "python3",
+      "runtimeExecutable": "python3.13",
       "runtimeArgs": ["serve.py"],
       "port": 8000
     }
