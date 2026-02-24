@@ -24,7 +24,7 @@ from . import db
 from .auth import auth_middleware
 from .helpers import ROOT, load_all_canonical
 from .rate_limiter import rate_limit_middleware
-from .routes import audit, export, fhir, health, pharmacies, queue, verification
+from .routes import audit, export, fhir, health, pharmacies, queue, regulator, verification
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 logger = logging.getLogger(__name__)
@@ -66,6 +66,7 @@ app.include_router(queue.router)
 app.include_router(audit.router)
 app.include_router(fhir.router)
 app.include_router(export.router)
+app.include_router(regulator.router)
 
 # ---------------------------------------------------------------------------
 # Startup / Shutdown
@@ -82,6 +83,7 @@ async def startup():
         logger.info("Running in DATABASE mode")
         _ensure_api_keys_table()
         _ensure_verification_tasks_table()
+        _ensure_regulator_staging_tables()
     else:
         logger.info("Running in JSON FALLBACK mode")
 
@@ -142,3 +144,27 @@ def _ensure_verification_tasks_table():
             logger.warning("006_verification_tasks.sql not found at %s", sql_path)
     except Exception as e:
         logger.warning("Could not ensure verification_tasks table: %s", e)
+
+
+def _ensure_regulator_staging_tables():
+    """Run 007_regulator_staging.sql if the tables don't exist yet."""
+    try:
+        with db.get_conn() as conn:
+            with conn.cursor() as cur:
+                cur.execute(
+                    "SELECT EXISTS (SELECT FROM information_schema.tables WHERE table_name = 'regulator_sync_batches')"
+                )
+                exists = cur.fetchone()[0]
+                if exists:
+                    return
+
+        sql_path = ROOT / "agent-01-data-architecture" / "sql" / "007_regulator_staging.sql"
+        if sql_path.exists():
+            with db.get_conn() as conn:
+                with conn.cursor() as cur:
+                    cur.execute(sql_path.read_text())
+            logger.info("Applied 007_regulator_staging.sql migration")
+        else:
+            logger.warning("007_regulator_staging.sql not found at %s", sql_path)
+    except Exception as e:
+        logger.warning("Could not ensure regulator_staging tables: %s", e)

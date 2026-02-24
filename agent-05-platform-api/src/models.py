@@ -72,3 +72,64 @@ class TaskSkipRequest(BaseModel):
         False,
         description="If true, create a new task with attempt_count+1",
     )
+
+
+class ReverificationGenerateRequest(BaseModel):
+    target_level: str | None = Field(
+        None,
+        description="Level to check for reverification (e.g. L1_contact_confirmed). Omit to scan all levels.",
+    )
+    include_expiring_soon: bool = Field(
+        False,
+        description="Include pharmacies expiring within the grace period",
+    )
+
+
+class DowngradeRequest(BaseModel):
+    reason: str = Field(
+        ...,
+        description="Reason for the downgrade",
+    )
+    actor_id: str = Field(
+        "system",
+        description="Actor performing the downgrade",
+    )
+
+
+class RegulatorUploadRequest(BaseModel):
+    regulator_source: str = Field(
+        ...,
+        description="Regulator source: 'pcn', 'nhia', or 'nafdac'",
+    )
+    extract_date: str | None = Field(
+        None,
+        description="Date when the regulator generated the data (YYYY-MM-DD)",
+    )
+    max_records: int = Field(
+        5000,
+        ge=1,
+        le=25000,
+        description="Maximum records to process in this batch",
+    )
+
+
+class RegulatorReviewRequest(BaseModel):
+    action: str = Field(
+        ...,
+        description="Review action: 'approve' or 'reject'",
+    )
+    matched_pharmacy_id: str | None = Field(
+        None,
+        description="Override pharmacy ID for manual matching (optional)",
+    )
+    notes: str | None = Field(
+        None,
+        description="Reviewer notes",
+    )
+
+
+class RegulatorBatchApproveRequest(BaseModel):
+    dry_run: bool = Field(
+        False,
+        description="If true, calculate what would happen without executing promotions",
+    )

@@ -16,6 +16,7 @@ requests>=2.31,<3
 # Dashboard API
 fastapi>=0.109,<1
 uvicorn>=0.27,<1
+python-multipart>=0.0.7,<1
 
 # Database driver (PostgreSQL)
 psycopg2-binary>=2.9,<3

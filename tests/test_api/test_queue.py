@@ -80,3 +80,35 @@ class TestQueueSkip:
             json={"reason": "Cannot reach pharmacy"},
         )
         assert resp.status_code == 401
+
+
+class TestQueueGenerateReverification:
+    """POST /api/queue/generate-reverification — requires admin + DB."""
+
+    def test_requires_auth(self, client):
+        resp = client.post("/api/queue/generate-reverification", json={})
+        assert resp.status_code == 401
+
+    def test_requires_admin(self, read_client):
+        resp = read_client.post("/api/queue/generate-reverification", json={})
+        assert resp.status_code == 403
+
+    def test_returns_503_without_db(self, admin_client):
+        resp = admin_client.post("/api/queue/generate-reverification", json={})
+        assert resp.status_code == 503
+
+
+class TestProcessDowngrades:
+    """POST /api/queue/process-downgrades — requires admin + DB."""
+
+    def test_requires_auth(self, client):
+        resp = client.post("/api/queue/process-downgrades")
+        assert resp.status_code == 401
+
+    def test_requires_admin(self, read_client):
+        resp = read_client.post("/api/queue/process-downgrades")
+        assert resp.status_code == 403
+
+    def test_returns_503_without_db(self, admin_client):
+        resp = admin_client.post("/api/queue/process-downgrades")
+        assert resp.status_code == 503

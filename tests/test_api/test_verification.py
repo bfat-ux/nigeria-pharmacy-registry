@@ -93,3 +93,118 @@ class TestValidationLadderRules:
         assert level_label("L4_high_assurance") == "High Assurance"
         assert level_label(None) == "Unknown"
         assert level_label("bogus") == "bogus"
+
+
+class TestReverificationConstants:
+    """Unit tests for re-verification interval and threshold constants."""
+
+    def test_intervals_match_schedule(self):
+        from agent_05_platform_api.src.helpers import REVERIFICATION_INTERVALS
+
+        assert REVERIFICATION_INTERVALS["L1_contact_confirmed"] == 365
+        assert REVERIFICATION_INTERVALS["L2_evidence_documented"] == 548
+        assert REVERIFICATION_INTERVALS["L3_regulator_verified"] == 90
+
+    def test_grace_period(self):
+        from agent_05_platform_api.src.helpers import GRACE_PERIOD_DAYS
+
+        assert GRACE_PERIOD_DAYS == 30
+
+    def test_crossref_thresholds(self):
+        from agent_05_platform_api.src.helpers import (
+            CROSSREF_AUTO_APPROVE_THRESHOLD,
+            CROSSREF_MANUAL_REVIEW_THRESHOLD,
+        )
+
+        assert CROSSREF_AUTO_APPROVE_THRESHOLD == 0.90
+        assert CROSSREF_MANUAL_REVIEW_THRESHOLD == 0.70
+        assert CROSSREF_MANUAL_REVIEW_THRESHOLD < CROSSREF_AUTO_APPROVE_THRESHOLD
+
+
+class TestExpiryReport:
+    """GET /api/validation/expiry-report — requires registry_read + DB."""
+
+    def test_requires_auth(self, client):
+        resp = client.get("/api/validation/expiry-report")
+        assert resp.status_code == 401
+
+    def test_returns_503_without_db(self, read_client):
+        resp = read_client.get("/api/validation/expiry-report")
+        assert resp.status_code == 503
+
+
+class TestDowngradeEndpoint:
+    """POST /api/pharmacies/{id}/downgrade — requires admin + DB."""
+
+    def test_requires_auth(self, client):
+        resp = client.post(
+            "/api/pharmacies/aaaaaaaa-0001-0001-0001-000000000001/downgrade",
+            json={"reason": "Re-verification expired"},
+        )
+        assert resp.status_code == 401
+
+    def test_requires_admin(self, read_client):
+        resp = read_client.post(
+            "/api/pharmacies/aaaaaaaa-0001-0001-0001-000000000001/downgrade",
+            json={"reason": "Re-verification expired"},
+        )
+        assert resp.status_code == 403
+
+    def test_returns_503_without_db(self, admin_client):
+        resp = admin_client.post(
+            "/api/pharmacies/aaaaaaaa-0001-0001-0001-000000000001/downgrade",
+            json={"reason": "Re-verification expired"},
+        )
+        assert resp.status_code == 503
+
+
+class TestDowngradeMap:
+    """Unit tests for the downgrade map constants."""
+
+    def test_covers_l1_through_l3(self):
+        from agent_05_platform_api.src.helpers import DOWNGRADE_MAP
+
+        assert DOWNGRADE_MAP["L1_contact_confirmed"] == "L0_mapped"
+        assert DOWNGRADE_MAP["L2_evidence_documented"] == "L1_contact_confirmed"
+        assert DOWNGRADE_MAP["L3_regulator_verified"] == "L2_evidence_documented"
+
+    def test_l0_not_downgradable(self):
+        from agent_05_platform_api.src.helpers import DOWNGRADE_MAP
+
+        assert "L0_mapped" not in DOWNGRADE_MAP
+
+    def test_l4_not_downgradable(self):
+        from agent_05_platform_api.src.helpers import DOWNGRADE_MAP
+
+        # L4 is not in the map — no automatic downgrade for high-assurance
+        assert "L4_high_assurance" not in DOWNGRADE_MAP
+
+
+class TestValidationProgress:
+    """GET /api/validation/progress — public, works in JSON fallback mode."""
+
+    def test_returns_200(self, client):
+        resp = client.get("/api/validation/progress")
+        assert resp.status_code == 200
+
+    def test_json_fallback_shape(self, client):
+        data = client.get("/api/validation/progress").json()
+        assert data["mode"] == "json_fallback"
+        assert data["total_pharmacies"] == 5
+        assert "by_level" in data
+        assert "verified_above_L0" in data
+        assert "verified_percentage" in data
+
+    def test_counts_match_sample_data(self, client):
+        data = client.get("/api/validation/progress").json()
+        # 5 sample pharmacies: 4 at L0, 1 at L1
+        assert data["by_level"].get("L0_mapped") == 4
+        assert data["by_level"].get("L1_contact_confirmed") == 1
+        assert data["verified_above_L0"] == 1
+        assert data["verified_percentage"] == 20.0
+
+    def test_recent_activity_null_in_json_mode(self, client):
+        data = client.get("/api/validation/progress").json()
+        # JSON fallback doesn't have history data
+        assert data["recent_activity"] is None
+        assert data["pending_tasks"] is None

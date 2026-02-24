@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import logging
+from datetime import datetime, timedelta, timezone
 from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
@@ -12,13 +13,21 @@ from .. import db
 from ..auth import ANONYMOUS, AuthContext, require_tier
 from ..db import extras
 from ..helpers import (
+    DOWNGRADE_MAP,
+    GRACE_PERIOD_DAYS,
     LEVEL_INDEX,
+    REVERIFICATION_INTERVALS,
     VALIDATION_LEVELS,
     iso,
     level_label,
 )
-from ..models import TaskGenerateRequest, TaskSkipRequest, VerifyRequest
-from .verification import execute_verification
+from ..models import (
+    ReverificationGenerateRequest,
+    TaskGenerateRequest,
+    TaskSkipRequest,
+    VerifyRequest,
+)
+from .verification import execute_downgrade, execute_verification
 
 logger = logging.getLogger(__name__)
 
@@ -30,6 +39,13 @@ _TASK_TYPE_MAP = {
     "L2_evidence_documented": "verify_L2",
     "L3_regulator_verified": "verify_L3",
     "L4_high_assurance": "verify_L4",
+}
+
+# Map level → reverify task_type
+_REVERIFY_TASK_TYPE_MAP = {
+    "L1_contact_confirmed": "reverify_L1",
+    "L2_evidence_documented": "reverify_L2",
+    "L3_regulator_verified": "reverify_L3",
 }
 
 
@@ -687,3 +703,178 @@ async def skip_task(request: Request, task_id: str, req: TaskSkipRequest):
     except Exception as e:
         logger.exception("Skip task failed")
         raise HTTPException(status_code=500, detail=str(e))
+
+
+# ---------------------------------------------------------------------------
+# Re-verification task generation
+# ---------------------------------------------------------------------------
+
+
+@router.post(
+    "/api/queue/generate-reverification",
+    dependencies=[Depends(require_tier("admin"))],
+)
+async def generate_reverification_tasks(request: Request, req: ReverificationGenerateRequest):
+    """Scan for pharmacies needing re-verification and generate tasks. Requires: admin."""
+    if not db.is_available():
+        raise HTTPException(status_code=503, detail="Database unavailable")
+
+    auth: AuthContext = getattr(request.state, "auth", ANONYMOUS)
+    now = datetime.now(timezone.utc)
+
+    # Determine which levels to scan
+    levels_to_scan = REVERIFICATION_INTERVALS.keys()
+    if req.target_level:
+        if req.target_level not in REVERIFICATION_INTERVALS:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Invalid target_level '{req.target_level}'. "
+                f"Valid: {list(REVERIFICATION_INTERVALS.keys())}",
+            )
+        levels_to_scan = [req.target_level]
+
+    tasks_created = 0
+    already_active = 0
+    scanned = 0
+
+    try:
+        with db.get_conn() as conn:
+            with conn.cursor(cursor_factory=extras.RealDictCursor) as cur:
+                for level in levels_to_scan:
+                    interval_days = REVERIFICATION_INTERVALS[level]
+                    task_type = _REVERIFY_TASK_TYPE_MAP.get(level)
+                    if not task_type:
+                        continue
+
+                    # Find pharmacies at this level whose last verification is expired
+                    # (or expiring soon if requested)
+                    if req.include_expiring_soon:
+                        cutoff = now - timedelta(days=interval_days)
+                    else:
+                        cutoff = now - timedelta(days=interval_days + GRACE_PERIOD_DAYS)
+
+                    cur.execute(
+                        """
+                        SELECT pl.id AS pharmacy_id
+                        FROM pharmacy_locations pl
+                        WHERE pl.current_validation_level = %s::validation_level
+                          AND NOT EXISTS (
+                              SELECT 1 FROM validation_status_history vsh
+                              WHERE vsh.pharmacy_id = pl.id
+                                AND vsh.new_level = %s::validation_level
+                                AND vsh.changed_at > %s
+                          )
+                          AND NOT EXISTS (
+                              SELECT 1 FROM verification_tasks vt
+                              WHERE vt.pharmacy_id = pl.id
+                                AND vt.task_type = %s::task_type
+                                AND vt.status IN ('pending', 'assigned')
+                          )
+                        """,
+                        (level, level, cutoff, task_type),
+                    )
+                    candidates = cur.fetchall()
+                    scanned += len(candidates)
+
+                    for row in candidates:
+                        cur.execute(
+                            """
+                            INSERT INTO verification_tasks
+                                (pharmacy_id, task_type, target_level, status, priority, created_by)
+                            VALUES (%s, %s::task_type, %s::validation_level, 'pending'::task_status, 3, %s)
+                            ON CONFLICT DO NOTHING
+                            RETURNING id
+                            """,
+                            (row["pharmacy_id"], task_type, level, auth.actor_id),
+                        )
+                        result = cur.fetchone()
+                        if result:
+                            tasks_created += 1
+                        else:
+                            already_active += 1
+
+        return {
+            "success": True,
+            "tasks_created": tasks_created,
+            "already_active": already_active,
+            "scanned": scanned,
+            "levels_scanned": list(levels_to_scan),
+        }
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.exception("Generate reverification tasks failed")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# ---------------------------------------------------------------------------
+# Bulk downgrade processing
+# ---------------------------------------------------------------------------
+
+
+@router.post(
+    "/api/queue/process-downgrades",
+    dependencies=[Depends(require_tier("admin"))],
+)
+async def process_downgrades(request: Request):
+    """Scan for pharmacies past expiry + grace period and downgrade them. Requires: admin."""
+    if not db.is_available():
+        raise HTTPException(status_code=503, detail="Database unavailable")
+
+    now = datetime.now(timezone.utc)
+    downgraded = 0
+    skipped = 0
+    errors = 0
+    all_candidates: list[str] = []
+    try:
+        with db.get_conn() as conn:
+            with conn.cursor(cursor_factory=extras.RealDictCursor) as cur:
+                for level, interval_days in REVERIFICATION_INTERVALS.items():
+                    if level not in DOWNGRADE_MAP:
+                        continue
+                    cutoff = now - timedelta(days=interval_days + GRACE_PERIOD_DAYS)
+                    cur.execute(
+                        """
+                        SELECT pl.id AS pharmacy_id
+                        FROM pharmacy_locations pl
+                        WHERE pl.current_validation_level = %s::validation_level
+                          AND NOT EXISTS (
+                              SELECT 1 FROM validation_status_history vsh
+                              WHERE vsh.pharmacy_id = pl.id
+                                AND vsh.new_level = %s::validation_level
+                                AND vsh.changed_at > %s
+                          )
+                        """,
+                        (level, level, cutoff),
+                    )
+                    for row in cur.fetchall():
+                        all_candidates.append(str(row["pharmacy_id"]))
+
+        for pid in all_candidates:
+            try:
+                execute_downgrade(pid, "Re-verification expired", "system")
+                downgraded += 1
+            except HTTPException as he:
+                if he.status_code == 400:
+                    skipped += 1
+                else:
+                    errors += 1
+                    logger.warning("Downgrade failed for %s: %s", pid, he.detail)
+            except Exception:
+                errors += 1
+                logger.exception("Downgrade failed for %s", pid)
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.exception("Process downgrades failed")
+        raise HTTPException(status_code=500, detail=str(e))
+
+    return {
+        "success": True,
+        "downgraded": downgraded,
+        "skipped": skipped,
+        "errors": errors,
+        "candidates_found": len(all_candidates),
+    }

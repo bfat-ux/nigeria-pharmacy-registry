@@ -106,6 +106,25 @@ REQUIRED_EVIDENCE = {
     "L4_high_assurance": "in_person_audit",
 }
 
+# Regulator crossref match-score thresholds (from SOP)
+CROSSREF_AUTO_APPROVE_THRESHOLD = 0.90
+CROSSREF_MANUAL_REVIEW_THRESHOLD = 0.70
+
+# Re-verification intervals (days) — from verification_sop.md / reverification_schedule.md
+REVERIFICATION_INTERVALS = {
+    "L1_contact_confirmed": 365,   # 12 months
+    "L2_evidence_documented": 548,  # 18 months
+    "L3_regulator_verified": 90,    # quarterly
+}
+GRACE_PERIOD_DAYS = 30
+
+# Downgrade map: current_level → target_level after lapse
+DOWNGRADE_MAP = {
+    "L1_contact_confirmed": "L0_mapped",
+    "L2_evidence_documented": "L1_contact_confirmed",
+    "L3_regulator_verified": "L2_evidence_documented",
+}
+
 # ---------------------------------------------------------------------------
 # Formatting helpers
 # ---------------------------------------------------------------------------
