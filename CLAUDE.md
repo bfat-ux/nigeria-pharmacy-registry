@@ -19,10 +19,40 @@ and regulator-alignment ready.
 | Level | Label                    | Meaning                                              |
 |-------|--------------------------|------------------------------------------------------|
 | L0    | Mapped                   | Record exists from an ingested data source           |
-| L1    | Contact Confirmed        | Phone/email contact verified (outbound call/message) |
+| L1    | Contact Confirmed        | Phone/email contact verified (outbound call, SMS campaign, or message) |
 | L2    | Evidence Documented      | Location confirmation + optional storefront photo    |
 | L3    | Regulator/Partner Verified | Cross-referenced with official or partner dataset  |
 | L4    | High-Assurance (Future)  | Biometric check-in or in-person audit                |
+
+## Verification Strategy
+
+### L1 — SMS-First Contact Confirmation
+
+Primary verification method is automated bulk SMS campaigns. An SMS is sent to
+each pharmacy's registered phone number asking whether the facility is currently
+operating. A valid reply (YES/NO/MOVED/CLOSED) from the registered number
+constitutes contact confirmation — the phone answered, someone acknowledged.
+
+- **SMS flow:** outbound message → reply parsed → auto-promote to L1
+- **Retry policy:** up to 3 attempts, 48h between attempts
+- **No reply = stays L0** until the next campaign cycle
+- **Gateway-agnostic:** the system provides an outbox + webhook endpoints;
+  any SMS provider (Africa's Talking, Twilio, bulk SMS tool) can plug in
+- **All valid replies promote:** even "CLOSED" or "MOVED" confirms the contact
+  works. The operating status is captured in evidence for downstream use.
+
+### L2 — Field Evidence Collection
+
+GPS coordinates + storefront photo via site visit. Requires L1 first.
+
+### L3 — Regulator Cross-Reference
+
+Batch CSV upload from PCN/NHIA/NAFDAC → composite scoring → auto-match at ≥0.90,
+manual review at 0.70–0.90. Administered via admin-only API endpoints.
+
+### L4 — High-Assurance (Future)
+
+Biometric check-in or in-person audit. Schema exists; workflow not yet implemented.
 
 ## Project Structure
 
@@ -36,7 +66,11 @@ nigeria-pharmacy-registry/
 │   │   ├── 001_core_schema.sql
 │   │   ├── 002_status_history.sql
 │   │   ├── 003_provenance_audit.sql
-│   │   └── 004_geospatial.sql
+│   │   ├── 004_geospatial.sql
+│   │   ├── 005_api_keys.sql
+│   │   ├── 006_verification_tasks.sql
+│   │   ├── 007_regulator_staging.sql
+│   │   └── 008_sms_campaigns.sql
 │   ├── fhir/                          # FHIR mapping specs
 │   │   ├── location_mapping.json
 │   │   └── organization_mapping.json

@@ -21,6 +21,9 @@ python-multipart>=0.0.7,<1
 # Database driver (PostgreSQL)
 psycopg2-binary>=2.9,<3
 
+# SMS gateway (Africa's Talking)
+africastalking>=1.2,<2
+
 # API key hashing
 bcrypt>=4.0,<5
 

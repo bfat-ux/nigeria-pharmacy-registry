@@ -133,3 +133,79 @@ class RegulatorBatchApproveRequest(BaseModel):
         False,
         description="If true, calculate what would happen without executing promotions",
     )
+
+
+# ---------------------------------------------------------------------------
+# SMS Campaign models
+# ---------------------------------------------------------------------------
+
+
+class SmsCampaignCreateRequest(BaseModel):
+    campaign_name: str = Field(
+        ...,
+        description="Human-readable campaign name",
+        max_length=255,
+    )
+    description: str | None = Field(
+        None,
+        description="Campaign description / purpose",
+    )
+    message_template: str | None = Field(
+        None,
+        description="SMS template with {pharmacy_name}, {address}, {msg_id_short} placeholders. "
+        "Uses default if not provided.",
+    )
+    max_attempts: int = Field(
+        3,
+        ge=1,
+        le=5,
+        description="Maximum send attempts per pharmacy",
+    )
+    retry_interval_hours: int = Field(
+        48,
+        ge=12,
+        le=168,
+        description="Hours between retry attempts",
+    )
+    filters: dict | None = Field(
+        None,
+        description="Target filters: {state, lga, facility_type}",
+    )
+
+
+class SmsDeliveryWebhook(BaseModel):
+    provider_message_id: str = Field(
+        ...,
+        description="SMS provider's message ID",
+    )
+    status: str = Field(
+        ...,
+        description="Delivery status from provider: 'delivered', 'failed', 'rejected'",
+    )
+    failure_reason: str | None = Field(
+        None,
+        description="Reason for delivery failure (if applicable)",
+    )
+    timestamp: str | None = Field(
+        None,
+        description="ISO 8601 timestamp from provider",
+    )
+
+
+class SmsReplyWebhook(BaseModel):
+    from_number: str = Field(
+        ...,
+        description="Phone number that sent the reply (E.164 format)",
+    )
+    message_text: str = Field(
+        ...,
+        description="Raw text of the inbound SMS",
+    )
+    provider_message_id: str | None = Field(
+        None,
+        description="Provider's ID for this inbound message",
+    )
+    timestamp: str | None = Field(
+        None,
+        description="ISO 8601 timestamp of when the reply was received",
+    )
